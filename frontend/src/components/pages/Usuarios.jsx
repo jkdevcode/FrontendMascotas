@@ -16,10 +16,10 @@ import {
     Pagination,
 } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
-import { PlusIcon } from "./../nextUI/PlusIcon.jsx";
-import { SearchIcon } from "./../nextUI/SearchIcon.jsx";
-import { EditIcon } from "../nextUI/EditIcon";
-import { DeleteIcon } from "../nextUI/DeleteIcon";
+import { PlusIcon } from "../nextUI/PlusIcon.jsx";
+import { SearchIcon } from "../nextUI/SearchIcon.jsx";
+import { EditIcon } from "../nextUI/EditIcon.jsx";
+import { DeleteIcon } from "../nextUI/DeleteIcon.jsx";
 import Header from '../moleculas/Header.jsx';
 
 function Usuarios() {
