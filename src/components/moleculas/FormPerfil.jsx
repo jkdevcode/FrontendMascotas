@@ -11,18 +11,18 @@ const FormPerfil = () => {
   const [apellidos, setApellidos] = useState('');
   const [correo, setCorreo] = useState('');
 
-  const [identificacion, setIdentificacion] = useState('');
+  const [id_usuario, setIdUsuario] = useState('');
 
   useEffect(() => {
     const obtenerDatos = async () => {
       try {
         const token = localStorage.getItem('token');
-        const getURL = 'http://localhost:3000/usuario/perfil';
+        const getURL = 'http://localhost:3000/usuarios/listar';
         const response = await axiosClient.get(getURL, { headers: { Authorization: `Bearer ${token}` } });
         console.log('Datos obtenidos:', response.data);
         setPerfil(response.data.data);
         setNombres(response.data.data.nombres);
-        setIdentificacion(response.data.data.identificacion); // Asegúrate de que sea identificacion
+        setIdUsuario(response.data.data.id_usuario); // Asegúrate de que sea identificacion
         setApellidos(response.data.data.apellidos);
         setCorreo(response.data.data.correo);
       } catch (error) {
@@ -42,7 +42,7 @@ const FormPerfil = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axiosClient.put(
-        `http://localhost:3000/usuario/perfilactualizar/${identificacion}`,
+        `http://localhost:3000/usuarios/actualizar/${id_usuario}`,
         { nombres, apellidos, correo },
         { headers: { Authorization: `Bearer ${token}` } }
       );
