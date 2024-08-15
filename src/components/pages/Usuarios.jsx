@@ -20,6 +20,7 @@ import { PlusIcon } from "./../nextUI/PlusIcon.jsx";
 import { SearchIcon } from "./../nextUI/SearchIcon.jsx";
 import { EditIcon } from "../nextUI/EditIcon";
 import { DeleteIcon } from "../nextUI/DeleteIcon";
+import Header from '../moleculas/Header.jsx';
 
 function Usuarios() {
 
@@ -41,11 +42,11 @@ function Usuarios() {
             if (hasSearchFilter) {
                 filteredusuarios = filteredusuarios.filter(usuario =>
                     (String(usuario.documento_identidad).toLowerCase().includes(filterValue.toLowerCase()) ||
-                    usuario.nombre.toLowerCase().includes(filterValue.toLowerCase()) ||
-                    usuario.apellido.toLowerCase().includes(filterValue.toLowerCase()) ||
-                    usuario.correo.toLowerCase().includes(filterValue.toLowerCase()) ||
-                    usuario.password.toLowerCase().includes(filterValue.toLowerCase()) ||
-                    usuario.rol.toLowerCase().includes(filterValue.toLowerCase())) &&
+                        usuario.nombre.toLowerCase().includes(filterValue.toLowerCase()) ||
+                        usuario.apellido.toLowerCase().includes(filterValue.toLowerCase()) ||
+                        usuario.correo.toLowerCase().includes(filterValue.toLowerCase()) ||
+                        usuario.password.toLowerCase().includes(filterValue.toLowerCase()) ||
+                        usuario.rol.toLowerCase().includes(filterValue.toLowerCase())) &&
                     usuario.rol !== "superusuario"
                 );
             } else {
@@ -84,13 +85,17 @@ function Usuarios() {
                         : 'path/to/default-image.jpg'; // Fallback in case there's no image
 
                     return (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-4">
                             <img
                                 src={imageUrl}
                                 alt={`${usuario.nombre} ${usuario.apellido}`}
                                 className="w-10 h-10 object-cover rounded-lg"
                             />
-                            <span>{usuario.nombre}</span>
+                            <div className="">
+                                <span>{usuario.nombre}</span>
+                                <span>{usuario.apellido}</span><br />
+                                <span>{usuario.correo}</span>
+                            </div>
                         </div>
                     );
                 case "actions":
@@ -298,16 +303,6 @@ function Usuarios() {
             sortable: true
         },
         {
-            uid: 'apellido',
-            name: 'Apellido',
-            sortable: true
-        },
-        {
-            uid: 'correo',
-            name: 'Correo',
-            sortable: true
-        },
-        {
             uid: 'telefono',
             name: 'Telefono ',
             sortable: true
@@ -416,6 +411,7 @@ function Usuarios() {
     return (
 
         <>
+        <Header />
             <div className='w-full max-w-[90%] ml-24 items-center p-10'>
                 <AccionesModal
                     isOpen={modalAcciones}

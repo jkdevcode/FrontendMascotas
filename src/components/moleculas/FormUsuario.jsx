@@ -8,26 +8,24 @@ import { CameraIcon } from '../nextUI/CameraIcon.jsx';
 import axiosClient from '../axiosClient.js';
 
 const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
-
     const [rol, setRol] = useState([]);
     const [tipo_documento, setTipoDocumento] = useState([]);
 
-    // useState se usa para gestionar el estado de los campos del formulario.
+    // useState para gestionar el estado de los campos del formulario.
     const [tipoDocumentoOp, setTipoDocumentoOp] = useState('');
-    const [rolOp, setRolOp] = useState('')
+    const [rolOp, setRolOp] = useState('');
     const [documento_identidad, setDocumentoIdentidad] = useState('');
     const [nombre, setNombre] = useState('');
     const [apellido, setApellido] = useState('');
     const [direccion, setDireccion] = useState('');
     const [correo, setCorreo] = useState('');
     const [telefono, setTelefono] = useState('');
-    const [password, setPassword] = useState('');;
-    // Estado para la imagen
+    const [password, setPassword] = useState('');
+    const [passwordDisplay, setPasswordDisplay] = useState('****'); // Para mostrar solo 4 asteriscos
     const [foto, setFoto] = useState(null);
-    const [fotoUrl, setFotoUrl] = useState(''); // URL de la imagen para mostrar
+    const [fotoUrl, setFotoUrl] = useState('');
     const fileInputRef = useRef(null);
 
-    // useContext se usa para acceder al contexto del usuario.
     const { idUsuario } = useContext(UsuarioContext);
 
     useEffect(() => {
@@ -48,7 +46,6 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
         setRol(enumDataRol);
     }, []);
 
-    // useEffect: Se utiliza para inicializar el formulario con los datos del usuario si el modo es 'update' y hay un usuario seleccionado. Si el modo es 'create', se inicializan los campos en blanco.
     useEffect(() => {
         if (mode === 'update' && idUsuario) {
             setTipoDocumentoOp(idUsuario.tipo_documento || '');
@@ -58,7 +55,8 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
             setDireccion(idUsuario.direccion || '');
             setCorreo(idUsuario.correo || '');
             setTelefono(idUsuario.telefono || '');
-            setPassword(idUsuario.password || '');
+            setPassword(''); // La contraseña en sí no se muestra
+            setPasswordDisplay('****'); // Mostrar solo 4 asteriscos
             setRolOp(idUsuario.rol || '');
             setFotoUrl(idUsuario.img ? `${axiosClient.defaults.baseURL}/uploads/${idUsuario.img}` : '');
         } else {
@@ -70,13 +68,13 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
             setCorreo('');
             setTelefono('');
             setPassword('');
+            setPasswordDisplay('');
             setRolOp('');
-            setFotoUrl(''); // Limpiar URL de imagen
+            setFotoUrl('');
             setFoto(null);
         }
     }, [mode, idUsuario]);
 
-    // handleFormSubmit: Se encarga de manejar el envío del formulario. Recolecta los datos del formulario y los pasa a la función handleSubmit.
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -88,7 +86,7 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
             formData.append('direccion', direccion);
             formData.append('correo', correo);
             formData.append('telefono', telefono);
-            formData.append('password', password);
+            formData.append('password', password); // Enviar la contraseña real
             formData.append('rol', rolOp);
 
             if (foto) {
@@ -101,11 +99,16 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
         }
     };
 
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value); // Actualizar la contraseña real
+        setPasswordDisplay(e.target.value); // Actualizar lo que se muestra en el campo
+    };
+
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         setFoto(file);
         if (file) {
-            setFotoUrl(URL.createObjectURL(file)); // Actualizar la vista previa de la imagen
+            setFotoUrl(URL.createObjectURL(file));
         }
     };
 
@@ -113,18 +116,8 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
         fileInputRef.current.click();
     };
 
-     // Función para mostrar los primeros cuatro dígitos
-     const displayPassword = () => {
-        if (password.length <= 4) {
-            return password;
-        }
-        return password.slice(0, 4) + '*'.repeat(password.length - 4);
-    };
-
-    // isVisible controla si la contraseña es visible o no.
     const [isVisible, setIsVisible] = useState(false);
 
-    // toggleVisibility cambia el estado de visibilidad de la contraseña.
     const toggleVisibility = () => setIsVisible(!isVisible);
 
     return (
@@ -241,29 +234,29 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             required
                         />
                     </div>
-                        <div className='py-2'>
-                            <Input
-                                label="Contraseña"
-                                name="password"
-                                color='warning'
-                                variant="bordered"
-                                id="password"
-                                endContent={
-                                    <button type="button" onClick={toggleVisibility}>
-                                        {isVisible ? (
-                                            <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none mb-2" />
-                                        ) : (
-                                            <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                                        )}
-                                    </button>
-                                }
-                                type={isVisible ? "text" : "password"}
-                                className="w-full"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </div>
+                    <div className='py-2'>
+                        <Input
+                            label="Contraseña"
+                            name="password"
+                            color='warning'
+                            variant="bordered"
+                            id="password"
+                            endContent={
+                                <button type="button" onClick={toggleVisibility}>
+                                    {isVisible ? (
+                                        <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none mb-2" />
+                                    ) : (
+                                        <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                    )}
+                                </button>
+                            }
+                            type={isVisible ? "text" : "password"}
+                            className="w-full"
+                            value={passwordDisplay}
+                            onChange={handlePasswordChange}
+                            required
+                        />
+                    </div>
                     <div className='py-2'>
                         <Input
                             color='warning'

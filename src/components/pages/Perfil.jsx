@@ -28,7 +28,7 @@ const PerfilUsuario = () => {
   const ObtenerDatos = async () => {
     try {
       const token = localStorage.getItem("token");
-      const getURL = "http://localhost:3000/usuario/perfil";
+      const getURL = "http://localhost:3000/usuarios/listar";
       const response = await axiosClient.get(getURL, { headers: { token: token } });
       console.log(response.data);
       setPerfil(response.data.data);

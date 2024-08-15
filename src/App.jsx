@@ -38,6 +38,12 @@ function App() {
               <>
                 <Route path="/usuarios" element={<Usuarios />} />
                 <Route path="/mascotas" element={<Mascotas />} />
+                {/* Vista de vacunas */}
+                {/* Vista de Categorias */}
+                {/* Vista de Razas */}
+                {/* Vista de PDF */}
+                {/* Vista de cambio de rol */}
+                {/* Vista de departamento y municipios */}
                 <Route path="/notificaciones" element={<Notificaciones />} />
                 <Route path="/graficas" element={<Graficas />} />
               </>
@@ -46,6 +52,7 @@ function App() {
               <>
                 <Route path="/mascotas" element={<Mascotas />} />
                 <Route path="/graficas" element={<Graficas />} />
+                <Route path="/perfil" element={<PerfilUsuario />} />
               </>
             )}
             {user && user.rol === 'usuario' && (
