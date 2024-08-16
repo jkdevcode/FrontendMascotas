@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react'
-import UsuarioModal from '../templates/UsuarioModal.jsx';
+import RazaModal from '../templates/RazaModal.jsx';
 import AccionesModal from '../organismos/ModalAcciones.jsx';
 import Swal from 'sweetalert2';
 import axiosClient from '../axiosClient.js';
-import UsuariosContext from '../../context/UsuariosContext.jsx';
+import RazasContext from '../../context/RazasContext.jsx';
 import {
     Table,
     TableHeader,
@@ -22,9 +22,9 @@ import { EditIcon } from "../nextUI/EditIcon";
 import { DeleteIcon } from "../nextUI/DeleteIcon";
 import Header from '../moleculas/Header.jsx';
 
-function Usuarios() {
+function Razas() {
 
-    function EjemploUsuario() {
+    function EjemploRaza() {
         const [filterValue, setFilterValue] = useState("");
         const [selectedKeys, setSelectedKeys] = useState(new Set([]));
         const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -38,24 +38,16 @@ function Usuarios() {
         const hasSearchFilter = Boolean(filterValue);
 
         const filteredItems = React.useMemo(() => {
-            let filteredusuarios = usuarios;
+            let filteredrazas = razas;
             if (hasSearchFilter) {
-                filteredusuarios = filteredusuarios.filter(usuario =>
-                    (String(usuario.documento_identidad).toLowerCase().includes(filterValue.toLowerCase()) ||
-                        usuario.nombre.toLowerCase().includes(filterValue.toLowerCase()) ||
-                        usuario.apellido.toLowerCase().includes(filterValue.toLowerCase()) ||
-                        usuario.correo.toLowerCase().includes(filterValue.toLowerCase()) ||
-                        usuario.password.toLowerCase().includes(filterValue.toLowerCase()) ||
-                        usuario.rol.toLowerCase().includes(filterValue.toLowerCase())) &&
-                    usuario.rol !== "superusuario"
+                filteredrazas = filteredrazas.filter(raza =>
+                    String(raza.nombre_raza).toLowerCase().includes(filterValue.toLowerCase()) ||
+                    raza.nombre_categoria.toLowerCase().includes(filterValue.toLowerCase())
                 );
-            } else {
-                // Si no hay filtro de búsqueda, igual excluimos los "superusuario"
-                filteredusuarios = filteredusuarios.filter(usuario => usuario.rol !== "superusuario");
             }
 
-            return filteredusuarios;
-        }, [usuarios, filterValue]);
+            return filteredrazas;
+        }, [razas, filterValue]);
 
         const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -74,41 +66,22 @@ function Usuarios() {
             });
         }, [sortDescriptor, items]);
 
-        const renderCell = React.useCallback((usuario, columnKey) => {
-            const cellValue = usuario[columnKey];
+        const renderCell = React.useCallback((raza, columnKey) => {
+            const cellValue = raza[columnKey];
 
 
             switch (columnKey) {
-                case "nombre":
-                    const imageUrl = usuario.img
-                        ? `${axiosClient.defaults.baseURL}/uploads/${usuario.img}`
-                        : 'path/to/default-image.jpg'; // Fallback in case there's no image
-
-                    return (
-                        <div className="flex items-center gap-4">
-                            <img
-                                src={imageUrl}
-                                alt={`${usuario.nombre} ${usuario.apellido}`}
-                                className="w-10 h-10 object-cover rounded-lg"
-                            />
-                            <div className="">
-                                <span>{usuario.nombre}</span>
-                                <span>{usuario.apellido}</span><br />
-                                <span>{usuario.correo}</span>
-                            </div>
-                        </div>
-                    );
                 case "actions":
                     return (
                         <div className="relative flex justify-start items-center gap-2">
                             <Dropdown>
                                 <div className="flex items-center gap-2">
                                     <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                        <EditIcon onClick={() => handleToggle('update', setUsuarioId(usuario))} />
+                                        <EditIcon onClick={() => handleToggle('update', setRazaId(raza))} />
                                     </span>
                                     <span className="text-lg text-danger cursor-pointer active:opacity-50">
                                         <DeleteIcon
-                                            onClick={() => peticionDesactivar(usuario.id_usuario)}
+                                            onClick={() => peticionDesactivar(raza.id_raza)}
                                         />
                                     </span>
                                 </div>
@@ -173,7 +146,7 @@ function Usuarios() {
                             </div>
                         </div>
                         <div className="flex justify-between items-center z-10 mr-30 mt-2">
-                            <span className="text-white text-small">Total {usuarios.length} Resultados</span>
+                            <span className="text-white text-small">Total {razas.length} Resultados</span>
                             <label className="flex items-center text-white mr-30 text-small">
                                 Columnas por página:
                                 <select
@@ -222,7 +195,7 @@ function Usuarios() {
 
         return (
             <div className="flex flex-col items-center justify-center p-4 w-full">
-                <div className="w-full  sm:w-full  lg:w-11/12 xl:w-11/12">
+                <div className="w-full  sm:w-6/12  lg:w-8/12 xl:w-10/12">
                     <Table
                         aria-label="Tabla"
                         isHeaderSticky
@@ -251,7 +224,7 @@ function Usuarios() {
                         </TableHeader>
                         <TableBody emptyContent={"No hay resultados registrados"} items={sortedItems}>
                             {(item) => (
-                                <TableRow key={item.id_usuario}>
+                                <TableRow key={item.id_raza}>
                                     {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                                 </TableRow>
                             )}
@@ -261,15 +234,13 @@ function Usuarios() {
             </div>
         );
     }
-
-
     const [modalOpen, setModalOpen] = useState(false);
     const [modalAcciones, setModalAcciones] = useState(false);
     const [mode, setMode] = useState('create');
     const [initialData, setInitialData] = useState(null);
     const [mensaje, setMensaje] = useState('')
-    const [usuarios, setusuarios] = useState([]);
-    const { idUsuario, setUsuarioId } = useContext(UsuariosContext)
+    const [razas, setRazas] = useState([]);
+    const { idRaza, setRazaId } = useContext(RazasContext)
 
     useEffect(() => {
         peticionGet()
@@ -277,8 +248,8 @@ function Usuarios() {
 
     const peticionGet = async () => {
         try {
-            await axiosClient.get('/usuarios/listar').then((response) => {
-                setusuarios(response.data)
+            await axiosClient.get('/razas/listar').then((response) => {
+                setRazas(response.data)
             })
         } catch (error) {
             console.log('Error en el servidor ' + error)
@@ -288,33 +259,18 @@ function Usuarios() {
 
     const data = [
         {
-            uid: 'tipo_documento',
-            name: 'Tipo',
+            uid: 'id_raza',
+            name: 'Id',
             sortable: true
         },
         {
-            uid: 'documento_identidad',
-            name: 'DNI',
+            uid: 'nombre_raza',
+            name: 'Raza',
             sortable: true
         },
         {
-            uid: 'nombre',
-            name: 'Nombre',
-            sortable: true
-        },
-        {
-            uid: 'telefono',
-            name: 'Telefono ',
-            sortable: true
-        },
-        {
-            uid: 'direccion',
-            name: 'Dirección',
-            sortable: true
-        },
-        {
-            uid: 'rol',
-            name: 'Rol',
+            uid: 'nombre_categoria',
+            name: 'Categoría',
             sortable: true
         },
         {
@@ -323,12 +279,12 @@ function Usuarios() {
             sortable: true
         }
     ];
-    const peticionDesactivar = async (id_usuario) => {
+    const peticionDesactivar = async (id_raza) => {
         try {
             // Mostrar la alerta de confirmación primero
             const result = await Swal.fire({
                 title: "¿Estás seguro?",
-                text: "¡Esto podría afectar a tus usuarios!",
+                text: "¡Esto podría afectar a tus razas!",
                 icon: "question",
                 showCancelButton: true,
                 confirmButtonColor: "orange",
@@ -338,19 +294,19 @@ function Usuarios() {
 
             // Si el usuario confirma, se procede con la eliminación
             if (result.isConfirmed) {
-                const response = await axiosClient.delete(`/usuarios/eliminar/${id_usuario}`);
+                const response = await axiosClient.delete(`/razas/eliminar/${id_raza}`);
 
                 if (response.status === 200) {
                     Swal.fire({
                         title: "¡Eliminado!",
-                        text: "Usuario eliminado correctamente.",
+                        text: "Raza eliminada correctamente.",
                         icon: "success"
                     });
 
-                    // Actualizar la lista de usuarios
+                    // Actualizar la lista de razas
                     peticionGet();
                 } else {
-                    alert('Error al eliminar el usuario');
+                    alert('Error al eliminar la raza');
                 }
             }
         } catch (error) {
@@ -366,12 +322,12 @@ function Usuarios() {
 
             if (mode === 'create') {
 
-                await axiosClient.post('/usuarios/registrar', formData).then((response) => {
+                await axiosClient.post('/razas/registrar', formData).then((response) => {
                     if (response.status == 200) {
                         Swal.fire({
                             position: "center",
                             icon: "success",
-                            title: "Usuario registrado con éxito",
+                            title: "Raza registrada con éxito",
                             showConfirmButton: false,
                             timer: 1500
                         });
@@ -381,12 +337,12 @@ function Usuarios() {
                     }
                 })
             } else if (mode === 'update') {
-                await axiosClient.put(`/usuarios/actualizar/${idUsuario.id_usuario}`, formData).then((response) => {
+                await axiosClient.put(`/razas/actualizar/${idRaza.id_raza}`, formData).then((response) => {
                     if (response.status === 200) {
                         Swal.fire({
                             position: "center",
                             icon: "success",
-                            title: "Se actualizó con éxito el usuario",
+                            title: "Se actualizó con éxito la raza",
                             showConfirmButton: false,
                             timer: 1500
                         });
@@ -411,28 +367,28 @@ function Usuarios() {
     return (
 
         <>
-        <Header />
+            <Header />
             <div className='w-full max-w-[90%] ml-24 items-center p-10'>
                 <AccionesModal
                     isOpen={modalAcciones}
                     onClose={() => setModalAcciones(false)}
                     label={mensaje}
                 />
-                <UsuarioModal
+                <RazaModal
                     open={modalOpen}
                     onClose={() => setModalOpen(false)}
-                    title={mode === 'create' ? 'Registrar usuario' : 'Actualizar usuario'}
+                    title={mode === 'create' ? 'Registrar raza' : 'Actualizar raza'}
                     actionLabel={mode === 'create' ? 'Registrar' : 'Actualizar'}
                     initialData={initialData}
                     handleSubmit={handleSubmit}
                     mode={mode}
                 />
-                <EjemploUsuario
+                <EjemploRaza
                     data={data}
-                    usuarios={usuarios}
+                    razas={razas}
                 />
             </div>
         </>
     )
 }
-export default Usuarios
+export default Razas

@@ -1,15 +1,15 @@
 import React, { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 // Import imagenes e iconos
-import imagenes from '../../styles/imagenes.jsx'
-import iconos from '../../styles/iconos.jsx'
-import Icon from '../atomos/IconVolver.jsx'
+import imagenes from '../../styles/imagenes'
+import iconos from '../../styles/iconos'
+import Icon from '../atomos/IconVolver'
 // Import conexion con el servidor
-import axiosClient from '../axiosClient.js'
+import axiosClient from '../axiosClient'
 // Import de nextUI
-import { EyeFilledIcon } from '../nextUI/EyeFilledIcon.jsx'
+import { EyeFilledIcon } from '../nextUI/EyeFilledIcon'
 import { CameraIcon } from '../nextUI/CameraIcon.jsx';
-import { EyeSlashFilledIcon } from '../nextUI/EyeSlashFilledIcon.jsx'
+import { EyeSlashFilledIcon } from '../nextUI/EyeSlashFilledIcon'
 import { Input, Select, SelectItem, Avatar } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 // Import alertas 

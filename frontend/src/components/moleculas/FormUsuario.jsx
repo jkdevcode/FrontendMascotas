@@ -2,8 +2,8 @@ import React, { useRef, useEffect, useState, useContext } from 'react';
 import { ModalFooter, Input, Select, SelectItem, Avatar } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import UsuarioContext from '../../context/UsuariosContext.jsx';
-import { EyeFilledIcon } from "../nextUI/EyeFilledIcon.jsx";
-import { EyeSlashFilledIcon } from "../nextUI/EyeSlashFilledIcon.jsx";
+import { EyeFilledIcon } from "../nextUI/EyeFilledIcon";
+import { EyeSlashFilledIcon } from "../nextUI/EyeSlashFilledIcon";
 import { CameraIcon } from '../nextUI/CameraIcon.jsx';
 import axiosClient from '../axiosClient.js';
 

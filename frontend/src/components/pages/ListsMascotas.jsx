@@ -18,8 +18,8 @@ import { ChevronDownIcon } from "../nextUI/ChevronDownIcon.jsx";
 import { Card, CardHeader, CardBody, Image, Skeleton } from "@nextui-org/react";
 import ListMascotaModal from '../templates/ListsMascotaModal.jsx';
 import AccionesModal from '../organismos/ModalAcciones.jsx';
-import iconos from '../../styles/iconos.jsx';
-import Icon from '../atomos/IconVolver.jsx';
+import iconos from '../../styles/iconos';
+import Icon from '../atomos/IconVolver';
 import { Tooltip } from "@nextui-org/react";
 
 
