@@ -13,6 +13,9 @@ import { Notificaciones } from "./components/pages/Notificaciones";
 import PerfilUsuario from "./components/pages/Perfil";
 import Graficas from "./components/pages/Grafica";
 import Usuarios from "./components/pages/Usuarios";
+import Razas from "./components/pages/Razas";
+import Municipios from "./components/pages/Municipios";
+import Departamentos from "./components/pages/Departamentos";
 
 // import { Notificaciones } from "./components/pages/notificaciones";
 
@@ -38,12 +41,13 @@ function App() {
               <>
                 <Route path="/usuarios" element={<Usuarios />} />
                 <Route path="/mascotas" element={<Mascotas />} />
+                <Route path="/razas" element={<Razas />} />
+                <Route path="/municipios" element={<Municipios />} />
+                <Route path="/departamentos" element={<Departamentos />} />
                 {/* Vista de vacunas */}
                 {/* Vista de Categorias */}
-                {/* Vista de Razas */}
                 {/* Vista de PDF */}
                 {/* Vista de cambio de rol */}
-                {/* Vista de departamento y municipios */}
                 <Route path="/notificaciones" element={<Notificaciones />} />
                 <Route path="/graficas" element={<Graficas />} />
               </>

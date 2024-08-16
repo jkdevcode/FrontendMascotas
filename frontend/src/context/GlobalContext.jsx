@@ -2,6 +2,10 @@ import React, { createContext } from 'react'
 import { MascotasProvider } from './MascotasContext'
 import { VacunasProvider } from './VacunasContext'
 import { UsuariosProvider } from './UsuariosContext'
+import { RazasProvider } from './RazasContext'
+import { MunicipiosProvider } from './MunicipiosContext'
+import { DepartamentosProvider } from './DepartamentosContext'
+
 
 // import { AuthProvider } from './authContext.jsx'
 
@@ -17,7 +21,13 @@ const GlobalProvider = ({ children }) => {
             <MascotasProvider>
                 <VacunasProvider>
                     <UsuariosProvider>
-                        {children}
+                        <RazasProvider>
+                            <MunicipiosProvider>
+                                <DepartamentosProvider>
+                                    {children}
+                                </DepartamentosProvider>
+                            </MunicipiosProvider>
+                        </RazasProvider>
                     </UsuariosProvider>
                 </VacunasProvider>
             </MascotasProvider>

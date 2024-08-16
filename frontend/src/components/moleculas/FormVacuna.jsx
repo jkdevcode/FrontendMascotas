@@ -5,7 +5,7 @@ import { DatePicker } from "@nextui-org/react";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import VacunasContext from '../../context/VacunasContext';
 
-const FormVacunas = ({ initialData, mode, handleSubmit, onClose, actionLabel }) => {
+const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
     const [mascotas, setMascotas] = useState([]);
     const [estado, setEstado] = useState([]);
 
