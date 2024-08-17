@@ -291,11 +291,7 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
                 </div>
             </div>
             <ModalFooter>
-                <Button
-                    color='danger'
-                    variant='flat'
-                    onClick={onClose}
-                >
+                <Button color='danger' variant='flat' onClick={onClose} >
                     Cerrar
                 </Button>
                 <Button
