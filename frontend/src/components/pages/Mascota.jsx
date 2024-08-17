@@ -11,12 +11,11 @@ import {
     DropdownItem,
     Chip
 } from "@nextui-org/react";
-import { Tooltip } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import { PlusIcon } from "../nextUI/PlusIcon.jsx";
 import { SearchIcon } from "../nextUI/SearchIcon.jsx";
 import { ChevronDownIcon } from "../nextUI/ChevronDownIcon.jsx";
-import { Card, CardHeader, CardBody, Image, Link, Skeleton } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Image, Skeleton } from "@nextui-org/react";
 
 import MascotaModal from '../templates/MascotaModal.jsx';
 import AccionesModal from '../organismos/ModalAcciones.jsx';
@@ -24,19 +23,21 @@ import VacunaModal from '../templates/VacunaModal.jsx';
 import Header from '../moleculas/Header.jsx';
 
 export function Mascotas() {
-    const navigate = useNavigate();
     const statusColorMap = {
-        adoptar: "success",
-        adoptada: "default",
-        'proceso adopcion': "warning",
+        'En Adopcion': "success",
+        Urgente: "danger",
+        Reservado: "secondary",
+        Adoptado: "warning",
         todos: "primary",
     };
 
     const statusOptions = [
         { name: "Todos", uid: "todos" },
-        { name: "Adoptar", uid: "adoptar" },
-        { name: "Proceso Adopcion", uid: "proceso adopcion" },
-        { name: "Adoptada", uid: "adoptada" },
+        { name: "En Adopcion", uid: "En Adopcion" },
+        { name: "Urgente", uid: "Urgente" },
+        { name: "Reservado", uid: "Reservado" },
+        { name: "Adoptado", uid: "Adoptado" },
+
     ];
 
     function Ejemplo({ mascotas }) {
@@ -57,10 +58,8 @@ export function Mascotas() {
 
             if (hasSearchFilter) {
                 filteredMascotas = filteredMascotas.filter(mascota =>
-                    String(mascota.id_mascota).toLowerCase().includes(filterValue.toLowerCase()) ||
                     mascota.nombre.toLowerCase().includes(filterValue.toLowerCase()) ||
-                    mascota.raza.toLowerCase().includes(filterValue.toLowerCase()) ||
-                    mascota.genero.toLowerCase().includes(filterValue.toLowerCase())
+                    mascota.sexo.toLowerCase().includes(filterValue.toLowerCase())
                 );
             }
 
@@ -225,7 +224,8 @@ export function Mascotas() {
                 });
             } else if (mode === 'update') {
                 await axiosClient.put(`/mascotas/actualizar/${idMascota.id_mascota}`, formData).then((response) => {
-                    console.log('API Response:', response);
+                    console.log('Datos enviados:', formData);
+                    console.log('Respuesta del servidor:', response);
                     if (response.status === 200) {
                         Swal.fire({
                             position: "center", // Posición centrada
