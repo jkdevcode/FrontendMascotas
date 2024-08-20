@@ -92,7 +92,7 @@ function Usuarios() {
                                 className="w-10 h-10 object-cover rounded-lg"
                             />
                             <div className="">
-                                <span>{usuario.nombre}</span>
+                                <span>{usuario.nombre} </span>
                                 <span>{usuario.apellido}</span><br />
                                 <span>{usuario.correo}</span>
                             </div>
@@ -411,7 +411,7 @@ function Usuarios() {
     return (
 
         <>
-        <Header />
+            <Header />
             <div className='w-full max-w-[90%] ml-24 items-center p-10'>
                 <AccionesModal
                     isOpen={modalAcciones}

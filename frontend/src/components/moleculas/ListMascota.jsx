@@ -13,7 +13,7 @@ function ListMascota({ initialData, onClose }) {
     useEffect(() => {
         const fetchVacunas = async () => {
             try {
-                const response = await axiosClient.get(`/vacuna/listar/${initialData.id_mascota}`);
+                const response = await axiosClient.get(`/vacunas/listar/${initialData.id_mascota}`);
                 setVacunas(response.data.data);
             } catch (error) {
                 console.error('Error al listar vacunas:', error);
@@ -26,9 +26,9 @@ function ListMascota({ initialData, onClose }) {
     const handleAdoptar = async () => {
         const user = JSON.parse(localStorage.getItem('user')); // Obtener el usuario del localStorage
         const id_usuario = user ? user.id_usuario : null; // Asegúrate de que el ID del usuario esté disponible
-    
+
         try {
-            const response = await axiosClient.post(`/mascota/iniciar/${initialData.id_mascota}`, { id_usuario });
+            const response = await axiosClient.post(`/mascotas/iniciar/${initialData.id_mascota}`, { id_usuario });
             if (response.status === 200) {
                 Swal.fire({
                     title: 'Éxito',
@@ -65,9 +65,10 @@ function ListMascota({ initialData, onClose }) {
     }
 
     const statusColorMap = {
-        adoptar: "success",
-        adoptada: "default",
-        'proceso adopcion': "warning",
+        'En Adopcion': "success",
+        Urgente: "danger",
+        Reservado: "secondary",
+        Adoptado: "warning",
         todos: "primary",
     };
     const formatDate = (dateString) => {
@@ -77,7 +78,7 @@ function ListMascota({ initialData, onClose }) {
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
-    
+
 
     return (
         <>
@@ -94,12 +95,30 @@ function ListMascota({ initialData, onClose }) {
                     </Chip>
                 </CardHeader>
                 <CardBody className="overflow-visible py-2">
-                    <div className="relative w-full h-52 mb-4 overflow-hidden">
-                        <Image
-                            alt="Card background"
-                            className="object-cover w-full h-full"
-                            src={initialData.img ? `${axiosClient.defaults.baseURL}/uploads/${initialData.img}` : "https://nextui.org/images/hero-card-complete.jpeg"}
-                        />
+                    <div className="relative w-full h-62 mb-4 overflow-hidden">
+                        {initialData.imagenes && initialData.imagenes.length > 0 ? (
+                            <div className={`grid ${initialData.imagenes.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
+                                {initialData.imagenes.map((imagen, index) => (
+                                    <div key={index} className={`flex items-center justify-center ${initialData.imagenes.length === 1 && index === 0 ? 'col-span-2' : ''}`}>
+                                        <Image
+                                            alt={`Imagen ${index + 1}`}
+                                            className="object-cover w-full h-full"
+                                            src={`${axiosClient.defaults.baseURL}/uploads/${imagen}`}
+                                            width='auto'
+                                            height='auto'
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <Image
+                                alt="Imagen por defecto"
+                                className="object-cover w-full h-full"
+                                src="https://nextui.org/images/hero-card-complete.jpeg"
+                                width='auto'
+                                height='auto'
+                            />
+                        )}
                     </div>
                     <p className="text-sm text-gray-700 font-medium mb-4">{initialData.descripcion}</p>
                     <p className="text-sm text-gray-700 font-medium mb-4">Edad: {initialData.edad} años</p>
@@ -117,7 +136,6 @@ function ListMascota({ initialData, onClose }) {
                             </div>
                         ))}
                     </div>
-
                 </CardBody>
             </Card>
             <ModalFooter>
