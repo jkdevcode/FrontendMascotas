@@ -43,8 +43,6 @@ export function Mascotas() {
     function Ejemplo({ mascotas }) {
         const [filterValue, setFilterValue] = useState("");
         const [selectedKeys, setSelectedKeys] = useState(new Set(["todos"]));
-        const [rowsPerPage, setRowsPerPage] = useState(5);
-        const [page, setPage] = useState(1);
         const [isLoaded, setIsLoaded] = useState(false);
 
         const statusFilter = useMemo(() => {
@@ -312,7 +310,7 @@ export function Mascotas() {
     };
     return (
         <>
-            <Header />
+            {/* <Header /> */}
             <Ejemplo mascotas={mascotas} />
             <MascotaModal
                 open={modalOpen}

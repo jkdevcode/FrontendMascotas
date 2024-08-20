@@ -16,6 +16,7 @@ import Usuarios from "./components/pages/Usuarios";
 import Razas from "./components/pages/Razas";
 import Municipios from "./components/pages/Municipios";
 import Departamentos from "./components/pages/Departamentos";
+import TabMascotas from "./components/pages/TabMascotas";
 
 // import { Notificaciones } from "./components/pages/notificaciones";
 
@@ -40,10 +41,11 @@ function App() {
             {user && user.rol === 'superusuario' && (
               <>
                 <Route path="/usuarios" element={<Usuarios />} />
-                <Route path="/mascotas" element={<Mascotas />} />
+                <Route path="/mascota" element={<Mascotas />} />
                 <Route path="/razas" element={<Razas />} />
                 <Route path="/municipios" element={<Municipios />} />
                 <Route path="/departamentos" element={<Departamentos />} />
+                <Route path="/mascotas" element={<TabMascotas />} />
                 {/* Vista de vacunas */}
                 {/* Vista de Categorias */}
                 {/* Vista de PDF */}

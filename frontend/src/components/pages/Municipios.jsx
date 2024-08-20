@@ -146,11 +146,11 @@ function Municipios() {
                             </div>
                         </div>
                         <div className="flex justify-between items-center z-10 mr-30 mt-2">
-                            <span className="text-white text-small">Total {municipios.length} Resultados</span>
-                            <label className="flex items-center text-white mr-30 text-small">
+                            <span className="text-default-400 text-small">Total {municipios.length} Resultados</span>
+                            <label className="flex items-center text-default-400 mr-30 text-small">
                                 Columnas por página:
                                 <select
-                                    className="bg-transparent outline-none text-white text-small"
+                                    className="bg-transparent outline-none text-default-400 text-small"
                                     onChange={onRowsPerPageChange}
                                 >
                                     <option value="5">5</option>
@@ -372,7 +372,7 @@ function Municipios() {
     return (
 
         <>
-        <Header />
+        {/* <Header /> */}
             <div className='w-full max-w-[90%] ml-24 items-center p-10'>
                 <AccionesModal
                     isOpen={modalAcciones}
