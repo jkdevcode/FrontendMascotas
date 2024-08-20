@@ -24,11 +24,8 @@ function ListMascota({ initialData, onClose }) {
     }, [initialData.id_mascota]);
 
     const handleAdoptar = async () => {
-        const user = JSON.parse(localStorage.getItem('user')); // Obtener el usuario del localStorage
-        const id_usuario = user ? user.id_usuario : null; // Asegúrate de que el ID del usuario esté disponible
-
         try {
-            const response = await axiosClient.post(`/mascotas/iniciar/${initialData.id_mascota}`, { id_usuario });
+            const response = await axiosClient.post(`/mascotas/iniciar/${initialData.id_mascota}`);
             if (response.status === 200) {
                 Swal.fire({
                     title: 'Éxito',
@@ -60,10 +57,6 @@ function ListMascota({ initialData, onClose }) {
         }
     };
 
-    if (!initialData) {
-        return <div>No se encontró la initialData.</div>;
-    }
-
     const statusColorMap = {
         'En Adopcion': "success",
         Urgente: "danger",
@@ -71,6 +64,7 @@ function ListMascota({ initialData, onClose }) {
         Adoptado: "warning",
         todos: "primary",
     };
+    
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = date.getDate().toString().padStart(2, '0'); // Asegura que el día tenga dos dígitos
@@ -78,7 +72,6 @@ function ListMascota({ initialData, onClose }) {
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
-
 
     return (
         <>
@@ -89,7 +82,7 @@ function ListMascota({ initialData, onClose }) {
                     <h4 className="font-bold text-large">Raza: {initialData.raza}</h4>
                     <small className="text-default-500">Especie: {initialData.especie}</small>
                     <h4 className="font-bold text-large">Edad: {initialData.edad}</h4>
-                    <h4 className="font-bold text-large">Esteralizacion: {initialData.esterilizacion}</h4>
+                    <h4 className="font-bold text-large">Esterilización: {initialData.esterilizacion}</h4>
                     <Chip className="capitalize" color={statusColorMap[initialData.estado]} size="xs" variant="flat">
                         {initialData.estado}
                     </Chip>
@@ -123,18 +116,22 @@ function ListMascota({ initialData, onClose }) {
                     <p className="text-sm text-gray-700 font-medium mb-4">{initialData.descripcion}</p>
                     <p className="text-sm text-gray-700 font-medium mb-4">Edad: {initialData.edad} años</p>
                     <div className="mt-2 flex flex-wrap justify-between">
-                        {vacunas.map((vacuna, index) => (
-                            <div
-                                key={vacuna.id_vacuna}
-                                className="mb-4 w-1/2 px-2"
-                            >
-                                <div className="border p-4 rounded">
-                                    <h5 className="font-bold">Enfermedad: {vacuna.enfermedad}</h5>
-                                    <p>Fecha: {formatDate(vacuna.fecha_vacuna)}</p>
-                                    <p>Estado: {vacuna.estado}</p>
+                        {vacunas.length > 0 ? (
+                            vacunas.map((vacuna) => (
+                                <div
+                                    key={vacuna.id_vacuna}
+                                    className="mb-4 w-1/2 px-2"
+                                >
+                                    <div className="border p-4 rounded">
+                                        <h5 className="font-bold">Enfermedad: {vacuna.enfermedad}</h5>
+                                        <p>Fecha: {formatDate(vacuna.fecha_vacuna)}</p>
+                                        <p>Estado: {vacuna.estado}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            <p className="text-sm text-gray-700 font-medium mb-4">Esta mascota no tiene vacunas.</p>
+                        )}
                     </div>
                 </CardBody>
             </Card>
