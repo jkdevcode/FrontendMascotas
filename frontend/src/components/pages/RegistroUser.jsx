@@ -67,43 +67,43 @@ function RegistroUser() {
         validationSchema: validationSchema,
         onSubmit: async (values) => {
 
-                // Verificar si el correo ya está registrado
-                const { data: correoExiste } = await axiosClient.get(`/usuarios/verificar/correo/${values.correo}`);
-                if (correoExiste.existe) {
-                    Swal.fire({
-                        position: "top-center",
-                        icon: 'warning',
-                        title: 'El correo electrónico ya está registrado',
-                        text: 'Por favor, utilice otro correo electrónico.',
-                        showConfirmButton: true
-                    });
-                    return;
-                }
+            // Verificar si el correo ya está registrado
+            const { data: correoExiste } = await axiosClient.get(`/usuarios/verificar/correo/${values.correo}`);
+            if (correoExiste.existe) {
+                Swal.fire({
+                    position: "top-center",
+                    icon: 'warning',
+                    title: 'El correo electrónico ya está registrado',
+                    text: 'Por favor, utilice otro correo electrónico.',
+                    showConfirmButton: true
+                });
+                return;
+            }
 
-                // Verificar si el documento de identidad ya está registrado
-                const { data: documentoExiste } = await axiosClient.get(`/usuarios/verificar/documento_identidad/${values.documento_identidad}`);
-                if (documentoExiste.existe) {
-                    Swal.fire({
-                        position: "top-center",
-                        icon: 'warning',
-                        title: 'El documento de identidad ya está registrado',
-                        text: 'Por favor, utilice otro documento de identidad.',
-                        showConfirmButton: true
-                    });
-                    return;
-                }
+            // Verificar si el documento de identidad ya está registrado
+            const { data: documentoExiste } = await axiosClient.get(`/usuarios/verificar/documento_identidad/${values.documento_identidad}`);
+            if (documentoExiste.existe) {
+                Swal.fire({
+                    position: "top-center",
+                    icon: 'warning',
+                    title: 'El documento de identidad ya está registrado',
+                    text: 'Por favor, utilice otro documento de identidad.',
+                    showConfirmButton: true
+                });
+                return;
+            }
 
-                // Verificar si se ha seleccionado una imagen
-                if (!foto) {
-                    Swal.fire({
-                        position: "top-center",
-                        icon: 'warning',
-                        title: 'Debe seleccionar una imagen',
-                        text: 'Por favor, seleccione una imagen antes de continuar.',
-                        showConfirmButton: true
-                    });
-                    return; // Detener el envío del formulario
-                }
+            // Verificar si se ha seleccionado una imagen
+            if (!foto) {
+                Swal.fire({
+                    position: "top-center",
+                    icon: 'warning',
+                    title: 'Debe seleccionar una imagen',
+                    text: 'Por favor, seleccione una imagen antes de continuar.',
+                    showConfirmButton: true
+                });
+                return; // Detener el envío del formulario
+            }
 
             const formDataUser = new FormData();
             formDataUser.append('nombre', values.nombre);
@@ -319,6 +319,14 @@ function RegistroUser() {
                                 errorMessage={formik.errors.documento_identidad}
                             />
                         </div>
+                        {/* Campo Rol */}
+                        <Select
+                            color="warning"
+                            variant="bordered"
+                            className='w-80'
+                            label='Usuario'
+                            isDisabled
+                        />
 
                         {/* Campo Password */}
                         <div className="py-2">
@@ -343,7 +351,7 @@ function RegistroUser() {
                             />
                         </div>
 
-                        <Button type="submit"    className='mt-4 w-full text-white p-2 '>
+                        <Button type="submit" className='mt-4 w-full text-white p-2 '>
                             Registrar
                         </Button>
                     </form>

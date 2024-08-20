@@ -26,17 +26,20 @@ import { Tooltip } from "@nextui-org/react";
 export function ListsMascotas() {
     const navigate = useNavigate();
     const statusColorMap = {
-        adoptar: "success",
-        adoptada: "default",
-        'proceso adopcion': "warning",
+        'En Adopcion': "success",
+        Urgente: "danger",
+        Reservado: "secondary",
+        Adoptado: "warning",
         todos: "primary",
     };
 
     const statusOptions = [
         { name: "Todos", uid: "todos" },
-        { name: "Adoptar", uid: "adoptar" },
-        { name: "Proceso Adopcion", uid: "proceso adopcion" },
-        { name: "Adoptada", uid: "adoptada" },
+        { name: "En Adopcion", uid: "En Adopcion" },
+        { name: "Urgente", uid: "Urgente" },
+        { name: "Reservado", uid: "Reservado" },
+        { name: "Adoptado", uid: "Adoptado" },
+
     ];
 
     function Ejemplo() {
@@ -108,13 +111,33 @@ export function ListsMascotas() {
                     <CardBody className="overflow-visible py-4">
                         <Skeleton isLoaded={isLoaded} className="rounded-lg">
                             <div className="relative w-full mb-4 overflow-hidden">
-                                <Image
-                                    alt="Card background"
-                                    className="object-cover rounded-xl w-full h-full"
-                                    src={mascota.img ? `${axiosClient.defaults.baseURL}/uploads/${mascota.img}` : "https://nextui.org/images/hero-card-complete.jpeg"}
-                                    width='auto'
-                                    height='auto'
-                                />
+                                {mascota.imagenes && mascota.imagenes.length > 0 ? (
+                                    <div className={`grid ${mascota.imagenes.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
+                                        {mascota.imagenes.map((imagen, index) => (
+                                            <div key={index} className={`flex items-center justify-center ${mascota.imagenes.length === 1 && index === 0 ? 'col-span-2' : ''}`}>
+                                                <Image
+                                                    alt={`Imagen ${index + 1}`}
+                                                    className="object-cover rounded-xl"
+                                                    src={`${axiosClient.defaults.baseURL}/uploads/${imagen}`}
+                                                    width='auto'
+                                                    height='auto'
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="col-span-2 flex items-center justify-center">
+                                            <Image
+                                                alt="Imagen por defecto"
+                                                className="object-cover rounded-xl"
+                                                src="https://nextui.org/images/hero-card-complete.jpeg"
+                                                width='auto'
+                                                height='auto'
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </Skeleton>
                         <p className="text-sm text-gray-700 font-medium mb-4">{mascota.descripcion}</p>
@@ -193,7 +216,7 @@ export function ListsMascotas() {
 
     const peticionGet = async () => {
         try {
-            await axiosClient.get('/mascota/listar').then((response) => {
+            await axiosClient.get('/mascotas/listar').then((response) => {
                 console.log(response.data);
                 setMascotas(response.data);
             });

@@ -100,13 +100,33 @@ export function Mascotas() {
                     <CardBody className="overflow-visible py-4">
                         <Skeleton isLoaded={isLoaded} className="rounded-lg">
                             <div className="relative w-full mb-4 overflow-hidden">
-                                <Image
-                                    alt="Card background"
-                                    className="object-cover rounded-xl w-full h-full"
-                                    src={mascota.img ? `${axiosClient.defaults.baseURL}/uploads/${mascota.img}` : "https://nextui.org/images/hero-card-complete.jpeg"}
-                                    width='auto'
-                                    height='auto'
-                                />
+                                {mascota.imagenes && mascota.imagenes.length > 0 ? (
+                                    <div className={`grid ${mascota.imagenes.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
+                                        {mascota.imagenes.map((imagen, index) => (
+                                            <div key={index} className={`flex items-center justify-center ${mascota.imagenes.length === 1 && index === 0 ? 'col-span-2' : ''}`}>
+                                                <Image
+                                                    alt={`Imagen ${index + 1}`}
+                                                    className="object-cover rounded-xl"
+                                                    src={`${axiosClient.defaults.baseURL}/uploads/${imagen}`}
+                                                    width='auto'
+                                                    height='auto'
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="col-span-2 flex items-center justify-center">
+                                            <Image
+                                                alt="Imagen por defecto"
+                                                className="object-cover rounded-xl"
+                                                src="https://nextui.org/images/hero-card-complete.jpeg"
+                                                width='auto'
+                                                height='auto'
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </Skeleton>
                         <p className="text-sm text-gray-700 font-medium mb-4">{mascota.descripcion}</p>
@@ -117,6 +137,7 @@ export function Mascotas() {
                         </div>
                     </CardBody>
                 </Card>
+
             );
         }, [isLoaded]);
 
@@ -202,7 +223,7 @@ export function Mascotas() {
     };
 
     const handleSubmit = async (formData, e) => {
-        console.log('Datos enviados:', formData);
+        console.log('Datos enviados...:', formData);
         e.preventDefault();
 
         try {
@@ -224,8 +245,6 @@ export function Mascotas() {
                 });
             } else if (mode === 'update') {
                 await axiosClient.put(`/mascotas/actualizar/${idMascota.id_mascota}`, formData).then((response) => {
-                    console.log('Datos enviados:', formData);
-                    console.log('Respuesta del servidor:', response);
                     if (response.status === 200) {
                         Swal.fire({
                             position: "center", // Posición centrada
