@@ -14,7 +14,7 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
     const [enfermedad, setEnfermedad] = useState('');
     const [estadoOp, setEstadoOp] = useState('');
 
-    const { idVacuna } = useContext(VacunasContext);
+    const { vacuna } = useContext(VacunasContext);
 
     useEffect(() => {
         const enumData = [
@@ -34,45 +34,46 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
     }, []);
 
     useEffect(() => {
-        if (mode === 'update' && idVacuna) {
-            setMascotaFk(idVacuna.fk_id_mascota);
-            setFechaVacuna(idVacuna.fecha_vacuna);
-            setEnfermedad(idVacuna.enfermedad);
-            setEstadoOp(idVacuna.estado);
+        if (mode === 'update' && vacuna) {
+            setMascotaFk(vacuna.fk_id_mascota || '');
+            setFechaVacuna(vacuna.fecha_vacuna ? new Date(vacuna.fecha_vacuna) : null);
+            setEnfermedad(vacuna.enfermedad || '');
+            setEstadoOp(vacuna.estado || '');
         } else if (mode === 'create') {
             setMascotaFk('');
             setFechaVacuna(null);
             setEnfermedad('');
             setEstadoOp('');
         }
-    }, [mode, idVacuna]);
+    }, [mode, vacuna]);
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         try {
             const formData = {
                 fk_id_mascota: mascotaFK,
-                fecha_vacuna: fechaVacuna ? fechaVacuna.toString() : '',
+                fecha_vacuna: fechaVacuna ? new Date(fechaVacuna).toISOString() : '',
                 enfermedad,
                 estado: estadoOp
             };
-            handleSubmit(formData, e);
+            await handleSubmit(formData);
         } catch (error) {
             console.log(error);
             alert('Hay un error en el sistema ' + error);
         }
     };
+    
 
     return (
         <form method='post' onSubmit={handleFormSubmit}>
-            <div className='ml-5 align-items-center '>
+            <div className='ml-5 align-items-center'>
                 <div className="py-2">
                     <select
                         className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
                         name="id_mascota"
                         value={mascotaFK}
                         onChange={(e) => setMascotaFk(e.target.value)}
-                        required={true}
+                        required
                     >
                         <option value="" hidden className="text-gray-600">
                             Seleccionar Mascota
@@ -99,7 +100,7 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                 <div className='py-2'>
                     <Input
                         className='w-80'
-                          color='warning'
+                        color='warning'
                         variant="bordered"
                         type="text"
                         label='Ingrese la enfermedad'
