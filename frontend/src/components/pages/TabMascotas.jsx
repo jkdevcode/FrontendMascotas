@@ -4,6 +4,8 @@ import Municipios from './Municipios.jsx';
 import Departamentos from './Departamentos.jsx';
 import Mascotas from './Mascota.jsx';
 import Razas from './Razas.jsx';
+import Vacunas from './Vacunas.jsx';
+import Categorias from './Categoria.jsx';
 import Header from '../moleculas/Header.jsx';
 
 const TabMascotas = () => {
@@ -39,6 +41,20 @@ const TabMascotas = () => {
                                 <Card className="h-full">
                                     <CardBody>
                                         <Razas />
+                                    </CardBody>
+                                </Card>
+                            </Tab>
+                            <Tab key="vacunas" title="Vacunas">
+                                <Card className="h-full">
+                                    <CardBody>
+                                        <Vacunas />
+                                    </CardBody>
+                                </Card>
+                            </Tab>
+                            <Tab key="categorias" title="Categorias">
+                                <Card className="h-full">
+                                    <CardBody>
+                                        <Categorias />
                                     </CardBody>
                                 </Card>
                             </Tab>

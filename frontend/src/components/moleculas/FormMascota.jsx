@@ -6,6 +6,7 @@ import MascotasContext from '../../context/MascotasContext.jsx';
 import axiosClient from '../axiosClient.js';
 /* import { DatePicker } from "@nextui-org/react";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date"; */
+
 const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
     // Estados para manejar los datos del formulario
     const [categoria, setCategoria] = useState([]);
@@ -40,7 +41,7 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
     useEffect(() => {
         if (mode === 'update' && idMascota) {
             // Cargar los datos de la mascota si estamos en modo de actualización
-            setNombre(idMascota.nombre || '');
+            setNombre(idMascota.nombre_mascota || '');
             setFechaNacimiento(idMascota.fecha_nacimiento ? new Date(idMascota.fecha_nacimiento).toISOString().split('T')[0] : '');
             setEstado(idMascota.estado || 'En Adopcion');
             setDescripcion(idMascota.descripcion || '');
@@ -87,7 +88,7 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
             return;
         }
         const formData = new FormData();
-        formData.append('nombre', nombre);
+        formData.append('nombre_mascota', nombre);
         formData.append('fecha_nacimiento', fechaNacimiento);
         formData.append('estado', estado);
         formData.append('descripcion', descripcion);

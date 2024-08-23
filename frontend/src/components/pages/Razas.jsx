@@ -20,7 +20,7 @@ import { PlusIcon } from "./../nextUI/PlusIcon.jsx";
 import { SearchIcon } from "./../nextUI/SearchIcon.jsx";
 import { EditIcon } from "../nextUI/EditIcon";
 import { DeleteIcon } from "../nextUI/DeleteIcon";
-import Header from '../moleculas/Header.jsx';
+
 
 function Razas() {
 
@@ -367,7 +367,6 @@ function Razas() {
     return (
 
         <>
-          {/*   <Header /> */}
             <div className='w-full max-w-[90%] ml-24 items-center p-10'>
                 <AccionesModal
                     isOpen={modalAcciones}

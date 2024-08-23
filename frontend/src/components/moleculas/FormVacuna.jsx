@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axiosClient from '../axiosClient';
 import { ModalFooter, Button, Input } from "@nextui-org/react";
-import { DatePicker } from "@nextui-org/react";
-import { getLocalTimeZone, today } from "@internationalized/date";
+/* import { DatePicker } from "@nextui-org/react"; */
+/* import { getLocalTimeZone, today, parseDate } from "@internationalized/date"; */
 import VacunasContext from '../../context/VacunasContext';
 
 const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
@@ -14,7 +14,8 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
     const [enfermedad, setEnfermedad] = useState('');
     const [estadoOp, setEstadoOp] = useState('');
 
-    const { vacuna } = useContext(VacunasContext);
+    const { idVacuna } = useContext(VacunasContext);
+    /*  const { idRaza } = useContext(RazasContext); */
 
     useEffect(() => {
         const enumData = [
@@ -34,25 +35,25 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
     }, []);
 
     useEffect(() => {
-        if (mode === 'update' && vacuna) {
-            setMascotaFk(vacuna.fk_id_mascota || '');
-            setFechaVacuna(vacuna.fecha_vacuna ? new Date(vacuna.fecha_vacuna) : null);
-            setEnfermedad(vacuna.enfermedad || '');
-            setEstadoOp(vacuna.estado || '');
+        if (mode === 'update' && idVacuna) {
+            setMascotaFk(idVacuna.fk_id_mascota || '');
+            setFechaVacuna(idVacuna.fecha_vacuna ? new Date(idVacuna.fecha_vacuna).toISOString().split('T')[0] : '');
+            setEnfermedad(idVacuna.enfermedad || '');
+            setEstadoOp(idVacuna.estado || '');
         } else if (mode === 'create') {
             setMascotaFk('');
             setFechaVacuna(null);
             setEnfermedad('');
             setEstadoOp('');
         }
-    }, [mode, vacuna]);
+    }, [mode, idVacuna]);
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         try {
             const formData = {
                 fk_id_mascota: mascotaFK,
-                fecha_vacuna: fechaVacuna ? new Date(fechaVacuna).toISOString() : '',
+                fecha_vacuna: fechaVacuna ? fechaVacuna.toString() : '',
                 enfermedad,
                 estado: estadoOp
             };
@@ -62,14 +63,14 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
             alert('Hay un error en el sistema ' + error);
         }
     };
-    
+
 
     return (
         <form method='post' onSubmit={handleFormSubmit}>
             <div className='ml-5 align-items-center'>
                 <div className="py-2">
                     <select
-                        className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
+                        className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
                         name="id_mascota"
                         value={mascotaFK}
                         onChange={(e) => setMascotaFk(e.target.value)}
@@ -80,22 +81,29 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                         </option>
                         {mascotas.map(masco => (
                             <option key={masco.id_mascota} value={masco.id_mascota}>
-                                {masco.nombre}
+                                {masco.nombre_mascota}
                             </option>
                         ))}
                     </select>
                 </div>
                 <div className='py-2'>
-                    <DatePicker
-                        color='warning'
-                        variant="bordered"
+                <input
+                            type="date"
+                            className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
+                            id='fecha_nacimiento'
+                            name="fecha_nacimiento"
+                            value={fechaVacuna}
+                            onChange={(e) => setFechaVacuna(e.target.value)}
+                            required
+                        />
+                    {/* <DatePicker
                         label="Fecha de la vacuna"
                         maxValue={today(getLocalTimeZone())}
                         value={fechaVacuna}
                         className='w-80'
                         onChange={(date) => setFechaVacuna(date)}
                         required
-                    />
+                    /> */}
                 </div>
                 <div className='py-2'>
                     <Input

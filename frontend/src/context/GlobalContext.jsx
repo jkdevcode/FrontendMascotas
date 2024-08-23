@@ -5,6 +5,8 @@ import { UsuariosProvider } from './UsuariosContext'
 import { RazasProvider } from './RazasContext'
 import { MunicipiosProvider } from './MunicipiosContext'
 import { DepartamentosProvider } from './DepartamentosContext'
+import { AdopcionesProvider } from './AdopcionesContext'
+import { CategoriasProvider } from './CategoriaContext'
 
 
 // import { AuthProvider } from './authContext.jsx'
@@ -24,7 +26,11 @@ const GlobalProvider = ({ children }) => {
                         <RazasProvider>
                             <MunicipiosProvider>
                                 <DepartamentosProvider>
-                                    {children}
+                                    <AdopcionesProvider>
+                                        <CategoriasProvider>
+                                            {children}
+                                        </CategoriasProvider>
+                                    </AdopcionesProvider>
                                 </DepartamentosProvider>
                             </MunicipiosProvider>
                         </RazasProvider>

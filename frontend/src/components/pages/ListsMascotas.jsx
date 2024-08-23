@@ -61,7 +61,7 @@ export function ListsMascotas() {
             if (hasSearchFilter) {
                 filteredMascotas = filteredMascotas.filter(mascota =>
                     String(mascota.id_mascota).toLowerCase().includes(filterValue.toLowerCase()) ||
-                    mascota.nombre.toLowerCase().includes(filterValue.toLowerCase()) ||
+                    mascota.nombre_mascota.toLowerCase().includes(filterValue.toLowerCase()) ||
                     mascota.raza.toLowerCase().includes(filterValue.toLowerCase()) ||
                     mascota.genero.toLowerCase().includes(filterValue.toLowerCase())
                 );
@@ -101,9 +101,9 @@ export function ListsMascotas() {
                 <Card className="p-2 bg-gray-200">
 
                     <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
-                        <h4 className="font-bold text-2xl mb-1 text-gray-800">Nombre: {mascota.nombre}</h4>
-                        <small className="text-gray-600 mb-2">Género: {mascota.genero}</small>
-                        <h4 className="font-semibold text-lg mb-2 text-gray-700">Raza: {mascota.raza}</h4>
+                        <h4 className="font-bold text-2xl mb-1 text-gray-800">Nombre: {mascota.nombre_mascota}</h4>
+                        <small className="text-gray-600 mb-2">Género: {mascota.sexo}</small>
+                        <h4 className="font-semibold text-lg mb-2 text-gray-700">Raza: {mascota.fk_id_raza}</h4>
                         <Chip className="capitalize" color={statusColorMap[mascota.estado]} size="sm" variant="flat">
                             {mascota.estado}
                         </Chip>
