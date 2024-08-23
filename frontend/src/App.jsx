@@ -9,15 +9,16 @@ import DashboardUser from './components/pages/DashboardUser';
 import { Mascotas } from "./components/pages/Mascota";
 import GlobalProvider from "./context/GlobalContext";
 import { ListsMascotas } from "./components/pages/ListsMascotas";
-import { Notificaciones } from "./components/pages/Notificaciones";
+import NotificacionesMascotas from "./components/pages/NotificacionesMascotas";
 import PerfilUsuario from "./components/pages/Perfil";
 import Graficas from "./components/pages/Grafica";
 import Usuarios from "./components/pages/Usuarios";
 import Razas from "./components/pages/Razas";
 import Municipios from "./components/pages/Municipios";
 import Departamentos from "./components/pages/Departamentos";
-import Vacunas from "./components/pages/Vacunas.jsx";
-import Categoria from "./components/pages/Categoria.jsx";
+import TabMascotas from "./components/pages/TabMascotas";
+import TabNotificaciones from "./components/pages/TabNotificaciones";
+
 // import { Notificaciones } from "./components/pages/notificaciones";
 
 
@@ -41,15 +42,17 @@ function App() {
             {user && user.rol === 'superusuario' && (
               <>
                 <Route path="/usuarios" element={<Usuarios />} />
-                <Route path="/mascotas" element={<Mascotas />} />
+                <Route path="/mascota" element={<Mascotas />} />
                 <Route path="/razas" element={<Razas />} />
                 <Route path="/municipios" element={<Municipios />} />
                 <Route path="/departamentos" element={<Departamentos />} />
-                <Route path="/vacunas" element={<Vacunas />} />
-                <Route path="/categorias" element={<Categoria />} />
+                <Route path="/mascotas" element={<TabMascotas />} />
+                <Route path="/notificaciones" element={<TabNotificaciones />} />
+                {/* Vista de vacunas */}
+                {/* Vista de Categorias */}
                 {/* Vista de PDF */}
                 {/* Vista de cambio de rol */}
-                <Route path="/notificaciones" element={<Notificaciones />} />
+                <Route path="/notificacionesmascotas" element={<NotificacionesMascotas />} />
                 <Route path="/graficas" element={<Graficas />} />
               </>
             )}

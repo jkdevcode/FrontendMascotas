@@ -20,7 +20,6 @@ import { PlusIcon } from "./../nextUI/PlusIcon.jsx";
 import { SearchIcon } from "./../nextUI/SearchIcon.jsx";
 import { EditIcon } from "../nextUI/EditIcon";
 import { DeleteIcon } from "../nextUI/DeleteIcon";
-import Header from '../moleculas/Header.jsx';
 
 function Categorias() {
 
@@ -346,17 +345,17 @@ function Categorias() {
             alert('Error en el servidor');
         }
     };
-    
-    
+
+
     const handleToggle = (mode, categoria = null) => {
-    setMode(mode);
-    if (categoria) {
-        setInitialData(categoria);  // Establecer los datos iniciales
-    } else {
-        setInitialData(null);  // Limpiar los datos iniciales en modo de creación
-    }
-    setModalOpen(true);
-};
+        setMode(mode);
+        if (categoria) {
+            setInitialData(categoria);  // Establecer los datos iniciales
+        } else {
+            setInitialData(null);  // Limpiar los datos iniciales en modo de creación
+        }
+        setModalOpen(true);
+    };
 
     const handleCloseModal = () => {
         setModalOpen(false);
@@ -365,20 +364,19 @@ function Categorias() {
 
     return (
         <>
-            <Header />
             <div className='w-full max-w-[90%] ml-24 items-center p-10'>
                 <EjemploCategoria />
                 {modalOpen && (
-    <CategoriaModal
-        open={modalOpen}           // Cambiado de isOpen a open
-        onClose={handleCloseModal} // Cambiado de handleToggle a onClose
-        handleSubmit={handleSubmit}
-        actionLabel={mode === 'create' ? 'Registrar Vacuna' : 'Actualizar Vacuna'}
-        title={mode === 'create' ? 'Registrar Categoría' : 'Actualizar Categoría'}
-        initialData={initialData}
-        mode={mode}
-    />
-)}
+                    <CategoriaModal
+                        open={modalOpen}           // Cambiado de isOpen a open
+                        onClose={handleCloseModal} // Cambiado de handleToggle a onClose
+                        handleSubmit={handleSubmit}
+                        actionLabel={mode === 'create' ? 'Registrar Vacuna' : 'Actualizar Vacuna'}
+                        title={mode === 'create' ? 'Registrar Categoría' : 'Actualizar Categoría'}
+                        initialData={initialData}
+                        mode={mode}
+                    />
+                )}
 
                 {modalAcciones && (
                     <AccionesModal

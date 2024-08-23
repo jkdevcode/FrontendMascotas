@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import Swal from 'sweetalert2';
-import { useNavigate } from 'react-router-dom';
 import axiosClient from '../axiosClient.js';
 import MascotasContext from '../../context/MascotasContext.jsx';
 import {
@@ -19,8 +18,6 @@ import { Card, CardHeader, CardBody, Image, Skeleton } from "@nextui-org/react";
 
 import MascotaModal from '../templates/MascotaModal.jsx';
 import AccionesModal from '../organismos/ModalAcciones.jsx';
-import VacunaModal from '../templates/VacunaModal.jsx';
-import Header from '../moleculas/Header.jsx';
 
 export function Mascotas() {
     const statusColorMap = {
@@ -56,7 +53,7 @@ export function Mascotas() {
 
             if (hasSearchFilter) {
                 filteredMascotas = filteredMascotas.filter(mascota =>
-                    mascota.nombre.toLowerCase().includes(filterValue.toLowerCase()) ||
+                    mascota.nombre_mascota.toLowerCase().includes(filterValue.toLowerCase()) ||
                     mascota.sexo.toLowerCase().includes(filterValue.toLowerCase())
                 );
             }
@@ -88,7 +85,7 @@ export function Mascotas() {
             return (
                 <Card className="p-2 bg-gray-200" key={mascota.id_mascota}>
                     <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
-                        <h4 className="font-bold text-2xl mb-1 text-gray-800">Nombre: {mascota.nombre}</h4>
+                        <h4 className="font-bold text-2xl mb-1 text-gray-800">Nombre: {mascota.nombre_mascota}</h4>
                         <small className="text-gray-600 mb-2">Género: {mascota.sexo}</small>
                         <h4 className="font-semibold text-lg mb-2 text-gray-700">Raza: {mascota.fk_id_raza}</h4>
                         <Chip className="capitalize" color={statusColorMap[mascota.estado]} size="sm" variant="flat">
@@ -182,9 +179,6 @@ export function Mascotas() {
                                 <Button color="warning" variant="bordered" className="z-1 text-orange-500" style={{ position: 'relative' }} endContent={<PlusIcon />} onClick={() => handleToggle('create')}>
                                     Registrar
                                 </Button>
-                                <Button color="default" variant="ghost" className="z-1 text-black" style={{ position: 'relative' }} endContent={<PlusIcon />} onClick={() => handleToggleVacuna('create')}>
-                                    Registrar Vacuna
-                                </Button>
                             </div>
                         </div>
                         <div className="z-0 grid gap-4 mt-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -264,33 +258,6 @@ export function Mascotas() {
         handleToggle();
     };
 
-    const handleSubmitVacuna = async (formData, e) => {
-        console.log('Datos enviados:', formData);
-        e.preventDefault();
-
-        try {
-            await axiosClient.post('/vacunas/registrar', formData).then((response) => {
-                console.log('API Response:', response);
-                if (response.status === 200) {
-                    Swal.fire({
-                        position: "center", // Posición centrada
-                        icon: "success",
-                        title: "Vacuna registrada con éxito",
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                    peticionGet();
-                } else {
-                    alert('Error en el registro');
-                }
-            });
-        } catch (error) {
-            console.log(error);
-        }
-
-        handleToggleVacuna();
-    };
-
     const handleToggle = (modalMode = 'create', data = null) => {
         setMode(modalMode);
         setInitialData(data);
@@ -310,7 +277,6 @@ export function Mascotas() {
     };
     return (
         <>
-            {/* <Header /> */}
             <Ejemplo mascotas={mascotas} />
             <MascotaModal
                 open={modalOpen}
@@ -327,15 +293,6 @@ export function Mascotas() {
                 handleSubmit={handleSubmit}
                 actionLabel={mode === 'create' ? 'Registrar' : 'Actualizar'}
                 title={mode === 'create' ? 'Registrar Mascota' : 'Actualizar Mascota'}
-                initialData={initialData}
-                mode={mode}
-            />
-            <VacunaModal
-                open={modalVacunaOpen}
-                onClose={handleToggleVacuna}
-                handleSubmit={handleSubmitVacuna}
-                actionLabel={'Registrar Vacuna'}
-                title={'Registrar Vacuna'}
                 initialData={initialData}
                 mode={mode}
             />

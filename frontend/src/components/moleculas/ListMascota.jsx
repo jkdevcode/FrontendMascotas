@@ -25,7 +25,17 @@ function ListMascota({ initialData, onClose }) {
 
     const handleAdoptar = async () => {
         try {
-            const response = await axiosClient.post(`/mascotas/iniciar/${initialData.id_mascota}`);
+            // Obtener el id_usuario desde el localStorage (verifica que estés guardando correctamente el usuario)
+            const user = JSON.parse(localStorage.getItem('user'));
+            const id_usuario = user?.id_usuario; // Accede a id_usuario desde el objeto user
+            
+            console.log("El id_usuario es:", id_usuario);
+    
+            // Realiza la solicitud al backend
+            const response = await axiosClient.post(`/adopciones/iniciar/${initialData.id_mascota}`, { id_usuario });
+            
+            console.log("Respuesta del servidor:", response);
+    
             if (response.status === 200) {
                 Swal.fire({
                     title: 'Éxito',
@@ -35,7 +45,6 @@ function ListMascota({ initialData, onClose }) {
                     timer: 1500
                 });
                 setMascotas();
-                setModalOpen(false);
             } else {
                 Swal.fire({
                     title: 'Error',
@@ -56,7 +65,8 @@ function ListMascota({ initialData, onClose }) {
             });
         }
     };
-
+    
+    
     const statusColorMap = {
         'En Adopcion': "success",
         Urgente: "danger",
@@ -67,8 +77,8 @@ function ListMascota({ initialData, onClose }) {
     
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        const day = date.getDate().toString().padStart(2, '0'); // Asegura que el día tenga dos dígitos
-        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Los meses son 0-indexados, por lo que sumamos 1
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
@@ -77,12 +87,12 @@ function ListMascota({ initialData, onClose }) {
         <>
             <Card className="py-2 bg-gray-200">
                 <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
-                    <h4 className="font-bold text-large">Nombre: {initialData.nombre}</h4>
-                    <small className="text-default-500">Sexo: {initialData.genero}</small>
-                    <h4 className="font-bold text-large">Raza: {initialData.raza}</h4>
-                    <small className="text-default-500">Especie: {initialData.especie}</small>
+                    <h4 className="font-bold text-large">Nombre: {initialData.nombre_mascota}</h4>
+                    <small className="text-default-500">Sexo: {initialData.sexo}</small>
+                    <h4 className="font-bold text-large">Raza: {initialData.fk_id_raza}</h4>
+                    <small className="text-default-500">Especie: {initialData.fk_id_categoria}</small>
                     <h4 className="font-bold text-large">Edad: {initialData.edad}</h4>
-                    <h4 className="font-bold text-large">Esterilización: {initialData.esterilizacion}</h4>
+                    <h4 className="font-bold text-large">Esterilización: {initialData.esterilizado}</h4>
                     <Chip className="capitalize" color={statusColorMap[initialData.estado]} size="xs" variant="flat">
                         {initialData.estado}
                     </Chip>
