@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import VacunaModal from '../templates/VacunaModal.jsx';
 import AccionesModal from '../organismos/ModalAcciones.jsx';
 import Swal from 'sweetalert2';
+import { format } from 'date-fns';
 import axiosClient from '../axiosClient.js';
 import VacunasContext from '../../context/VacunasContext.jsx';
 import {
@@ -67,9 +68,12 @@ function Vacunas() {
         }, [sortDescriptor, items]);
 
         const renderCell = React.useCallback((vacuna, columnKey) => {
-            const cellValue = vacuna[columnKey];
-
-
+            let cellValue = vacuna[columnKey];
+        
+            if (columnKey === 'fecha_vacuna') {
+                cellValue = format(new Date(cellValue), 'dd/MM/yyyy'); // Formato corto de fecha
+            }
+        
             switch (columnKey) {
                 case "actions":
                     return (
@@ -88,11 +92,12 @@ function Vacunas() {
                             </Dropdown>
                         </div>
                     );
-
+        
                 default:
                     return cellValue;
             }
         }, []);
+        
 
         const onNextPage = React.useCallback(() => {
             if (page < pages) {
@@ -265,12 +270,12 @@ function Vacunas() {
         },
         {
             uid: 'fk_id_mascota',
-            name: 'vacuna',
+            name: 'Vacuna',
             sortable: true
         },
         {
             uid: 'fecha_vacuna',
-            name: 'Categoría',
+            name: 'Fecha Vacuna',
             sortable: true
         },
         {
