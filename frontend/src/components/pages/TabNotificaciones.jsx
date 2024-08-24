@@ -3,6 +3,7 @@ import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import Header from '../moleculas/Header.jsx';
 import NotificacionesMascotas from './NotificacionesMascotas.jsx';
 
+
 const TabNotificaciones = () => {
     return (
         <div className='bg-[#EAEDF6] min-h-screen h-full'>
