@@ -19,6 +19,7 @@ import { Card, CardHeader, CardBody, Image, Skeleton } from "@nextui-org/react";
 import MascotaModal from '../templates/MascotaModal.jsx';
 import AccionesModal from '../organismos/ModalAcciones.jsx';
 
+
 export function Mascotas() {
     const statusColorMap = {
         'En Adopcion': "success",
@@ -277,6 +278,7 @@ export function Mascotas() {
     };
     return (
         <>
+        <div className='pl-24'>
             <Ejemplo mascotas={mascotas} />
             <MascotaModal
                 open={modalOpen}
@@ -296,6 +298,7 @@ export function Mascotas() {
                 initialData={initialData}
                 mode={mode}
             />
+            </div>
         </>
     );
 }

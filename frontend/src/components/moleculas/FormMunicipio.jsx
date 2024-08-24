@@ -25,10 +25,6 @@ const FormMunicipios = ({ mode, handleSubmit, onClose, actionLabel }) => {
             setNombreMunicipio(idMunicipio.nombre_municipio);
             setCodigoDane(idMunicipio.codigo_dane);
             setDepartamentoFk(idMunicipio.fk_id_departamento);
-        } else if (mode === 'create') {
-            setNombreMunicipio('');
-            setCodigoDane('');
-            setDepartamentoFk('');
         }
     }, [mode, idMunicipio]);
 

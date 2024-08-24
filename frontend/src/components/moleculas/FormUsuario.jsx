@@ -59,19 +59,6 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
             setPasswordDisplay('****'); // Mostrar solo 4 asteriscos
             setRolOp(idUsuario.rol || '');
             setFotoUrl(idUsuario.img ? `${axiosClient.defaults.baseURL}/uploads/${idUsuario.img}` : '');
-        } else {
-            setTipoDocumentoOp('');
-            setDocumentoIdentidad('');
-            setNombre('');
-            setApellido('');
-            setDireccion('');
-            setCorreo('');
-            setTelefono('');
-            setPassword('');
-            setPasswordDisplay('');
-            setRolOp('');
-            setFotoUrl('');
-            setFoto(null);
         }
     }, [mode, idUsuario]);
 

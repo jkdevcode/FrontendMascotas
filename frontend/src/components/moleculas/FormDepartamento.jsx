@@ -12,10 +12,7 @@ const FormDepartamentos = ({ mode, handleSubmit, onClose, actionLabel }) => {
         if (mode === 'update' && idDepartamento) {
             setNombreDepartamento(idDepartamento.nombre_departamento);
             setCodigoDane(idDepartamento.codigo_dane);
-        } else if (mode === 'create') {
-            setNombreDepartamento('');
-            setCodigoDane('');
-        }
+        } 
     }, [mode, idDepartamento]);
 
     const handleFormSubmit = async (e) => {

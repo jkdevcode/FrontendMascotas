@@ -6,7 +6,7 @@ import { Button } from "@nextui-org/button";
 import { Card, CardHeader, CardBody, Chip } from "@nextui-org/react";
 
 
-export function Notificaciones() {
+export function NotificacionesSuperU() {
     const [notifications, setNotifications] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
 
@@ -16,33 +16,33 @@ export function Notificaciones() {
                 const token = localStorage.getItem("token");
                 const id_usuario = JSON.parse(localStorage.getItem('user')).id_usuario;
                 const response = await axiosClient.get(`/usuarios/listarNoti/${id_usuario}`, { headers: { token: token } });
-                
+
                 console.log('Respuesta de la API:', response.data); // Verificar la respuesta de la API
-    
+
                 setNotifications(response.data);
                 setIsLoaded(true);
             } catch (error) {
                 console.log('Error en el servidor: ' + error);
             }
         };
-    
+
         fetchNotifications();
     }, []);
-    
-    
+
+
 
     const handleApprove = async (id_notificacion) => {
         const notification = notifications.find(notif => notif.id_notificacion === id_notificacion);
-    
+
         if (notification.estado === 'aprobado') {
             Swal.fire('Advertencia', 'La solicitud ya está en estado aprobado', 'warning');
             return; // No hacer la solicitud al backend
         }
-    
+
         try {
             const response = await axiosClient.put(`/usuarios/manejar/${id_notificacion}`, { estado: 'aprobado' });
             Swal.fire('Éxito', response.data.message, 'success');
-            
+
             // Actualizar el estado de la notificación en la lista
             const updatedNotifications = notifications.map(notif =>
                 notif.id_notificacion === id_notificacion ? { ...notif, estado: 'aprobado' } : notif
@@ -53,20 +53,20 @@ export function Notificaciones() {
             Swal.fire('Error', 'No se pudo aprobar la solicitud', 'error');
         }
     };
-    
-    
+
+
     const handleDeny = async (id_notificacion) => {
         const notification = notifications.find(notif => notif.id_notificacion === id_notificacion);
-        
+
         if (notification.estado === 'denegado') {
             Swal.fire('Advertencia', 'La solicitud ya está en estado denegado', 'warning');
             return; // No hacer la solicitud al backend
         }
-    
+
         try {
             const response = await axiosClient.put(`/usuarios/manejar/${id_notificacion}`, { estado: 'denegado' });
             Swal.fire('Éxito', response.data.message, 'success');
-            
+
             // Actualizar el estado de la notificación en la lista
             const updatedNotifications = notifications.map(notif =>
                 notif.id_notificacion === id_notificacion ? { ...notif, estado: 'denegado' } : notif
@@ -77,8 +77,8 @@ export function Notificaciones() {
             Swal.fire('Error', 'No se pudo denegar la solicitud', 'error');
         }
     };
-    
-    
+
+
     const handleDelete = async (id_notificacion) => {
         const result = await Swal.fire({
             title: '¿Estás seguro?',
@@ -108,12 +108,12 @@ export function Notificaciones() {
     const renderNotificationCard = useCallback((notification) => {
         return (
             <Card key={notification.id_notificacion} className="p-4 m-4 bg-gray-200 shadow-lg relative">
-<button
-    onClick={() => handleDelete(notification.id_notificacion)}
-    className="absolute top-2 right-2 text-gray-800 hover:text-red-600 active:text-red-500"
->
-    <FaTrash size={20} />
-</button>
+                <button
+                    onClick={() => handleDelete(notification.id_notificacion)}
+                    className="absolute top-2 right-2 text-gray-800 hover:text-red-600 active:text-red-500"
+                >
+                    <FaTrash size={20} />
+                </button>
 
                 <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
                     <h4 className="font-bold text-2xl mb-1 text-gray-800">Solicitud de: {notification.nombre_solicitante}</h4>
@@ -141,7 +141,7 @@ export function Notificaciones() {
     return (
         <>
 
-<div className="z-0 w-full sm:w-full lg:w-12/12 xl:w-11/12 mt-20">
+            <div className="z-0 w-full sm:w-full lg:w-12/12 xl:w-11/12 mt-20">
                 {notifications.length === 0 ? (
                     <div className="flex justify-center items-center h-64">
                         <h2 className="text-center text-2xl font-bold text-red-500">
@@ -153,9 +153,9 @@ export function Notificaciones() {
                         {notifications.map(renderNotificationCard)}
                     </div>
                 )}
-            </div> 
+            </div>
         </>
     );
 }
 
-export default Notificaciones;
+export default NotificacionesSuperU;
