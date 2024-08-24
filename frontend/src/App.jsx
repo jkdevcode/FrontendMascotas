@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import './App.css'
 import React from "react";
-/* import { DatePicker } from "@nextui-org/react"; */
+
 import Inicio from './components/pages/Inicio';
 import RegistroUser from './components/pages/RegistroUser';
 import IniciarSesion from './components/pages/IniciarSesion';
@@ -19,16 +19,10 @@ import Departamentos from "./components/pages/Departamentos";
 import TabMascotas from "./components/pages/TabMascotas";
 import TabNotificaciones from "./components/pages/TabNotificaciones";
 
-// import { Notificaciones } from "./components/pages/notificaciones";
-
-
-
 
 function App() {
   const stored = localStorage.getItem('user')
   const user = stored && stored !== 'undefined' ? JSON.parse(stored) : null;
-  /* console.log('Usuario almacenado:', user); */
-
 
   return (
     <>

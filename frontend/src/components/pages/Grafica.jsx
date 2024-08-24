@@ -13,11 +13,7 @@ import {
     Legend,
 } from 'chart.js';
 import ListGraficaModal from "../templates/GraficaModal";
-import { Link } from '@nextui-org/react';
-import iconos from '../../styles/iconos';
-import Icon from '../atomos/IconVolver';
-import Swal from 'sweetalert2';
-import Header from '../moleculas/Header';
+import Header from '../moleculas/Header.jsx';
 
 ChartJS.register(
     CategoryScale,
@@ -48,7 +44,6 @@ const Graficas = () => {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchMascotasData = async () => {
@@ -149,15 +144,11 @@ const Graficas = () => {
         maintainAspectRatio: false,
     };
 
-    const logout = () => {
-        localStorage.clear();
-        navigate('/');
-    };
 
     return (
         <>
-           <Header />
-            <div className="p-8">
+           <Header title="Graficas" />
+            <div className="p-8 pl-24">
                 <ListGraficaModal>
                     <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-28">
                         <div>
