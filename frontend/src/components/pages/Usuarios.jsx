@@ -167,7 +167,7 @@ function Usuarios() {
                                 onValueChange={onSearchChange}
                             />
                             <div className="flex gap-3">
-                                <Button color="warning" className="mr-30 text-default-400" style={{ position: 'relative' }} endContent={<PlusIcon />} onClick={() => handleToggle('create')}>
+                                <Button color="warning" className="mr-30 text-white" style={{ position: 'relative' }} endContent={<PlusIcon />} onClick={() => handleToggle('create')}>
                                     Registrar
                                 </Button>
                             </div>

@@ -41,18 +41,18 @@ export const Sidebar = () => {
     { title: "Mascotas", link: "/mascotas", icon: MdOutlinePets },
     { title: "Notificaciones", link: "/notificaciones", icon: AiOutlineBell },
     { title: "Gráficas", link: "/graficas", icon: AiOutlinePieChart },
-       /*  { title: "Perfil", link: "/perfil", icon: AiOutlineUser }, */
+    { title: "Perfil", link: "/perfil", icon: AiOutlineUser },
   ];
 
   const MenusAdmin = [
     { title: "Mascotas", link: "/mascotas", icon: MdOutlinePets },
 
-   /*  { title: "Perfil", link: "/perfil", icon: AiOutlineUser }, */
+    { title: "Perfil", link: "/perfil", icon: AiOutlineUser },
   ];
 
   const MenusUser = [
     { title: "Mis Mascotas", link: "/listmascotas", icon: MdOutlinePets },
-   /*  { title: "Perfil", link: "/perfil", icon: AiOutlineUser }, */
+    { title: "Perfil", link: "/perfil", icon: AiOutlineUser },
   ];
 
   return (
@@ -74,9 +74,8 @@ export const Sidebar = () => {
                 className={`cursor-pointer duration-500 h-10 w-10 rounded-full ${open ? "rotate-[360deg] w-20 h-20 rounded-full" : ""}`}
               />
               <h1
-                className={`text-[#fff] origin-left ml-2 font-bold  text-xl duration-200 overflow-hidden whitespace-nowrap ${
-                  !open && "scale-0 flex flex-col"
-                }`}
+                className={`text-[#fff] origin-left ml-2 font-bold  text-xl duration-200 overflow-hidden whitespace-nowrap ${!open && "scale-0 flex flex-col"
+                  }`}
                 style={{ maxWidth: "calc(100% - 4rem)" }}
                 title="Madac-coffee"
               >
