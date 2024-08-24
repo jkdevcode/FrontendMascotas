@@ -3,10 +3,9 @@ import iconos from '../../styles/iconos';
 import Icon from '../atomos/IconVolver';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import ButtonActualizar from '../atomos/ButtonActualizar';
 import AccionesModal from '../organismos/ModalAcciones';
 import PerfilModal from '../templates/PerfilModal';
-import { Tooltip, Card, Button, Link } from "@nextui-org/react";
+import { Tooltip, Card, Button } from "@nextui-org/react";
 import axiosClient from '../axiosClient';
 
 const PerfilUsuario = () => {
@@ -17,13 +16,6 @@ const PerfilUsuario = () => {
   const [initialData, setInitialData] = useState(null);
   const [mensaje, setMensaje] = useState('');
   const [mode, setMode] = useState('create');
-
-  const navigate = useNavigate();
-
-  const logout = () => {
-    localStorage.clear();
-    navigate('/');
-  };
 
   const ObtenerDatos = async () => {
     try {
@@ -81,15 +73,6 @@ const PerfilUsuario = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center p-8 w-full">
-        <header className="fixed top-0 left-0 right-0 z-10 flex justify-between items-center px-10 h-14 bg-zinc-300 shadow-md max-w-screen-xxl flex-wrap mx-auto p-4">
-          <h1 className="text-3xl font-semibold text-blue-400">Perrfect Match</h1>
-          <nav className="flex-grow flex justify-center space-x-24">
-            <Link href="/listmascotas" color="default" className="mx-2 text-lg cursor-pointer">Listas de mascotas</Link>
-          </nav>
-          <Link href="/perfil" color="black" className="mx-2 text-lg cursor-pointer">Perfil</Link>
-        </header>
-      </div>
       {perfil && (
         <div className='my-12 flex justify-center'>
           <Card css={{ maxWidth: "1100px" }} className="bg-white rounded-2xl">
@@ -100,36 +83,6 @@ const PerfilUsuario = () => {
                   <Button auto flat color="warning" onClick={() => handleToggle('update', perfil)}>
                     Actualizar
                   </Button>
-                </div>
-                <div className="flex items-center">
-                  <Tooltip content="Salir">
-                    <Button auto flat color="error" onClick={() => {
-                      const swalWithBootstrapButtons = Swal.mixin({
-                        customClass: {
-                          confirmButton: "btn btn-success",
-                          cancelButton: "btn btn-danger",
-                          actions: "gap-5"
-                        },
-                        buttonsStyling: false
-                      });
-
-                      swalWithBootstrapButtons.fire({
-                        title: "¿Estás Seguro que deseas Cerrar Sesión?",
-                        text: "",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonText: "Salir",
-                        cancelButtonText: "Cancelar",
-                        reverseButtons: true
-                      }).then((result) => {
-                        if (result.isConfirmed) {
-                          logout();
-                        }
-                      });
-                    }}>
-                      <Icon className="w-5 h-5" icon={iconos.iconoSalir} />
-                    </Button>
-                  </Tooltip>
                 </div>
               </div>
 
