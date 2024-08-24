@@ -2,7 +2,7 @@ import React from 'react';
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import Header from '../moleculas/Header.jsx';
 import NotificacionesMascotas from './NotificacionesMascotas.jsx';
-
+import Notificaciones from './Notificaciones.jsx';
 
 const TabNotificaciones = () => {
     return (
@@ -22,7 +22,7 @@ const TabNotificaciones = () => {
                             <Tab key="usuarios" title="Usuarios">
                                 <Card className="h-full">
                                     <CardBody>
-                                        {/* Lo suyo cana */}
+                                    <Notificaciones />
                                     </CardBody>
                                 </Card>
                             </Tab>

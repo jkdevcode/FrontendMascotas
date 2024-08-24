@@ -72,7 +72,7 @@ export function NotificacionesUsuario() {
 
     const renderNotificationCard = (notification) => {
         return (
-            <Card key={notification.id_notificacion} className="p-4 m-4 bg-gray-200 shadow-lg relative">
+            <Card key={notification.id_notificacion} className="p-4 m-4 bg-gray-200 shadow-lg relative ">
 <button
     onClick={() => handleDelete(notification.id_notificacion)}
     className="absolute top-2 right-2 text-gray-800 hover:text-red-600 active:text-red-500"
@@ -99,15 +99,19 @@ export function NotificacionesUsuario() {
     return (
         <>
             <Header />
-            <div className="z-0 w-full sm:w-full lg:w-12/12 xl:w-11/12 mt-20">
-                {isLoaded ? (
+<div className="z-0 w-full sm:w-full lg:w-12/12 xl:w-11/12 mt-20">
+                {notifications.length === 0 ? (
+                    <div className="flex justify-center items-center h-64">
+                        <h2 className="text-center text-2xl font-bold text-red-500">
+                            No tienes notificaciones  disponibles
+                        </h2>
+                    </div>
+                ) : (
                     <div className="grid gap-4 mt-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 xxl:grid-cols-4">
                         {notifications.map(renderNotificationCard)}
                     </div>
-                ) : (
-                    <div className="text-center">Cargando notificaciones...</div>
                 )}
-            </div>
+            </div> 
         </>
     );
 }

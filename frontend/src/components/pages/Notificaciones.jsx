@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 import axiosClient from '../axiosClient.js';
 import { Button } from "@nextui-org/button";
 import { Card, CardHeader, CardBody, Chip } from "@nextui-org/react";
-import Header from '../moleculas/Header.jsx';
+
 
 export function Notificaciones() {
     const [notifications, setNotifications] = useState([]);
@@ -140,16 +140,20 @@ export function Notificaciones() {
 
     return (
         <>
-            <Header />
-            <div className="z-0 w-full sm:w-full lg:w-12/12 xl:w-11/12 mt-20">
-                {isLoaded ? (
+
+<div className="z-0 w-full sm:w-full lg:w-12/12 xl:w-11/12 mt-20">
+                {notifications.length === 0 ? (
+                    <div className="flex justify-center items-center h-64">
+                        <h2 className="text-center text-2xl font-bold text-red-500">
+                            No tienes notificaciones de solicitudes de cambio de rol disponibles
+                        </h2>
+                    </div>
+                ) : (
                     <div className="grid gap-4 mt-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 xxl:grid-cols-4">
                         {notifications.map(renderNotificationCard)}
                     </div>
-                ) : (
-                    <div className="text-center">Cargando notificaciones...</div>
                 )}
-            </div>
+            </div> 
         </>
     );
 }
