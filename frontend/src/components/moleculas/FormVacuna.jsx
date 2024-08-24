@@ -57,7 +57,7 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                 enfermedad,
                 estado: estadoOp
             };
-            await handleSubmit(formData);
+            await handleSubmit(formData, e);
         } catch (error) {
             console.log(error);
             alert('Hay un error en el sistema ' + error);
@@ -87,15 +87,15 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                     </select>
                 </div>
                 <div className='py-2'>
-                <input
-                            type="date"
-                            className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
-                            id='fecha_nacimiento'
-                            name="fecha_nacimiento"
-                            value={fechaVacuna}
-                            onChange={(e) => setFechaVacuna(e.target.value)}
-                            required
-                        />
+                    <input
+                        type="date"
+                        className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
+                        id='fecha_nacimiento'
+                        name="fecha_nacimiento"
+                        value={fechaVacuna}
+                        onChange={(e) => setFechaVacuna(e.target.value)}
+                        required
+                    />
                     {/* <DatePicker
                         label="Fecha de la vacuna"
                         maxValue={today(getLocalTimeZone())}

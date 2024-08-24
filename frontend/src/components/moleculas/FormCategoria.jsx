@@ -11,10 +11,7 @@ const FormCategoria = ({ mode, handleSubmit, onClose, actionLabel, initialData }
         if (mode === 'update' && initialData) {
             setNombreCategoria(initialData.nombre_categoria);
             setEstadoCategoria(initialData.estado);
-        } else if (mode === 'create') {
-            setNombreCategoria('');
-            setEstadoCategoria('');
-        }
+        } 
     }, [mode, initialData]);
 
     const handleFormSubmit = async (e) => {

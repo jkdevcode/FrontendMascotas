@@ -52,7 +52,7 @@ export const Sidebar = () => {
 
   const MenusUser = [
     { title: "Mis Mascotas", link: "/listmascotas", icon: MdOutlinePets },
-    { title: "Notificaciones", link: "/notificacionesusuario", icon: AiOutlineBell },
+    { title: "Notificaciones", link: "/notificaciones", icon: AiOutlineBell },
     { title: "Perfil", link: "/perfil", icon: AiOutlineUser },
   ];
 

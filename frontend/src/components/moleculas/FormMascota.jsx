@@ -60,22 +60,6 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                 return imageUrl;
             });
             setFotos(formattedFotos || []);
-        } else {
-            // Inicializar campos vacíos si estamos en modo de creación
-            console.log("Modo de creación de mascota, inicializando campos vacíos.");
-            setNombre('');
-            setFechaNacimiento('');
-            setEstado('En Adopcion');
-            setDescripcion('');
-            setEsterilizacion('');
-            setTamano('');
-            setPeso('');
-            setFkIdCategoria('');
-            setFkIdRaza('');
-            setFkIdDepartamento('');
-            setFkIdMunicipio('');
-            setSexo('');
-            setFotos([]);
         }
     }, [mode, idMascota]);
     // Manejar el envío del formulario

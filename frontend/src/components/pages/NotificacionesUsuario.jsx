@@ -16,17 +16,17 @@ export function NotificacionesUsuario() {
                 const token = localStorage.getItem("token");
                 const id_usuario = JSON.parse(localStorage.getItem('user')).id_usuario;
                 const response = await axiosClient.get(`/usuarios/listarNoti/${id_usuario}`, { headers: { token: token } });
-                
+
                 setNotifications(response.data);
                 setIsLoaded(true);
             } catch (error) {
                 console.log('Error en el servidor: ' + error);
             }
         };
-    
+
         fetchNotifications();
     }, []);
-    
+
     useEffect(() => {
         notifications.forEach(notification => {
             if (notification.estado === 'denegado') {
@@ -73,12 +73,12 @@ export function NotificacionesUsuario() {
     const renderNotificationCard = (notification) => {
         return (
             <Card key={notification.id_notificacion} className="p-4 m-4 bg-gray-200 shadow-lg relative ">
-<button
-    onClick={() => handleDelete(notification.id_notificacion)}
-    className="absolute top-2 right-2 text-gray-800 hover:text-red-600 active:text-red-500"
->
-    <FaTrash size={20} />
-</button>
+                <button
+                    onClick={() => handleDelete(notification.id_notificacion)}
+                    className="absolute top-2 right-2 text-gray-800 hover:text-red-600 active:text-red-500"
+                >
+                    <FaTrash size={20} />
+                </button>
                 <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
                     <div className="w-full text-center">
                         <h4 className="font-bold text-3xl mb-2 text-gray-900">Notificación</h4>
@@ -98,8 +98,8 @@ export function NotificacionesUsuario() {
 
     return (
         <>
-            <Header />
-<div className="z-0 w-full sm:w-full lg:w-12/12 xl:w-11/12 mt-20">
+            {/* <Header /> */}
+            <div className="z-0 w-full sm:w-full lg:w-12/12 xl:w-11/12 mt-20">
                 {notifications.length === 0 ? (
                     <div className="flex justify-center items-center h-64">
                         <h2 className="text-center text-2xl font-bold text-red-500">
@@ -111,7 +111,7 @@ export function NotificacionesUsuario() {
                         {notifications.map(renderNotificationCard)}
                     </div>
                 )}
-            </div> 
+            </div>
         </>
     );
 }

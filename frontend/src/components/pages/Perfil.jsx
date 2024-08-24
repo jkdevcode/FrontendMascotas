@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { Tooltip, Button, Avatar } from "@nextui-org/react";
+import { Button, Avatar } from "@nextui-org/react";
 import axiosClient from '../axiosClient';
-import Icon from '../atomos/IconVolver';
 import { FaUserCircle } from 'react-icons/fa';
 import PerfilModal from '../templates/PerfilModal';
-import iconos from '../../styles/iconos';
 import Header from '../moleculas/Header';
 
 const PerfilUsuario = () => {
@@ -14,14 +12,9 @@ const PerfilUsuario = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [initialData, setInitialData] = useState(null);
   const [mode, setMode] = useState('update');
-  const [showRequestSection, setShowRequestSection] = useState(false);
 
   const navigate = useNavigate();
 
-  const logout = () => {
-    localStorage.clear();
-    navigate('/');
-  };
 
   const refreshPerfil = async () => {
     await obtenerDatos(); // Obtén los datos más recientes
@@ -203,7 +196,7 @@ const PerfilUsuario = () => {
             </div>
 
             {/* Sección para solicitar cambio de rol */}
-            {perfil.rol !== 'Super-Usuario' && (
+            {perfil.rol === 'usuario' && (
               <div className="mt-8 text-center">
                 <p className="text-lg font-medium text-gray-700">¿Deseas solicitar un cambio de rol superior?</p>
                 <Button

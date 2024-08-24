@@ -24,9 +24,6 @@ const FormRazas = ({ mode, handleSubmit, onClose, actionLabel }) => {
             console.log('idRaza:', idRaza); 
             setNombreRaza(idRaza.nombre_raza);
             setCategoriaFk(idRaza.fk_id_categoria);
-        } else if (mode === 'create') {
-            setNombreRaza('');
-            setCategoriaFk('');
         }
     }, [mode, idRaza]);
 
