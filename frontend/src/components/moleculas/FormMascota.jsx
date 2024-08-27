@@ -48,9 +48,9 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
             setEsterilizacion(idMascota.esterilizado || '');
             setTamano(idMascota.tamano || '');
             setPeso(idMascota.peso || '');
-            setFkIdCategoria(idMascota.fk_id_categoria || '');
-            setFkIdRaza(idMascota.fk_id_raza || '');
-            setFkIdDepartamento(idMascota.fk_id_departamento || '');
+            setFkIdCategoria(idMascota.categoria || '');
+            setFkIdRaza(idMascota.nombre_raza || '');
+            setFkIdDepartamento(idMascota.id_departamento || '');
             setFkIdMunicipio(idMascota.fk_id_municipio || '');
             setSexo(idMascota.sexo || '');
             // Convertir las URLs de las imágenes existentes en objetos Blob para la vista previa

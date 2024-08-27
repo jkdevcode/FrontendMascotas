@@ -88,7 +88,7 @@ export function Mascotas() {
                     <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
                         <h4 className="font-bold text-2xl mb-1 text-gray-800">Nombre: {mascota.nombre_mascota}</h4>
                         <small className="text-gray-600 mb-2">Género: {mascota.sexo}</small>
-                        <h4 className="font-semibold text-lg mb-2 text-gray-700">Raza: {mascota.fk_id_raza}</h4>
+                        <h4 className="font-semibold text-lg mb-2 text-gray-700">Raza: {mascota.raza}</h4>
                         <Chip className="capitalize" color={statusColorMap[mascota.estado]} size="sm" variant="flat">
                             {mascota.estado}
                         </Chip>
