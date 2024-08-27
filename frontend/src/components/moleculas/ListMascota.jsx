@@ -14,7 +14,7 @@ function ListMascota({ initialData, onClose }) {
         const fetchVacunas = async () => {
             try {
                 const response = await axiosClient.get(`/vacunas/listar/${initialData.id_mascota}`);
-                setVacunas(response.data.data);
+                setVacunas(response.data);
             } catch (error) {
                 console.error('Error al listar vacunas:', error);
             }
@@ -82,6 +82,31 @@ function ListMascota({ initialData, onClose }) {
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
+    const calculateAge = (birthDate) => {
+        const today = new Date();
+        const birth = new Date(birthDate);
+    
+        let ageYears = today.getFullYear() - birth.getFullYear();
+        let ageMonths = today.getMonth() - birth.getMonth();
+    
+        if (ageMonths < 0) {
+          ageYears--;
+          ageMonths += 12;
+        }
+    
+        if (today.getDate() < birth.getDate()) {
+          ageMonths--;
+          if (ageMonths < 0) {
+            ageYears--;
+            ageMonths += 12;
+          }
+        }
+    
+        return { years: ageYears, months: ageMonths };
+      };
+    
+      // Calcula la edad
+      const { years, months } = calculateAge(initialData.fecha_nacimiento);
 
     return (
         <>
@@ -89,10 +114,14 @@ function ListMascota({ initialData, onClose }) {
                 <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
                     <h4 className="font-bold text-large">Nombre: {initialData.nombre_mascota}</h4>
                     <small className="text-default-500">Sexo: {initialData.sexo}</small>
-                    <h4 className="font-bold text-large">Raza: {initialData.fk_id_raza}</h4>
-                    <small className="text-default-500">Especie: {initialData.fk_id_categoria}</small>
-                    <h4 className="font-bold text-large">Edad: {initialData.edad}</h4>
+                    <h4 className="font-bold text-large">Raza: {initialData.raza}</h4>
+                    <small className="text-default-500">Especie: {initialData.categoria}</small>
+                    <h4 className="font-bold text-large">Edad: {years} Años y {months} Meses</h4>
                     <h4 className="font-bold text-large">Esterilización: {initialData.esterilizado}</h4>
+                    <h4 className="font-bold text-large">Departamento: {initialData.departamento}</h4>
+                    <h4 className="font-bold text-large">Municipio: {initialData.municipio}</h4>
+                    <h4 className="font-bold text-large">Tamaño: {initialData.tamano}</h4>
+                    <h4 className="font-bold text-large">Peso: {initialData.peso}</h4>
                     <Chip className="capitalize" color={statusColorMap[initialData.estado]} size="xs" variant="flat">
                         {initialData.estado}
                     </Chip>
@@ -124,7 +153,7 @@ function ListMascota({ initialData, onClose }) {
                         )}
                     </div>
                     <p className="text-sm text-gray-700 font-medium mb-4">{initialData.descripcion}</p>
-                    <p className="text-sm text-gray-700 font-medium mb-4">Edad: {initialData.edad} años</p>
+                    {/* <p className="text-sm text-gray-700 font-medium mb-4">Edad: {initialData.edad} años</p> */}
                     <div className="mt-2 flex flex-wrap justify-between">
                         {vacunas.length > 0 ? (
                             vacunas.map((vacuna) => (
