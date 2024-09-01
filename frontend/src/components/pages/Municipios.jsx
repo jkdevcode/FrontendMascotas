@@ -274,7 +274,7 @@ function Municipios() {
             sortable: true
         },
         {
-            uid: 'fk_id_departamento',
+            uid: 'nombre_departamento',
             name: 'Departamento',
             sortable: true
         },
