@@ -351,7 +351,7 @@ function RegistroUser() {
                             />
                         </div>
 
-                        <Button type="submit" className='mt-4 w-full text-white p-2 '>
+                        <Button type="submit" color="warning" className='mt-4 w-full text-white p-2 '>
                             Registrar
                         </Button>
                     </form>
