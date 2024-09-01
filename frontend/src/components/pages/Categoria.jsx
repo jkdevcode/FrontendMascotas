@@ -140,11 +140,11 @@ function Categorias() {
                             </div>
                         </div>
                         <div className="flex justify-between items-center z-10 mr-30 mt-2">
-                            <span className="text-white text-small">Total {categorias.length} Resultados</span>
-                            <label className="flex items-center text-white mr-30 text-small">
+                            <span className="text-default-400 text-small">Total {categorias.length} Resultados</span>
+                            <label className="flex items-center text-default-400 mr-30 text-small">
                                 Columnas por página:
                                 <select
-                                    className="bg-transparent outline-none text-white text-small"
+                                    className="bg-transparent outline-none text-default-400 text-small"
                                     onChange={onRowsPerPageChange}
                                 >
                                     <option value="5">5</option>
@@ -189,7 +189,7 @@ function Categorias() {
 
         return (
             <div className="flex flex-col items-center justify-center p-4 w-full">
-                <div className="w-full sm:w-6/12 lg:w-8/12 xl:w-10/12">
+                <div className="w-full sm:w-12/12 lg:w-8/12 xl:w-10/12">
                     <Table
                         aria-label="Tabla"
                         isHeaderSticky
@@ -364,7 +364,7 @@ function Categorias() {
 
     return (
         <>
-            <div className='w-full max-w-[90%] ml-24 items-center p-10'>
+            <div className='w-full max-w-[90%] items-center p-10'>
                 <EjemploCategoria />
                 {modalOpen && (
                     <CategoriaModal

@@ -278,7 +278,7 @@ export function Mascotas() {
     };
     return (
         <>
-        <div className='pl-24'>
+        <div className='pl-4'>
             <Ejemplo mascotas={mascotas} />
             <MascotaModal
                 open={modalOpen}

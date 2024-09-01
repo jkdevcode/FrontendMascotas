@@ -200,7 +200,7 @@ function Vacunas() {
 
         return (
             <div className="flex flex-col items-center justify-center p-4 w-full">
-                <div className="w-full  sm:w-6/12  lg:w-8/12 xl:w-10/12">
+                <div className="w-full  sm:w-12/12  lg:w-8/12 xl:w-10/12">
                     <Table
                         aria-label="Tabla"
                         isHeaderSticky
@@ -382,7 +382,7 @@ function Vacunas() {
     return (
 
         <>
-            <div className='w-full max-w-[90%] ml-24 items-center p-10'>
+            <div className='w-full max-w-[90%] items-center p-10'>
                 <AccionesModal
                     isOpen={modalAcciones}
                     onClose={() => setModalAcciones(false)}
