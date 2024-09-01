@@ -88,37 +88,38 @@ const NotificacionesMascotas = () => {
                     <Chip className="capitalize" color={statusColorMap[mascota.estado_adopcion]} size="sm" variant="flat">
                         {mascota.estado_adopcion}
                     </Chip>
-                    <p className="text-sm text-gray-700 mt-2"><strong>Solicitante:</strong> {mascota.usuario.nombre} {mascota.usuario.apellido}</p>
-                    <p className="text-sm text-gray-700"><strong>Correo:</strong> {mascota.usuario.correo}</p>
-                    <p className="text-sm text-gray-700"><strong>Numero:</strong> {mascota.usuario.telefono}</p>
+                    <p className="text-sm text-gray-700 mt-2"><strong>Solicitante:</strong> {mascota.usuario_nombre} {mascota.usuario_apellido}</p>
+                    <p className="text-sm text-gray-700"><strong>Correo:</strong> {mascota.usuario_correo}</p>
+                    <p className="text-sm text-gray-700"><strong>Numero:</strong> {mascota.usuario_telefono}</p>
                 </CardHeader>
                 <CardBody className="overflow-visible py-2">
                     <Skeleton isLoaded={isLoaded} className="rounded-lg">
-                        <div className="relative w-full h-52 mb-4 overflow-hidden">
-                            {mascota.imagenes && mascota.imagenes.length > 0 ? (
-                                <div className={`grid ${mascota.imagenes.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
-                                    {mascota.imagenes.map((imagen, index) => (
-                                        <div key={index} className={`flex items-center justify-center ${mascota.imagenes.length === 1 && index === 0 ? 'col-span-2' : ''}`}>
-                                            <Image
-                                                alt={`Imagen ${index + 1}`}
-                                                className="object-cover rounded-xl w-full h-full"
-                                                src={`${axiosClient.defaults.baseURL}/uploads/${imagen}`}
-                                                width="auto"
-                                                height="auto"
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <Image
-                                    alt="Imagen por defecto"
-                                    className="object-cover rounded-xl w-full h-full"
-                                    src="https://nextui.org/images/hero-card-complete.jpeg"
-                                    width="auto"
-                                    height="auto"
-                                />
-                            )}
-                        </div>
+                    <div className="relative w-full h-52 mb-4 overflow-hidden">
+  {mascota && mascota.imagenes ? (
+    <div className={`grid ${mascota.imagenes.split(',').length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
+      {mascota.imagenes.split(',').map((imagen, index) => (
+        <div key={index} className={`flex items-center justify-center ${mascota.imagenes.split(',').length === 1 && index === 0 ? 'col-span-2' : ''}`}>
+          <Image
+            alt={`Imagen ${index + 1}`}
+            className="object-cover rounded-xl w-full h-full"
+            src={`${axiosClient.defaults.baseURL}/uploads/${imagen}`}
+            width="auto"
+            height="auto"
+          />
+        </div>
+      ))}
+    </div>
+  ) : (
+    <Image
+      alt="Imagen por defecto"
+      className="object-cover rounded-xl w-full h-full"
+      src="https://nextui.org/images/hero-card-complete.jpeg"
+      width="auto"
+      height="auto"
+    />
+  )}
+</div>
+
                     </Skeleton>
                     <p className="text-sm text-gray-700 font-medium mb-4">{mascota.descripcion}</p>
                     <div className="flex justify-start gap-2">

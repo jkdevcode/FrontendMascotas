@@ -30,6 +30,7 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
     const [nuevasFotos, setNuevasFotos] = useState([]); // Para manejar nuevas fotos
     const fileInputRef = useRef(null);
     const { idMascota } = useContext(MascotasContext);
+
     // useEffect para cargar las listas de categorías, razas, departamentos y municipios
     useEffect(() => {
         axiosClient.get('/categorias/listar').then((response) => setCategoria(response.data));
@@ -37,10 +38,10 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
         axiosClient.get('/departamentos/listar').then((response) => setDepartamento(response.data));
         axiosClient.get('/municipios/listar').then((response) => setMunicipio(response.data));
     }, []);
+
     // useEffect para manejar la lógica de actualización o creación de una mascota
     useEffect(() => {
         if (mode === 'update' && idMascota) {
-            // Cargar los datos de la mascota si estamos en modo de actualización
             setNombre(idMascota.nombre_mascota || '');
             setFechaNacimiento(idMascota.fecha_nacimiento ? new Date(idMascota.fecha_nacimiento).toISOString().split('T')[0] : '');
             setEstado(idMascota.estado || 'En Adopcion');
@@ -48,20 +49,19 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
             setEsterilizacion(idMascota.esterilizado || '');
             setTamano(idMascota.tamano || '');
             setPeso(idMascota.peso || '');
-            setFkIdCategoria(idMascota.categoria || '');
-            setFkIdRaza(idMascota.nombre_raza || '');
-            setFkIdDepartamento(idMascota.id_departamento || '');
+            setFkIdCategoria(idMascota.fk_id_categoria || '');
+            setFkIdRaza(idMascota.fk_id_raza || '');
+            setFkIdDepartamento(idMascota.fk_id_departamento || '');
             setFkIdMunicipio(idMascota.fk_id_municipio || '');
             setSexo(idMascota.sexo || '');
-            // Convertir las URLs de las imágenes existentes en objetos Blob para la vista previa
-            const formattedFotos = idMascota.imagenes?.map((imagen) => {
-                const imageUrl = `http://localhost:8366/uploads/${imagen}`;
-                console.log(`Obteniendo imagen existente: ${imageUrl}`);
-                return imageUrl;
-            });
-            setFotos(formattedFotos || []);
+
+            // Convertir cadena de imágenes a array de URLs
+            const imagenesArray = idMascota.imagenes ? idMascota.imagenes.split(',').map(imagen => `http://localhost:8366/uploads/${imagen}`) : [];
+            console.log("Imágenes existentes:", imagenesArray);
+            setFotos(imagenesArray);
         }
     }, [mode, idMascota]);
+
     // Manejar el envío del formulario
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -85,25 +85,30 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
         formData.append('fk_id_municipio', fk_id_municipio);
         formData.append('sexo', sexo);
         formData.append('fk_id_usuario', fk_id_usuario);
+
         // Agregar las nuevas fotos a FormData
-        nuevasFotos.forEach((imagenes) => {
-            formData.append('imagenes', imagenes);
-            console.log(`Agregando nueva imagen al FormData: ${imagenes}`);
+        nuevasFotos.forEach((imagen) => {
+            formData.append('imagenes', imagen);
+            console.log(`Agregando nueva imagen al FormData: ${imagen}`);
         });
+
         // Enviar los datos al método handleSubmit
         handleSubmit(formData, e);
     };
+
     // Manejar cambios en la selección de imágenes
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
         console.log("Nuevas fotos seleccionadas:", files);
         setNuevasFotos((prevFotos) => [...prevFotos, ...files]);
     };
+
     // Manejar clic en el selector de archivos
     const handleClick = () => {
         console.log("Abriendo selector de archivos...");
         fileInputRef.current.click();
     };
+
     return (
         <form method='post' onSubmit={handleFormSubmit} encType="multipart/form-data">
             <div className='flex flex-row items-center justify-center'>
@@ -291,7 +296,7 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             required
                         >
                             <option value="" hidden className="text-gray-600">
-                                Seleccionar Categoría
+                                Seleccionar Municipio
                             </option>
                             {municipio.map(muni => (
                                 <option key={muni.id_municipio} value={muni.id_municipio}>

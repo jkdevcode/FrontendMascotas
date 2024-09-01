@@ -108,11 +108,11 @@ export function ListsMascotas() {
                     </CardHeader>
                     <CardBody className="overflow-visible py-4">
                         <Skeleton isLoaded={isLoaded} className="rounded-lg">
-                            <div className="relative w-full mb-4 overflow-hidden">
+                        <div className="relative w-full mb-4 overflow-hidden">
                                 {mascota.imagenes && mascota.imagenes.length > 0 ? (
-                                    <div className={`grid ${mascota.imagenes.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
-                                        {mascota.imagenes.map((imagen, index) => (
-                                            <div key={index} className={`flex items-center justify-center ${mascota.imagenes.length === 1 && index === 0 ? 'col-span-2' : ''}`}>
+                                    <div className={`grid ${mascota.imagenes.split(',').length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
+                                        {mascota.imagenes.split(',').map((imagen, index) => (
+                                            <div key={index} className={`flex items-center justify-center ${mascota.imagenes.split(',').length === 1 && index === 0 ? 'col-span-2' : ''}`}>
                                                 <Image
                                                     alt={`Imagen ${index + 1}`}
                                                     className="object-cover rounded-xl"

@@ -97,9 +97,9 @@ export function Mascotas() {
                         <Skeleton isLoaded={isLoaded} className="rounded-lg">
                             <div className="relative w-full mb-4 overflow-hidden">
                                 {mascota.imagenes && mascota.imagenes.length > 0 ? (
-                                    <div className={`grid ${mascota.imagenes.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
-                                        {mascota.imagenes.map((imagen, index) => (
-                                            <div key={index} className={`flex items-center justify-center ${mascota.imagenes.length === 1 && index === 0 ? 'col-span-2' : ''}`}>
+                                    <div className={`grid ${mascota.imagenes.split(',').length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
+                                        {mascota.imagenes.split(',').map((imagen, index) => (
+                                            <div key={index} className={`flex items-center justify-center ${mascota.imagenes.split(',').length === 1 && index === 0 ? 'col-span-2' : ''}`}>
                                                 <Image
                                                     alt={`Imagen ${index + 1}`}
                                                     className="object-cover rounded-xl"
@@ -124,6 +124,7 @@ export function Mascotas() {
                                     </div>
                                 )}
                             </div>
+
                         </Skeleton>
                         <p className="text-sm text-gray-700 font-medium mb-4">{mascota.descripcion}</p>
                         <div className="mt-2 flex justify-start gap-2">
@@ -278,26 +279,26 @@ export function Mascotas() {
     };
     return (
         <>
-        <div className='pl-4'>
-            <Ejemplo mascotas={mascotas} />
-            <MascotaModal
-                open={modalOpen}
-                onClose={handleToggle}
-                handleSubmit={handleSubmit}
-                actionLabel={mode === 'create' ? 'Registrar' : 'Actualizar'}
-                title={mode === 'create' ? 'Registrar Mascota' : 'Actualizar Mascota'}
-                initialData={initialData}
-                mode={mode}
-            />
-            <AccionesModal
-                open={modalAcciones}
-                onClose={handleToggleAcciones}
-                handleSubmit={handleSubmit}
-                actionLabel={mode === 'create' ? 'Registrar' : 'Actualizar'}
-                title={mode === 'create' ? 'Registrar Mascota' : 'Actualizar Mascota'}
-                initialData={initialData}
-                mode={mode}
-            />
+            <div className='pl-4'>
+                <Ejemplo mascotas={mascotas} />
+                <MascotaModal
+                    open={modalOpen}
+                    onClose={handleToggle}
+                    handleSubmit={handleSubmit}
+                    actionLabel={mode === 'create' ? 'Registrar' : 'Actualizar'}
+                    title={mode === 'create' ? 'Registrar Mascota' : 'Actualizar Mascota'}
+                    initialData={initialData}
+                    mode={mode}
+                />
+                <AccionesModal
+                    open={modalAcciones}
+                    onClose={handleToggleAcciones}
+                    handleSubmit={handleSubmit}
+                    actionLabel={mode === 'create' ? 'Registrar' : 'Actualizar'}
+                    title={mode === 'create' ? 'Registrar Mascota' : 'Actualizar Mascota'}
+                    initialData={initialData}
+                    mode={mode}
+                />
             </div>
         </>
     );
