@@ -21,7 +21,7 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
     const [correo, setCorreo] = useState('');
     const [telefono, setTelefono] = useState('');
     const [password, setPassword] = useState('');
-    const [passwordDisplay, setPasswordDisplay] = useState('****'); // Para mostrar solo 4 asteriscos
+    const [passwordDisplay, setPasswordDisplay] = useState('********'); // Para mostrar solo 4 asteriscos
     const [foto, setFoto] = useState(null);
     const [fotoUrl, setFotoUrl] = useState('');
     const fileInputRef = useRef(null);
@@ -56,7 +56,7 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
             setCorreo(idUsuario.correo || '');
             setTelefono(idUsuario.telefono || '');
             setPassword(''); // La contraseña en sí no se muestra
-            setPasswordDisplay('****'); // Mostrar solo 4 asteriscos
+            setPasswordDisplay('********'); // Mostrar solo 4 asteriscos
             setRolOp(idUsuario.rol || '');
             setFotoUrl(idUsuario.img ? `${axiosClient.defaults.baseURL}/uploads/${idUsuario.img}` : '');
         }
@@ -248,7 +248,7 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
                         <Input
                             color='warning'
                             variant="bordered"
-                            type="tel"
+                            type="number"
                             label="Teléfono"
                             className="w-full"
                             id='telefono'
