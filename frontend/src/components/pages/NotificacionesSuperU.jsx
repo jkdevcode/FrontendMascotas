@@ -33,19 +33,19 @@ export function NotificacionesSuperU() {
 
     const handleApprove = async (id_notificacion) => {
         const notification = notifications.find(notif => notif.id_notificacion === id_notificacion);
-
-        if (notification.estado === 'aprobado') {
-            Swal.fire('Advertencia', 'La solicitud ya está en estado aprobado', 'warning');
+    
+        if (notification.estado === 'aceptada') {
+            Swal.fire('Advertencia', 'La solicitud ya está en estado aceptada', 'warning');
             return; // No hacer la solicitud al backend
         }
-
+    
         try {
-            const response = await axiosClient.put(`/usuarios/manejar/${id_notificacion}`, { estado: 'aprobado' });
+            const response = await axiosClient.put(`/usuarios/manejar/${id_notificacion}`, { estado: 'aceptada' });
             Swal.fire('Éxito', response.data.message, 'success');
-
+    
             // Actualizar el estado de la notificación en la lista
             const updatedNotifications = notifications.map(notif =>
-                notif.id_notificacion === id_notificacion ? { ...notif, estado: 'aprobado' } : notif
+                notif.id_notificacion === id_notificacion ? { ...notif, estado: 'aceptada' } : notif
             );
             setNotifications(updatedNotifications);
         } catch (error) {
@@ -53,23 +53,22 @@ export function NotificacionesSuperU() {
             Swal.fire('Error', 'No se pudo aprobar la solicitud', 'error');
         }
     };
-
-
+    
     const handleDeny = async (id_notificacion) => {
         const notification = notifications.find(notif => notif.id_notificacion === id_notificacion);
-
-        if (notification.estado === 'denegado') {
-            Swal.fire('Advertencia', 'La solicitud ya está en estado denegado', 'warning');
+    
+        if (notification.estado === 'rechazada') {
+            Swal.fire('Advertencia', 'La solicitud ya está en estado rechazada', 'warning');
             return; // No hacer la solicitud al backend
         }
-
+    
         try {
-            const response = await axiosClient.put(`/usuarios/manejar/${id_notificacion}`, { estado: 'denegado' });
+            const response = await axiosClient.put(`/usuarios/manejar/${id_notificacion}`, { estado: 'rechazada' });
             Swal.fire('Éxito', response.data.message, 'success');
-
+    
             // Actualizar el estado de la notificación en la lista
             const updatedNotifications = notifications.map(notif =>
-                notif.id_notificacion === id_notificacion ? { ...notif, estado: 'denegado' } : notif
+                notif.id_notificacion === id_notificacion ? { ...notif, estado: 'rechazada' } : notif
             );
             setNotifications(updatedNotifications);
         } catch (error) {
@@ -77,6 +76,7 @@ export function NotificacionesSuperU() {
             Swal.fire('Error', 'No se pudo denegar la solicitud', 'error');
         }
     };
+    
 
 
     const handleDelete = async (id_notificacion) => {
@@ -127,10 +127,10 @@ export function NotificacionesSuperU() {
                 <CardBody className="overflow-visible py-2">
                     <div className="flex justify-start gap-2">
                         <Button color="warning" onClick={() => handleApprove(notification.id_notificacion)}>
-                            Aprobar
+                            Aceptar
                         </Button>
                         <Button color="danger" onClick={() => handleDeny(notification.id_notificacion)}>
-                            Denegar
+                            Rechazar
                         </Button>
                     </div>
                 </CardBody>
