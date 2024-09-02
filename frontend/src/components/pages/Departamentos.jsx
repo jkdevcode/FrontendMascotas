@@ -377,8 +377,8 @@ function Departamentos() {
                 <DepartamentoModal
                     open={modalOpen}
                     onClose={() => setModalOpen(false)}
-                    title={mode === 'create' ? 'Registrar departamento' : 'Actualizar departamento'}
-                    actionLabel={mode === 'create' ? 'Registrar' : 'Actualizar'}
+                    title={mode === 'create' ? 'Registrar departamento' : 'Editar departamento'}
+                    actionLabel={mode === 'create' ? 'Registrar' : 'Editar'}
                     initialData={initialData}
                     handleSubmit={handleSubmit}
                     mode={mode}

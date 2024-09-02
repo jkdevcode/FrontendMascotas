@@ -95,6 +95,21 @@ export function ListsMascotas() {
         };
 
         const renderCard = useCallback((mascota) => {
+            const handleDownloadPDF = async (id) => {
+                try {
+                    const response = await axiosClient.get(`/mascotas/pdf/${id}`, {
+                        responseType: 'blob', // Esperamos un archivo blob
+                    });
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', `mascota_${id}.pdf`);
+                    document.body.appendChild(link);
+                    link.click();
+                } catch (error) {
+                    console.error('Error al descargar el PDF:', error);
+                }
+            };
             return (
                 <Card className="p-2 bg-gray-200">
 
@@ -139,10 +154,13 @@ export function ListsMascotas() {
                             </div>
                         </Skeleton>
                         <p className="text-sm text-gray-700 font-medium mb-4">{mascota.descripcion}</p>
-                        <div className="flex justify-start gap-2">
+                        <div className="flex justify-start gap-10">
                             <Link className='text-blue-600 underline cursor-pointer font-semibold' to='#' onClick={() => handleToggle('view', mascota)}>
                                 Ver más
                             </Link>
+                            <Button color="primary" variant="ghost" onPress={() => handleDownloadPDF(mascota.id_mascota)}>
+                                Ficha Técnica
+                            </Button>
                         </div>
                     </CardBody>
                 </Card>

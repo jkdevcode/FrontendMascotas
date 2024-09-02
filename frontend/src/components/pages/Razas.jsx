@@ -376,8 +376,8 @@ function Razas() {
                 <RazaModal
                     open={modalOpen}
                     onClose={() => setModalOpen(false)}
-                    title={mode === 'create' ? 'Registrar raza' : 'Actualizar raza'}
-                    actionLabel={mode === 'create' ? 'Registrar' : 'Actualizar'}
+                    title={mode === 'create' ? 'Registrar raza' : 'Editar raza'}
+                    actionLabel={mode === 'create' ? 'Registrar' : 'Editar'}
                     initialData={initialData}
                     handleSubmit={handleSubmit}
                     mode={mode}

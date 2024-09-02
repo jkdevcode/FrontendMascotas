@@ -371,8 +371,8 @@ function Categorias() {
                         open={modalOpen}           // Cambiado de isOpen a open
                         onClose={handleCloseModal} // Cambiado de handleToggle a onClose
                         handleSubmit={handleSubmit}
-                        actionLabel={mode === 'create' ? 'Registrar categoria' : 'Actualizar Categoria'}
-                        title={mode === 'create' ? 'Registrar Categoría' : 'Actualizar Categoría'}
+                        actionLabel={mode === 'create' ? 'Registrar categoria' : 'Editar Categoria'}
+                        title={mode === 'create' ? 'Registrar Categoría' : 'Editar Categoría'}
                         initialData={initialData}
                         mode={mode}
                     />

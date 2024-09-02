@@ -381,8 +381,8 @@ function Municipios() {
                 <MunicipioModal
                     open={modalOpen}
                     onClose={() => setModalOpen(false)}
-                    title={mode === 'create' ? 'Registrar municipio' : 'Actualizar municipio'}
-                    actionLabel={mode === 'create' ? 'Registrar' : 'Actualizar'}
+                    title={mode === 'create' ? 'Registrar municipio' : 'Editar municipio'}
+                    actionLabel={mode === 'create' ? 'Registrar' : 'Editar'}
                     initialData={initialData}
                     handleSubmit={handleSubmit}
                     mode={mode}

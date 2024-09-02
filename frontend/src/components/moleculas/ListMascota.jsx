@@ -9,6 +9,10 @@ function ListMascota({ initialData, onClose }) {
     const { mascotas, setMascotas } = useContext(MascotasContext);
     const [vacunas, setVacunas] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
+    // Convertir imagenes en un array si es una cadena separada por comas
+    const imagenesArray = typeof initialData.imagenes === 'string'
+        ? initialData.imagenes.split(',').filter(imagen => imagen.trim() !== '')
+        : [];
 
     useEffect(() => {
         const fetchVacunas = async () => {
@@ -28,14 +32,14 @@ function ListMascota({ initialData, onClose }) {
             // Obtener el id_usuario desde el localStorage (verifica que estés guardando correctamente el usuario)
             const user = JSON.parse(localStorage.getItem('user'));
             const id_usuario = user?.id_usuario; // Accede a id_usuario desde el objeto user
-            
+
             console.log("El id_usuario es:", id_usuario);
-    
+
             // Realiza la solicitud al backend
             const response = await axiosClient.post(`/adopciones/iniciar/${initialData.id_mascota}`, { id_usuario });
-            
+
             console.log("Respuesta del servidor:", response);
-    
+
             if (response.status === 200) {
                 Swal.fire({
                     title: 'Éxito',
@@ -65,8 +69,8 @@ function ListMascota({ initialData, onClose }) {
             });
         }
     };
-    
-    
+
+
     const statusColorMap = {
         'En Adopcion': "success",
         Urgente: "danger",
@@ -74,7 +78,7 @@ function ListMascota({ initialData, onClose }) {
         Adoptado: "warning",
         todos: "primary",
     };
-    
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         const day = date.getDate().toString().padStart(2, '0');
@@ -85,28 +89,28 @@ function ListMascota({ initialData, onClose }) {
     const calculateAge = (birthDate) => {
         const today = new Date();
         const birth = new Date(birthDate);
-    
+
         let ageYears = today.getFullYear() - birth.getFullYear();
         let ageMonths = today.getMonth() - birth.getMonth();
-    
+
         if (ageMonths < 0) {
-          ageYears--;
-          ageMonths += 12;
-        }
-    
-        if (today.getDate() < birth.getDate()) {
-          ageMonths--;
-          if (ageMonths < 0) {
             ageYears--;
             ageMonths += 12;
-          }
         }
-    
+
+        if (today.getDate() < birth.getDate()) {
+            ageMonths--;
+            if (ageMonths < 0) {
+                ageYears--;
+                ageMonths += 12;
+            }
+        }
+
         return { years: ageYears, months: ageMonths };
-      };
-    
-      // Calcula la edad
-      const { years, months } = calculateAge(initialData.fecha_nacimiento);
+    };
+
+    // Calcula la edad
+    const { years, months } = calculateAge(initialData.fecha_nacimiento);
 
     return (
         <>
@@ -128,16 +132,16 @@ function ListMascota({ initialData, onClose }) {
                 </CardHeader>
                 <CardBody className="overflow-visible py-2">
                     <div className="relative w-full h-62 mb-4 overflow-hidden">
-                        {initialData.imagenes && initialData.imagenes.length > 0 ? (
-                            <div className={`grid ${initialData.imagenes.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
-                                {initialData.imagenes.map((imagen, index) => (
-                                    <div key={index} className={`flex items-center justify-center ${initialData.imagenes.length === 1 && index === 0 ? 'col-span-2' : ''}`}>
+                        {imagenesArray.length > 0 ? (
+                            <div className={`grid ${imagenesArray.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
+                                {imagenesArray.map((imagen, index) => (
+                                    <div key={index} className={`flex items-center justify-center ${imagenesArray.length === 1 && index === 0 ? 'col-span-2' : ''}`}>
                                         <Image
                                             alt={`Imagen ${index + 1}`}
                                             className="object-cover w-full h-full"
                                             src={`${axiosClient.defaults.baseURL}/uploads/${imagen}`}
-                                            width='auto'
-                                            height='auto'
+                                            width="auto"
+                                            height="auto"
                                         />
                                     </div>
                                 ))}
@@ -147,8 +151,8 @@ function ListMascota({ initialData, onClose }) {
                                 alt="Imagen por defecto"
                                 className="object-cover w-full h-full"
                                 src="https://nextui.org/images/hero-card-complete.jpeg"
-                                width='auto'
-                                height='auto'
+                                width="auto"
+                                height="auto"
                             />
                         )}
                     </div>

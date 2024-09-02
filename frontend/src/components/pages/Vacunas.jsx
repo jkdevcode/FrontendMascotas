@@ -391,8 +391,8 @@ function Vacunas() {
                 <VacunaModal
                     open={modalOpen}
                     onClose={() => setModalOpen(false)}
-                    title={mode === 'create' ? 'Registrar vacuna' : 'Actualizar vacuna'}
-                    actionLabel={mode === 'create' ? 'Registrar' : 'Actualizar'}
+                    title={mode === 'create' ? 'Registrar vacuna' : 'Editar vacuna'}
+                    actionLabel={mode === 'create' ? 'Registrar' : 'Editar'}
                     initialData={initialData}
                     handleSubmit={handleSubmit}
                     mode={mode}

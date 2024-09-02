@@ -203,18 +203,21 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                         /> */}
                     </div>
                     <div className='py-2'>
-                        <Input
-                            type="text"
-                            label="Tamaño"
-                            className="w-80"
-                            color='warning'
-                            variant="bordered"
-                            id='tamano'
+                        <select
+                            className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
                             name="tamano"
                             value={tamano}
                             onChange={(e) => setTamano(e.target.value)}
                             required
-                        />
+                        >
+                            <option value="" hidden>
+                                Tamaño
+                            </option>
+                            <option value="grande">Grande</option>
+                            <option value="intermedio">Intermedio</option>
+                            <option value="mediano">Mediano</option>
+                            <option value="pequeño">Pequeño</option>
+                        </select>
                     </div>
                     <div className='py-2'>
                         <Input

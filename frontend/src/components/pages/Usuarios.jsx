@@ -421,8 +421,8 @@ function Usuarios() {
                 <UsuarioModal
                     open={modalOpen}
                     onClose={() => setModalOpen(false)}
-                    title={mode === 'create' ? 'Registrar usuario' : 'Actualizar usuario'}
-                    actionLabel={mode === 'create' ? 'Registrar' : 'Actualizar'}
+                    title={mode === 'create' ? 'Registrar usuario' : 'Editar usuario'}
+                    actionLabel={mode === 'create' ? 'Registrar' : 'Editar'}
                     initialData={initialData}
                     handleSubmit={handleSubmit}
                     mode={mode}

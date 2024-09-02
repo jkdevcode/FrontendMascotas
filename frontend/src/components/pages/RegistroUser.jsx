@@ -42,11 +42,13 @@ function RegistroUser() {
         direccion: yup.string().required('La dirección es obligatoria'),
         correo: yup.string().email('Debe ser un correo válido').required('El correo es obligatorio'),
         telefono: yup.string()
-            .matches(/^[0-9]+$/, 'El teléfono solo puede contener números')
-            .required('El teléfono es obligatorio'),
+        .matches(/^[0-9]{10}$/, 'El teléfono debe contener exactamente 10 dígitos')
+        .required('El teléfono es obligatorio'),
+    
         documento_identidad: yup.string()
-            .matches(/^[0-9]+$/, 'La identificación solo puede contener números')
-            .required('La identificación es obligatoria'),
+        .matches(/^[0-9]{10}$/, 'La identificación debe contener exactamente 10 dígitos')
+        .required('La identificación es obligatoria'),
+    
         password: yup.string().min(8, 'La contraseña debe tener al menos 8 caracteres').max(16, 'La contraseña no puede tener más de 16 caracteres').required('La contraseña es obligatoria'),
         tipo_documento: yup.string().required('Debe seleccionar un tipo de documento')
     });

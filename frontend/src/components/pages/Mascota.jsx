@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import Swal from 'sweetalert2';
+import { Link } from 'react-router-dom';
 import axiosClient from '../axiosClient.js';
 import MascotasContext from '../../context/MascotasContext.jsx';
 import {
@@ -15,7 +16,6 @@ import { PlusIcon } from "../nextUI/PlusIcon.jsx";
 import { SearchIcon } from "../nextUI/SearchIcon.jsx";
 import { ChevronDownIcon } from "../nextUI/ChevronDownIcon.jsx";
 import { Card, CardHeader, CardBody, Image, Skeleton } from "@nextui-org/react";
-
 import MascotaModal from '../templates/MascotaModal.jsx';
 import AccionesModal from '../organismos/ModalAcciones.jsx';
 
@@ -82,7 +82,23 @@ export function Mascotas() {
             setFilterValue('');
         };
 
+
         const renderCard = useCallback((mascota) => {
+            const handleDownloadPDF = async (id) => {
+                try {
+                    const response = await axiosClient.get(`/mascotas/pdf/${id}`, {
+                        responseType: 'blob', // Esperamos un archivo blob
+                    });
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', `mascota_${id}.pdf`);
+                    document.body.appendChild(link);
+                    link.click();
+                } catch (error) {
+                    console.error('Error al descargar el PDF:', error);
+                }
+            };
             return (
                 <Card className="p-2 bg-gray-200" key={mascota.id_mascota}>
                     <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
@@ -127,9 +143,12 @@ export function Mascotas() {
 
                         </Skeleton>
                         <p className="text-sm text-gray-700 font-medium mb-4">{mascota.descripcion}</p>
-                        <div className="mt-2 flex justify-start gap-2">
-                            <Button color="default" variant="ghost" onPress={() => handleToggle('update', setMascotaId(mascota))}>
-                                Actualizar
+                        <div className="mt-2 flex justify-start gap-4">
+                            <Button color="warning" variant="ghost" onPress={() => handleToggle('update', setMascotaId(mascota))}>
+                                Editar
+                            </Button>
+                            <Button color="primary" variant="ghost" onPress={() => handleDownloadPDF(mascota.id_mascota)}>
+                                Ficha Técnica
                             </Button>
                         </div>
                     </CardBody>
@@ -152,36 +171,40 @@ export function Mascotas() {
                                 onClear={onClear}
                                 onChange={onSearchChange}
                             />
-                            <div className="z-0 flex gap-3">
-                                <Dropdown>
-                                    <DropdownTrigger>
-                                        <Button
-                                            variant="bordered"
-                                            className="capitalize"
-                                            endContent={<ChevronDownIcon className="text-small text-slate-700" />}
-                                        >
-                                            {statusFilter}
-                                        </Button>
-                                    </DropdownTrigger>
-                                    <DropdownMenu
-                                        aria-label="Single selection example"
-                                        variant="flat"
-                                        disallowEmptySelection
-                                        selectionMode="single"
-                                        selectedKeys={selectedKeys}
-                                        onSelectionChange={setSelectedKeys}
-                                    >
-                                        {statusOptions.map((status) => (
-                                            <DropdownItem key={status.uid} className="capitalize w-55">
-                                                {status.name}
-                                            </DropdownItem>
-                                        ))}
-                                    </DropdownMenu>
-                                </Dropdown>
-                                <Button color="warning" variant="bordered" className="z-1 text-orange-500" style={{ position: 'relative' }} endContent={<PlusIcon />} onClick={() => handleToggle('create')}>
-                                    Registrar
-                                </Button>
-                            </div>
+<div className="z-0 flex gap-3">
+<Button as={Link} to="/reportes" color="primary" variant="bordered" className="text-gray-700">
+    Reportes
+</Button>
+    <Dropdown>
+        <DropdownTrigger>
+            <Button
+                variant="bordered"
+                className="capitalize"
+                endContent={<ChevronDownIcon className="text-small text-slate-700" />}
+            >
+                {statusFilter}
+            </Button>
+        </DropdownTrigger>
+        <DropdownMenu
+            aria-label="Single selection example"
+            variant="flat"
+            disallowEmptySelection
+            selectionMode="single"
+            selectedKeys={selectedKeys}
+            onSelectionChange={setSelectedKeys}
+        >
+            {statusOptions.map((status) => (
+                <DropdownItem key={status.uid} className="capitalize w-55">
+                    {status.name}
+                </DropdownItem>
+            ))}
+        </DropdownMenu>
+    </Dropdown>
+    <Button color="warning" variant="bordered" className="z-1 text-orange-500" style={{ position: 'relative' }} endContent={<PlusIcon />} onClick={() => handleToggle('create')}>
+        Registrar
+    </Button>
+</div>
+
                         </div>
                         <div className="z-0 grid gap-4 mt-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {filteredItems.map(renderCard)}
@@ -285,8 +308,8 @@ export function Mascotas() {
                     open={modalOpen}
                     onClose={handleToggle}
                     handleSubmit={handleSubmit}
-                    actionLabel={mode === 'create' ? 'Registrar' : 'Actualizar'}
-                    title={mode === 'create' ? 'Registrar Mascota' : 'Actualizar Mascota'}
+                    actionLabel={mode === 'create' ? 'Registrar' : 'Editar'}
+                    title={mode === 'create' ? 'Registrar Mascota' : 'Editar Mascota'}
                     initialData={initialData}
                     mode={mode}
                 />
@@ -294,8 +317,8 @@ export function Mascotas() {
                     open={modalAcciones}
                     onClose={handleToggleAcciones}
                     handleSubmit={handleSubmit}
-                    actionLabel={mode === 'create' ? 'Registrar' : 'Actualizar'}
-                    title={mode === 'create' ? 'Registrar Mascota' : 'Actualizar Mascota'}
+                    actionLabel={mode === 'create' ? 'Registrar' : 'Editar'}
+                    title={mode === 'create' ? 'Registrar Mascota' : 'Editar Mascota'}
                     initialData={initialData}
                     mode={mode}
                 />
