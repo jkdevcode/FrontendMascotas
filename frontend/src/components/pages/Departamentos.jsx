@@ -315,11 +315,8 @@ function Departamentos() {
     };
 
 
-    const handleSubmit = async (formData, e) => {
-        e.preventDefault()
-
+    const handleSubmit = async (formData) => {
         try {
-
             if (mode === 'create') {
 
                 await axiosClient.post('/departamentos/registrar', formData).then((response) => {

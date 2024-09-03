@@ -1,21 +1,32 @@
 import React, { useEffect, useState, useContext } from 'react';
-import axiosClient from '../axiosClient';
 import { ModalFooter, Button, Input } from "@nextui-org/react";
-/* import { DatePicker } from "@nextui-org/react"; */
-/* import { getLocalTimeZone, today, parseDate } from "@internationalized/date"; */
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import axiosClient from '../axiosClient';
 import VacunasContext from '../../context/VacunasContext';
+
+// Esquema de validación con Yup
+const validationSchema = yup.object().shape({
+    fk_id_mascota: yup
+        .string()
+        .required('La mascota es obligatoria'),
+    fecha_vacuna: yup
+        .date()
+        .required('La fecha de la vacuna es obligatoria'),
+    enfermedad: yup
+        .string()
+        .required('La enfermedad es obligatoria')
+        .matches(/^[a-zA-Z\s]{1,20}$/, 'El nombre de la enfermedad debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
+    estado: yup
+        .string()
+        .required('El estado de la vacuna es obligatorio')
+});
 
 const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
     const [mascotas, setMascotas] = useState([]);
     const [estado, setEstado] = useState([]);
 
-    const [mascotaFK, setMascotaFk] = useState('');
-    const [fechaVacuna, setFechaVacuna] = useState(null);
-    const [enfermedad, setEnfermedad] = useState('');
-    const [estadoOp, setEstadoOp] = useState('');
-
     const { idVacuna } = useContext(VacunasContext);
-    /*  const { idRaza } = useContext(RazasContext); */
 
     useEffect(() => {
         const enumData = [
@@ -34,46 +45,42 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
         });
     }, []);
 
+    const formik = useFormik({
+        initialValues: {
+            fk_id_mascota: '',
+            fecha_vacuna: '',
+            enfermedad: '',
+            estado: ''
+        },
+        validationSchema: validationSchema,
+        onSubmit: (values, { resetForm }) => {
+            handleSubmit(values);
+            resetForm();
+        },
+    });
+
     useEffect(() => {
         if (mode === 'update' && idVacuna) {
-            setMascotaFk(idVacuna.fk_id_mascota || '');
-            setFechaVacuna(idVacuna.fecha_vacuna ? new Date(idVacuna.fecha_vacuna).toISOString().split('T')[0] : '');
-            setEnfermedad(idVacuna.enfermedad || '');
-            setEstadoOp(idVacuna.estado || '');
-        } else if (mode === 'create') {
-            setMascotaFk('');
-            setFechaVacuna(null);
-            setEnfermedad('');
-            setEstadoOp('');
+            formik.setValues({
+                fk_id_mascota: idVacuna.fk_id_mascota || '',
+                fecha_vacuna: idVacuna.fecha_vacuna ? new Date(idVacuna.fecha_vacuna).toISOString().split('T')[0] : '',
+                enfermedad: idVacuna.enfermedad || '',
+                estado: idVacuna.estado || '',
+            });
         }
     }, [mode, idVacuna]);
 
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const formData = {
-                fk_id_mascota: mascotaFK,
-                fecha_vacuna: fechaVacuna ? fechaVacuna.toString() : '',
-                enfermedad,
-                estado: estadoOp
-            };
-            await handleSubmit(formData, e);
-        } catch (error) {
-            console.log(error);
-            alert('Hay un error en el sistema ' + error);
-        }
-    };
-
-
     return (
-        <form method='post' onSubmit={handleFormSubmit}>
+        <form onSubmit={formik.handleSubmit}>
             <div className='ml-5 align-items-center'>
                 <div className="py-2">
                     <select
                         className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
-                        name="id_mascota"
-                        value={mascotaFK}
-                        onChange={(e) => setMascotaFk(e.target.value)}
+                        name="fk_id_mascota"
+                        value={formik.values.fk_id_mascota}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        isInvalid={formik.touched.fk_id_mascota && !!formik.errors.fk_id_mascota}
                         required
                     >
                         <option value="" hidden className="text-gray-600">
@@ -85,25 +92,25 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             </option>
                         ))}
                     </select>
+                    {formik.touched.fk_id_mascota && formik.errors.fk_id_mascota ? (
+                        <div className="text-red-500 text-xs">{formik.errors.fk_id_mascota}</div>
+                    ) : null}
                 </div>
                 <div className='py-2'>
                     <input
                         type="date"
                         className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
-                        id='fecha_nacimiento'
-                        name="fecha_nacimiento"
-                        value={fechaVacuna}
-                        onChange={(e) => setFechaVacuna(e.target.value)}
+                        id='fecha_vacuna'
+                        name="fecha_vacuna"
+                        value={formik.values.fecha_vacuna}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        isInvalid={formik.touched.fecha_vacuna && !!formik.errors.fecha_vacuna}
                         required
                     />
-                    {/* <DatePicker
-                        label="Fecha de la vacuna"
-                        maxValue={today(getLocalTimeZone())}
-                        value={fechaVacuna}
-                        className='w-80'
-                        onChange={(date) => setFechaVacuna(date)}
-                        required
-                    /> */}
+                    {formik.touched.fecha_vacuna && formik.errors.fecha_vacuna ? (
+                        <div className="text-red-500 text-xs">{formik.errors.fecha_vacuna}</div>
+                    ) : null}
                 </div>
                 <div className='py-2'>
                     <Input
@@ -114,18 +121,22 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                         label='Ingrese la enfermedad'
                         id='enfermedad'
                         name="enfermedad"
-                        value={enfermedad}
-                        onChange={(e) => setEnfermedad(e.target.value)}
+                        value={formik.values.enfermedad}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        isInvalid={formik.touched.enfermedad && !!formik.errors.enfermedad}
+                        errorMessage={formik.errors.enfermedad}
                         required
-                        pattern="^[a-zA-Z\s]{1,20}$"
-                        title="El nombre de la enfermedad debe tener máximo 20 caracteres, y solo puede contener letras y espacios"
                     />
                 </div>
                 <div className="py-2">
                     <select
                         className="pl-2 pr-4 py-2 w-11/12 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
-                        value={estadoOp}
-                        onChange={(e) => setEstadoOp(e.target.value)}
+                        name="estado"
+                        value={formik.values.estado}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        isInvalid={formik.touched.estado && !!formik.errors.estado}
                         required
                     >
                         <option value="" disabled hidden>
@@ -137,6 +148,9 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             </option>
                         ))}
                     </select>
+                    {formik.touched.estado && formik.errors.estado ? (
+                        <div className="text-red-500 text-xs">{formik.errors.estado}</div>
+                    ) : null}
                 </div>
                 <ModalFooter>
                     <Button color="danger" variant="flat" onPress={onClose}>
