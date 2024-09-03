@@ -1,27 +1,51 @@
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import { ModalFooter, Input, Select, SelectItem, Avatar } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 import UsuarioContext from '../../context/UsuariosContext.jsx';
 import { EyeFilledIcon } from "../nextUI/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../nextUI/EyeSlashFilledIcon";
-import { CameraIcon } from '../nextUI/CameraIcon.jsx';
 import axiosClient from '../axiosClient.js';
+
+// Definir el esquema de validación con yup
+const validationSchema = yup.object().shape({
+    tipo_documento: yup
+        .string()
+        .required('El tipo de documento es obligatorio'),
+    documento_identidad: yup
+        .string()
+        .required('El documento de identidad es obligatorio')
+        .matches(/^\d+$/, 'El documento de identidad debe ser numérico'),
+    nombre: yup
+        .string()
+        .required('El nombre es obligatorio'),
+    apellido: yup
+        .string()
+        .required('El apellido es obligatorio'),
+    direccion: yup
+        .string()
+        .required('La dirección es obligatoria'),
+    correo: yup
+        .string()
+        .email('El correo electrónico debe ser válido')
+        .required('El correo electrónico es obligatorio'),
+    telefono: yup
+        .string()
+        .required('El telefono es obligatorio')
+        .matches(/^\d*$/, 'El teléfono debe ser numérico'),
+    password: yup
+        .string()
+        .required('La contraseña es obligatoria'),
+    rol: yup
+        .string()
+        .required('El rol es obligatorio'),
+});
 
 const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
     const [rol, setRol] = useState([]);
     const [tipo_documento, setTipoDocumento] = useState([]);
 
-    // useState para gestionar el estado de los campos del formulario.
-    const [tipoDocumentoOp, setTipoDocumentoOp] = useState('');
-    const [rolOp, setRolOp] = useState('');
-    const [documento_identidad, setDocumentoIdentidad] = useState('');
-    const [nombre, setNombre] = useState('');
-    const [apellido, setApellido] = useState('');
-    const [direccion, setDireccion] = useState('');
-    const [correo, setCorreo] = useState('');
-    const [telefono, setTelefono] = useState('');
-    const [password, setPassword] = useState('');
-    const [passwordDisplay, setPasswordDisplay] = useState('********'); // Para mostrar solo 4 asteriscos
     const [foto, setFoto] = useState(null);
     const [fotoUrl, setFotoUrl] = useState('');
     const fileInputRef = useRef(null);
@@ -46,50 +70,59 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
         setRol(enumDataRol);
     }, []);
 
+    const formik = useFormik({
+        initialValues: {
+            tipo_documento: '',
+            documento_identidad: '',
+            nombre: '',
+            apellido: '',
+            direccion: '',
+            correo: '',
+            telefono: '',
+            password: '',
+            rol: ''
+        },
+        validationSchema: validationSchema,
+        onSubmit: async (values) => {
+            try {
+                const formData = new FormData();
+                formData.append('tipo_documento', values.tipo_documento);
+                formData.append('documento_identidad', values.documento_identidad);
+                formData.append('nombre', values.nombre);
+                formData.append('apellido', values.apellido);
+                formData.append('direccion', values.direccion);
+                formData.append('correo', values.correo);
+                formData.append('telefono', values.telefono);
+                formData.append('password', values.password);
+                formData.append('rol', values.rol);
+
+                if (foto) {
+                    formData.append('img', foto);
+                }
+
+                handleSubmit(formData);
+            } catch (error) {
+                alert('Hay un error en el sistema ' + error);
+            }
+        },
+    });
+
     useEffect(() => {
         if (mode === 'update' && idUsuario) {
-            setTipoDocumentoOp(idUsuario.tipo_documento || '');
-            setDocumentoIdentidad(idUsuario.documento_identidad || '');
-            setNombre(idUsuario.nombre || '');
-            setApellido(idUsuario.apellido || '');
-            setDireccion(idUsuario.direccion || '');
-            setCorreo(idUsuario.correo || '');
-            setTelefono(idUsuario.telefono || '');
-            setPassword(''); // La contraseña en sí no se muestra
-            setPasswordDisplay('********'); // Mostrar solo 4 asteriscos
-            setRolOp(idUsuario.rol || '');
+            formik.setValues({
+                tipo_documento: idUsuario.tipo_documento || '',
+                documento_identidad: idUsuario.documento_identidad || '',
+                nombre: idUsuario.nombre || '',
+                apellido: idUsuario.apellido || '',
+                direccion: idUsuario.direccion || '',
+                correo: idUsuario.correo || '',
+                telefono: idUsuario.telefono || '',
+                password: '*******', // La contraseña en sí no se muestra
+                rol: idUsuario.rol || '',
+            });
             setFotoUrl(idUsuario.img ? `${axiosClient.defaults.baseURL}/uploads/${idUsuario.img}` : '');
         }
     }, [mode, idUsuario]);
-
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const formData = new FormData();
-            formData.append('tipo_documento', tipoDocumentoOp);
-            formData.append('documento_identidad', documento_identidad);
-            formData.append('nombre', nombre);
-            formData.append('apellido', apellido);
-            formData.append('direccion', direccion);
-            formData.append('correo', correo);
-            formData.append('telefono', telefono);
-            formData.append('password', password); // Enviar la contraseña real
-            formData.append('rol', rolOp);
-
-            if (foto) {
-                formData.append('img', foto);
-            }
-
-            handleSubmit(formData, e);
-        } catch (error) {
-            alert('Hay un error en el sistema ' + error);
-        }
-    };
-
-    const handlePasswordChange = (e) => {
-        setPassword(e.target.value); // Actualizar la contraseña real
-        setPasswordDisplay(e.target.value); // Actualizar lo que se muestra en el campo
-    };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -108,7 +141,7 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
     const toggleVisibility = () => setIsVisible(!isVisible);
 
     return (
-        <form method='post' onSubmit={handleFormSubmit}>
+        <form onSubmit={formik.handleSubmit}>
             <div className='flex flex-col items-center mb-4'>
                 <Avatar
                     showFallback
@@ -128,14 +161,13 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
 
             <div className='flex flex-wrap justify-between'>
                 <div className='flex flex-col w-full md:w-1/2 p-2'>
-                    {/* Campo Tipo de Documento */}
                     <div className="py-2">
                         <select
-                            /* label="Tipo de documento" */
                             className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
                             name="tipo_documento"
-                            value={tipoDocumentoOp}
-                            onChange={(e) => setTipoDocumentoOp(e.target.value)}
+                            value={formik.values.tipo_documento}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                         >
                             <option value="" hidden className="text-gray-600">
                                 Seleccionar Tipo de documento
@@ -146,6 +178,9 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
                                 </option>
                             ))}
                         </select>
+                        {formik.touched.tipo_documento && formik.errors.tipo_documento && (
+                            <div className="text-red-500 text-sm">{formik.errors.tipo_documento}</div>
+                        )}
                     </div>
 
                     <div className='py-2'>
@@ -157,9 +192,11 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             className="w-full"
                             id='documento_identidad'
                             name="documento_identidad"
-                            value={documento_identidad}
-                            onChange={(e) => setDocumentoIdentidad(e.target.value)}
-                            required
+                            value={formik.values.documento_identidad}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            isInvalid={formik.touched.documento_identidad && !!formik.errors.documento_identidad}
+                            errorMessage={formik.errors.documento_identidad}
                         />
                     </div>
                     <div className='py-2'>
@@ -171,9 +208,11 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             className="w-full"
                             id='nombre'
                             name="nombre"
-                            value={nombre}
-                            onChange={(e) => setNombre(e.target.value)}
-                            required
+                            value={formik.values.nombre}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            isInvalid={formik.touched.nombre && !!formik.errors.nombre}
+                            errorMessage={formik.errors.nombre}
                         />
                     </div>
                     <div className='py-2'>
@@ -185,9 +224,11 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             className="w-full"
                             id='apellido'
                             name="apellido"
-                            value={apellido}
-                            onChange={(e) => setApellido(e.target.value)}
-                            required
+                            value={formik.values.apellido}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            isInvalid={formik.touched.apellido && !!formik.errors.apellido}
+                            errorMessage={formik.errors.apellido}
                         />
                     </div>
                     <div className='py-2'>
@@ -199,9 +240,11 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             className="w-full"
                             id='direccion'
                             name="direccion"
-                            value={direccion}
-                            onChange={(e) => setDireccion(e.target.value)}
-                            required
+                            value={formik.values.direccion}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            isInvalid={formik.touched.direccion && !!formik.errors.direccion}
+                            errorMessage={formik.errors.direccion}
                         />
                     </div>
                 </div>
@@ -216,18 +259,44 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             className="w-full"
                             id='correo'
                             name="correo"
-                            value={correo}
-                            onChange={(e) => setCorreo(e.target.value)}
-                            required
+                            value={formik.values.correo}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            isInvalid={formik.touched.correo && !!formik.errors.correo}
+                            errorMessage={formik.errors.correo}
                         />
                     </div>
                     <div className='py-2'>
                         <Input
-                            label="Contraseña"
-                            name="password"
+                            type="text"
                             color='warning'
                             variant="bordered"
-                            id="password"
+                            label="Teléfono"
+                            className="w-full"
+                            id='telefono'
+                            name="telefono"
+                            value={formik.values.telefono}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            isInvalid={formik.touched.telefono && !!formik.errors.telefono}
+                            errorMessage={formik.errors.telefono}
+                        />
+                    </div>
+                    <div className='py-2'>
+                        <Input
+                            color='warning'
+                            variant="bordered"
+                            label="Contraseña"
+                            type={isVisible ? "text" : "password"}
+                            className="w-full"
+                            required
+                            id='password'
+                            name="password"
+                            value={formik.values.password}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            isInvalid={formik.touched.password && !!formik.errors.password}
+                            errorMessage={formik.errors.password}
                             endContent={
                                 <button type="button" onClick={toggleVisibility}>
                                     {isVisible ? (
@@ -237,46 +306,32 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
                                     )}
                                 </button>
                             }
-                            type={isVisible ? "text" : "password"}
-                            className="w-full"
-                            value={passwordDisplay}
-                            onChange={handlePasswordChange}
-                            required
-                        />
-                    </div>
-                    <div className='py-2'>
-                        <Input
-                            color='warning'
-                            variant="bordered"
-                            type="number"
-                            label="Teléfono"
-                            className="w-full"
-                            id='telefono'
-                            name="telefono"
-                            value={telefono}
-                            onChange={(e) => setTelefono(e.target.value)}
                         />
                     </div>
                     <div className='py-2'>
                         <select
-                            label="Rol"
                             className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
                             name="rol"
-                            value={rolOp}
-                            onChange={(e) => setRolOp(e.target.value)}
+                            value={formik.values.rol}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                         >
                             <option value="" hidden className="text-gray-600">
                                 Seleccionar Rol
                             </option>
-                            {rol.map((rol) => (
-                                <option key={rol.key} value={rol.key}>
-                                    {rol.label}
+                            {rol.map((r) => (
+                                <option key={r.key} value={r.key}>
+                                    {r.label}
                                 </option>
                             ))}
                         </select>
+                        {formik.touched.rol && formik.errors.rol && (
+                            <div className="text-red-500 text-sm">{formik.errors.rol}</div>
+                        )}
                     </div>
                 </div>
             </div>
+
             <ModalFooter>
                 <Button color='danger' variant='flat' onClick={onClose} >
                     Cerrar

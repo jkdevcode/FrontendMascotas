@@ -320,9 +320,7 @@ function Municipios() {
     };
 
 
-    const handleSubmit = async (formData, e) => {
-        e.preventDefault()
-
+    const handleSubmit = async (formData) => {
         try {
 
             if (mode === 'create') {
