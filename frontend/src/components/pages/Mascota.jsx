@@ -18,6 +18,8 @@ import { ChevronDownIcon } from "../nextUI/ChevronDownIcon.jsx";
 import { Card, CardHeader, CardBody, Image, Skeleton } from "@nextui-org/react";
 import MascotaModal from '../templates/MascotaModal.jsx';
 import AccionesModal from '../organismos/ModalAcciones.jsx';
+import ListMascotaModal from '../templates/ListsMascotaModal.jsx';
+import { EyeIcon } from '../nextUI/EyeIcon.jsx';
 
 
 export function Mascotas() {
@@ -84,15 +86,15 @@ export function Mascotas() {
 
 
         const renderCard = useCallback((mascota) => {
-            const handleDownloadPDF = async (id) => {
+            const handleDownloadPDF = async (id_mascota) => {
                 try {
-                    const response = await axiosClient.get(`/mascotas/pdf/${id}`, {
+                    const response = await axiosClient.get(`/mascotas/pdf/${id_mascota}`, {
                         responseType: 'blob', // Esperamos un archivo blob
                     });
                     const url = window.URL.createObjectURL(new Blob([response.data]));
                     const link = document.createElement('a');
                     link.href = url;
-                    link.setAttribute('download', `mascota_${id}.pdf`);
+                    link.setAttribute('download', `mascota_${id_mascota}.pdf`);
                     document.body.appendChild(link);
                     link.click();
                 } catch (error) {
@@ -140,16 +142,24 @@ export function Mascotas() {
                                     </div>
                                 )}
                             </div>
-
                         </Skeleton>
                         <p className="text-sm text-gray-700 font-medium mb-4">{mascota.descripcion}</p>
-                        <div className="mt-2 flex justify-start gap-4">
-                            <Button color="warning" variant="ghost" onPress={() => handleToggle('update', setMascotaId(mascota))}>
-                                Editar
-                            </Button>
-                            <Button color="primary" variant="ghost" onPress={() => handleDownloadPDF(mascota.id_mascota)}>
-                                Ficha Técnica
-                            </Button>
+                        <div className="flex flex-col gap-2 mt-4">
+                            <div className="flex justify-start gap-4">
+                                <Button color="warning" variant="ghost" onPress={() => handleToggle('update', setMascotaId(mascota))}>
+                                    Editar
+                                </Button>
+                                <Button color="primary" variant="ghost" onPress={() => handleDownloadPDF(mascota.id_mascota)}>
+                                    Ficha Técnica
+                                </Button>
+                            </div>
+                            <div className="flex justify-start">
+                                <Button color="default" variant="ghost" onPress={() => handleViewDetails('view', mascota)}>
+                                    <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                        <EyeIcon />
+                                    </span>
+                                </Button>
+                            </div>
                         </div>
                     </CardBody>
                 </Card>
@@ -171,39 +181,39 @@ export function Mascotas() {
                                 onClear={onClear}
                                 onChange={onSearchChange}
                             />
-<div className="z-0 flex gap-3">
-<Button as={Link} to="/reportes" color="primary" variant="bordered" className="text-gray-700">
-    Reportes
-</Button>
-    <Dropdown>
-        <DropdownTrigger>
-            <Button
-                variant="bordered"
-                className="capitalize"
-                endContent={<ChevronDownIcon className="text-small text-slate-700" />}
-            >
-                {statusFilter}
-            </Button>
-        </DropdownTrigger>
-        <DropdownMenu
-            aria-label="Single selection example"
-            variant="flat"
-            disallowEmptySelection
-            selectionMode="single"
-            selectedKeys={selectedKeys}
-            onSelectionChange={setSelectedKeys}
-        >
-            {statusOptions.map((status) => (
-                <DropdownItem key={status.uid} className="capitalize w-55">
-                    {status.name}
-                </DropdownItem>
-            ))}
-        </DropdownMenu>
-    </Dropdown>
-    <Button color="warning" variant="bordered" className="z-1 text-orange-500" style={{ position: 'relative' }} endContent={<PlusIcon />} onClick={() => handleToggle('create')}>
-        Registrar
-    </Button>
-</div>
+                            <div className="z-0 flex gap-3">
+                                <Button as={Link} to="/reportes" color="primary" variant="bordered" className="text-gray-700">
+                                    Reportes
+                                </Button>
+                                <Dropdown>
+                                    <DropdownTrigger>
+                                        <Button
+                                            variant="bordered"
+                                            className="capitalize"
+                                            endContent={<ChevronDownIcon className="text-small text-slate-700" />}
+                                        >
+                                            {statusFilter}
+                                        </Button>
+                                    </DropdownTrigger>
+                                    <DropdownMenu
+                                        aria-label="Single selection example"
+                                        variant="flat"
+                                        disallowEmptySelection
+                                        selectionMode="single"
+                                        selectedKeys={selectedKeys}
+                                        onSelectionChange={setSelectedKeys}
+                                    >
+                                        {statusOptions.map((status) => (
+                                            <DropdownItem key={status.uid} className="capitalize w-55">
+                                                {status.name}
+                                            </DropdownItem>
+                                        ))}
+                                    </DropdownMenu>
+                                </Dropdown>
+                                <Button color="warning" variant="bordered" className="z-1 text-orange-500" style={{ position: 'relative' }} endContent={<PlusIcon />} onClick={() => handleToggle('create')}>
+                                    Registrar
+                                </Button>
+                            </div>
 
                         </div>
                         <div className="z-0 grid gap-4 mt-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -217,23 +227,23 @@ export function Mascotas() {
 
     const [modalOpen, setModalOpen] = useState(false);
     const [modalAcciones, setModalAcciones] = useState(false);
-    const [modalVacunaOpen, setModalVacunaOpen] = useState(false);
+    const [modalPetOpen, setModalPetOpen] = useState(false);
+    const [modePet, setModePet] = useState('view');
     const [mode, setMode] = useState('create');
     const [initialData, setInitialData] = useState(null);
     const [mascotas, setMascotas] = useState([]);
-    const [mensaje, setMensaje] = useState('')
     const { idMascota, setMascotaId } = useContext(MascotasContext);
 
+    
     useEffect(() => {
         peticionGet();
     }, []);
 
     const peticionGet = async () => {
         try {
-            await axiosClient.get('/mascotas/listar').then((response) => {
-                console.log(response.data);
-                setMascotas(response.data);
-            });
+            const response = await axiosClient.get('/mascotas/listar');
+            console.log(response.data);
+            setMascotas(response.data);
         } catch (error) {
             console.log('Error en el servidor ' + error);
         }
@@ -245,77 +255,80 @@ export function Mascotas() {
 
         try {
             if (mode === 'create') {
-                await axiosClient.post('/mascotas/registrar', formData).then((response) => {
-                    console.log('API Response:', response);
-                    if (response.status === 200) {
-                        Swal.fire({
-                            position: "center", // Posición centrada
-                            icon: "success",
-                            title: "Mascota registrada con éxito",
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                        peticionGet();
-                    } else {
-                        alert('Error en el registro');
-                    }
-                });
+                const response = await axiosClient.post('/mascotas/registrar', formData);
+                console.log('API Response:', response);
+                if (response.status === 200) {
+                    Swal.fire({
+                        position: "center", // Posición centrada
+                        icon: "success",
+                        title: "Mascota registrada con éxito",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    peticionGet();
+                    setModalOpen(false); // Cierra el modal de registro
+                } else {
+                    alert('Error en el registro');
+                }
             } else if (mode === 'update') {
-                await axiosClient.put(`/mascotas/actualizar/${idMascota.id_mascota}`, formData).then((response) => {
-                    if (response.status === 200) {
-                        Swal.fire({
-                            position: "center", // Posición centrada
-                            icon: "success",
-                            title: "Mascota actualizada con éxito",
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                        peticionGet();
-                    } else {
-                        alert('Error en la actualización');
-                    }
-                });
+                const response = await axiosClient.put(`/mascotas/actualizar/${idMascota.id_mascota}`, formData);
+                if (response.status === 200) {
+                    Swal.fire({
+                        position: "center", // Posición centrada
+                        icon: "success",
+                        title: "Mascota actualizada con éxito",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    peticionGet();
+                    setModalOpen(false); // Cierra el modal de actualización
+                } else {
+                    alert('Error en la actualización');
+                }
             }
         } catch (error) {
             console.log(error);
         }
 
-        handleToggle();
+
     };
 
-    const handleToggle = (modalMode = 'create', data = null) => {
-        setMode(modalMode);
-        setInitialData(data);
-        setModalOpen(!modalOpen);
+    const handleToggle = (mode, initialData) => {
+        setInitialData(initialData);
+        setModalOpen(true);
+        setMode(mode);
     };
 
-    const handleToggleAcciones = (modalMode = 'create', data = null) => {
-        setMode(modalMode);
-        setInitialData(data);
-        setModalAcciones(!modalAcciones);
+    const handleViewDetails = (modePet, initialData) => {
+        setInitialData(initialData);
+        setModalPetOpen(true);
+        setModePet(modePet);
     };
 
-    const handleToggleVacuna = (modalMode = 'create', data = null) => {
-        setMode(modalMode);
-        setInitialData(data);
-        setModalVacunaOpen(!modalVacunaOpen);
-    };
     return (
         <>
             <div className='pl-4'>
                 <Ejemplo mascotas={mascotas} />
                 <MascotaModal
                     open={modalOpen}
-                    onClose={handleToggle}
+                    onClose={() => setModalOpen(false)}
                     handleSubmit={handleSubmit}
                     actionLabel={mode === 'create' ? 'Registrar' : 'Editar'}
                     title={mode === 'create' ? 'Registrar Mascota' : 'Editar Mascota'}
                     initialData={initialData}
                     mode={mode}
                 />
+                <ListMascotaModal
+                    open={modalPetOpen}
+                    onClose={() => setModalPetOpen(false)}
+                    title='Mascota'
+                    actionLabel='Cerrar'
+                    initialData={initialData}
+                    modePet={modePet}
+                />
                 <AccionesModal
                     open={modalAcciones}
-                    onClose={handleToggleAcciones}
+                    onClose={() => setModalAcciones(false)}
                     handleSubmit={handleSubmit}
                     actionLabel={mode === 'create' ? 'Registrar' : 'Editar'}
                     title={mode === 'create' ? 'Registrar Mascota' : 'Editar Mascota'}
