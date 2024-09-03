@@ -55,8 +55,6 @@ function App() {
               <Route path="/reportes" element={<Reportes />} />
             </>
           )}
-          {/* Ruta por defecto para manejar rutas no coincidentes */}
-          <Route path="*" element={<Inicio />} />
         </Routes>
       </GlobalProvider>
     </BrowserRouter>

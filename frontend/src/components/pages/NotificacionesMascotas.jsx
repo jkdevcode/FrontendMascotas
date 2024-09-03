@@ -48,7 +48,7 @@ const NotificacionesMascotas = () => {
             });
 
             console.log('Actualizando adopciones...');
-            await petAdopciones(); // Refresca la lista de adopciones
+            setAdopciones(adopciones.filter(adopcion => adopcion.id_adopcion !== id_adopcion)); // Actualiza el estado local
         } catch (error) {
             console.error('Error en la adopción: ', error);
             Swal.fire('Error', 'No se pudo completar la adopción', 'error');
@@ -70,7 +70,7 @@ const NotificacionesMascotas = () => {
             });
 
             console.log('Actualizando adopciones...');
-            await petAdopciones(); // Refresca la lista de adopciones
+            setAdopciones(adopciones.filter(adopcion => adopcion.id_adopcion !== id_adopcion)); // Actualiza el estado local
         } catch (error) {
             console.error('Error en la denegación: ', error);
             Swal.fire('Error', 'No se pudo denegar la adopción', 'error');
@@ -83,7 +83,7 @@ const NotificacionesMascotas = () => {
             <Card key={mascota.id_mascota} className="p-4 m-4 bg-gray-300 shadow-lg">
                 <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
                     <h4 className="font-bold text-2xl mb-1 text-gray-800">Nombre: {mascota.nombre_mascota}</h4>
-                    <small className="text-gray-600 mb-2">Genero: {mascota.sexo}</small>
+                    <small className="text-gray-600 mb-2">Género: {mascota.sexo}</small>
                     <h4 className="font-semibold text-lg mb-2 text-gray-700">Raza: {mascota.raza}</h4>
                     <Chip className="capitalize" color={statusColorMap[mascota.estado_adopcion]} size="sm" variant="flat">
                         {mascota.estado_adopcion}
@@ -94,32 +94,31 @@ const NotificacionesMascotas = () => {
                 </CardHeader>
                 <CardBody className="overflow-visible py-2">
                     <Skeleton isLoaded={isLoaded} className="rounded-lg">
-                    <div className="relative w-full h-52 mb-4 overflow-hidden">
-  {mascota && mascota.imagenes ? (
-    <div className={`grid ${mascota.imagenes.split(',').length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
-      {mascota.imagenes.split(',').map((imagen, index) => (
-        <div key={index} className={`flex items-center justify-center ${mascota.imagenes.split(',').length === 1 && index === 0 ? 'col-span-2' : ''}`}>
-          <Image
-            alt={`Imagen ${index + 1}`}
-            className="object-cover rounded-xl w-full h-full"
-            src={`${axiosClient.defaults.baseURL}/uploads/${imagen}`}
-            width="auto"
-            height="auto"
-          />
-        </div>
-      ))}
-    </div>
-  ) : (
-    <Image
-      alt="Imagen por defecto"
-      className="object-cover rounded-xl w-full h-full"
-      src="https://nextui.org/images/hero-card-complete.jpeg"
-      width="auto"
-      height="auto"
-    />
-  )}
-</div>
-
+                        <div className="relative w-full h-52 mb-4 overflow-hidden">
+                            {mascota && mascota.imagenes ? (
+                                <div className={`grid ${mascota.imagenes.split(',').length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
+                                    {mascota.imagenes.split(',').map((imagen, index) => (
+                                        <div key={index} className={`flex items-center justify-center ${mascota.imagenes.split(',').length === 1 && index === 0 ? 'col-span-2' : ''}`}>
+                                            <Image
+                                                alt={`Imagen ${index + 1}`}
+                                                className="object-cover rounded-xl w-full h-full"
+                                                src={`${axiosClient.defaults.baseURL}/uploads/${imagen}`}
+                                                width="auto"
+                                                height="auto"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <Image
+                                    alt="Imagen por defecto"
+                                    className="object-cover rounded-xl w-full h-full"
+                                    src="https://nextui.org/images/hero-card-complete.jpeg"
+                                    width="auto"
+                                    height="auto"
+                                />
+                            )}
+                        </div>
                     </Skeleton>
                     <p className="text-sm text-gray-700 font-medium mb-4">{mascota.descripcion}</p>
                     <div className="flex justify-start gap-2">
@@ -133,7 +132,7 @@ const NotificacionesMascotas = () => {
                 </CardBody>
             </Card>
         );
-    }, [isLoaded]);
+    }, [adopciones, isLoaded]);
 
     return (
         <>

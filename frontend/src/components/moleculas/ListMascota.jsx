@@ -1,14 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Card, CardHeader, CardBody, Image, Chip, ModalFooter } from "@nextui-org/react";
+import { Image } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import axiosClient from '../axiosClient';
 import MascotasContext from '../../context/MascotasContext';
 import Swal from 'sweetalert2';
+import { FaPaw, FaStar, FaCalendarDay, FaCheckCircle, FaMapMarkerAlt, FaWeight, FaMars, FaVenus } from "react-icons/fa";
+import { Tooltip } from "@nextui-org/react";
 
 function ListMascota({ initialData, onClose }) {
-    const { mascotas, setMascotas } = useContext(MascotasContext);
+    // const { mascotas, setMascotas } = useContext(MascotasContext);
     const [vacunas, setVacunas] = useState([]);
-    const [modalOpen, setModalOpen] = useState(false);
+    const [mascotas, setMascotas] = useState([]);
+    const genderIcon = initialData.sexo === "Macho" ? <FaMars className="text-blue-500" /> : <FaVenus className="text-pink-500" />;
+    const stored = localStorage.getItem('user')
+    const user = stored && stored !== 'undefined' ? JSON.parse(stored) : null;
+
     // Convertir imagenes en un array si es una cadena separada por comas
     const imagenesArray = typeof initialData.imagenes === 'string'
         ? initialData.imagenes.split(',').filter(imagen => imagen.trim() !== '')
@@ -26,6 +32,21 @@ function ListMascota({ initialData, onClose }) {
 
         fetchVacunas();
     }, [initialData.id_mascota]);
+
+
+    useEffect(() => {
+        peticionGet();
+    }, []);
+
+    const peticionGet = async () => {
+        try {
+            const response = await axiosClient.get('/mascotas/listar');
+            console.log(response.data);
+            setMascotas(response.data);
+        } catch (error) {
+            console.log('Error en el servidor ' + error);
+        }
+    };
 
     const handleAdoptar = async () => {
         try {
@@ -48,7 +69,21 @@ function ListMascota({ initialData, onClose }) {
                     showConfirmButton: false,
                     timer: 1500
                 });
-                setMascotas();
+                // Actualizar el estado localmente
+                setMascotas((prevMascotas) => {
+                    return prevMascotas.map((mascota) =>
+                        mascota.id_mascota === initialData.id_mascota
+                            ? { ...mascota, estado: 'Reservado' }
+                            : mascota
+                    );
+                });
+
+                // Llamar a peticionGet para actualizar la lista de mascotas globalmente
+                // Aquí asumimos que tienes una función para obtener la lista actualizada de mascotas
+                peticionGet(); // Asegúrate de que peticionGet esté disponible en este contexto
+
+                // Opcional: Cerrar el modal después de la adopción
+                onClose();
             } else {
                 Swal.fire({
                     title: 'Error',
@@ -114,78 +149,144 @@ function ListMascota({ initialData, onClose }) {
 
     return (
         <>
-            <Card className="py-2 bg-gray-200">
-                <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
-                    <h4 className="font-bold text-large">Nombre: {initialData.nombre_mascota}</h4>
-                    <small className="text-default-500">Sexo: {initialData.sexo}</small>
-                    <h4 className="font-bold text-large">Raza: {initialData.raza}</h4>
-                    <small className="text-default-500">Especie: {initialData.categoria}</small>
-                    <h4 className="font-bold text-large">Edad: {years} Años y {months} Meses</h4>
-                    <h4 className="font-bold text-large">Esterilización: {initialData.esterilizado}</h4>
-                    <h4 className="font-bold text-large">Departamento: {initialData.departamento}</h4>
-                    <h4 className="font-bold text-large">Municipio: {initialData.municipio}</h4>
-                    <h4 className="font-bold text-large">Tamaño: {initialData.tamano}</h4>
-                    <h4 className="font-bold text-large">Peso: {initialData.peso}</h4>
-                    <Chip className="capitalize" color={statusColorMap[initialData.estado]} size="xs" variant="flat">
-                        {initialData.estado}
-                    </Chip>
-                </CardHeader>
-                <CardBody className="overflow-visible py-2">
-                    <div className="relative w-full h-62 mb-4 overflow-hidden">
-                        {imagenesArray.length > 0 ? (
-                            <div className={`grid ${imagenesArray.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
-                                {imagenesArray.map((imagen, index) => (
-                                    <div key={index} className={`flex items-center justify-center ${imagenesArray.length === 1 && index === 0 ? 'col-span-2' : ''}`}>
-                                        <Image
-                                            alt={`Imagen ${index + 1}`}
-                                            className="object-cover w-full h-full"
-                                            src={`${axiosClient.defaults.baseURL}/uploads/${imagen}`}
-                                            width="auto"
-                                            height="auto"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <Image
-                                alt="Imagen por defecto"
-                                className="object-cover w-full h-full"
-                                src="https://nextui.org/images/hero-card-complete.jpeg"
-                                width="auto"
-                                height="auto"
-                            />
-                        )}
+            <div className="px-6">
+                <div className="grid grid-cols-3 gap-4">
+                    <div>
+                        <Tooltip content="Nombre de la mascota">
+                            <h4 className="font-semibold text-lg flex items-center space-x-2">
+                                <FaPaw className="text-indigo-600" />
+                                <span>{initialData.nombre_mascota}</span>
+                            </h4>
+                        </Tooltip>
+                        <Tooltip content="Sexo de la mascota">
+                            <h4 className="font-semibold text-base flex items-center space-x-2 mt-2">
+                                {genderIcon}
+                                <span>{initialData.sexo}</span>
+                            </h4>
+                        </Tooltip>
+                        <Tooltip content="Raza de la mascota">
+                            <h4 className="font-semibold text-base flex items-center space-x-2 mt-2">
+                                <FaPaw className="text-indigo-600" />
+                                <span>{initialData.raza}</span>
+                            </h4>
+                        </Tooltip>
+                        <Tooltip content="Categoría de la mascota">
+                            <h4 className="font-semibold text-base flex items-center space-x-2 mt-2">
+                                <FaStar className="text-yellow-500" />
+                                <span>{initialData.categoria}</span>
+                            </h4>
+                        </Tooltip>
                     </div>
-                    <p className="text-sm text-gray-700 font-medium mb-4">{initialData.descripcion}</p>
-                    {/* <p className="text-sm text-gray-700 font-medium mb-4">Edad: {initialData.edad} años</p> */}
-                    <div className="mt-2 flex flex-wrap justify-between">
-                        {vacunas.length > 0 ? (
-                            vacunas.map((vacuna) => (
+                    <div>
+                        <Tooltip content="Edad de la mascota">
+                            <h4 className="font-semibold text-base flex items-center space-x-2 mt-2">
+                                <FaCalendarDay className="text-green-500" />
+                                <span>{years} Años y {months} Meses</span>
+                            </h4>
+                        </Tooltip>
+                        <Tooltip content="Esterilización">
+                            <h4 className="font-semibold text-base flex items-center space-x-2 mt-2">
+                                <FaCheckCircle className="text-blue-500" />
+                                <span>{initialData.esterilizado}</span>
+                            </h4>
+                        </Tooltip>
+                        <Tooltip content="Departamento">
+                            <h4 className="font-semibold text-base flex items-center space-x-2 mt-2">
+                                <FaMapMarkerAlt className="text-red-500" />
+                                <span>{initialData.departamento}</span>
+                            </h4>
+                        </Tooltip>
+                    </div>
+                    <div>
+                        <Tooltip content="Municipio">
+                            <h4 className="font-semibold text-base flex items-center space-x-2 mt-2">
+                                <FaMapMarkerAlt className="text-red-500" />
+                                <span>{initialData.municipio}</span>
+                            </h4>
+                        </Tooltip>
+                        <Tooltip content="Tamaño de la mascota">
+                            <h4 className="font-semibold text-base flex items-center space-x-2 mt-2">
+                                <FaWeight className="text-gray-500" />
+                                <span>{initialData.tamano}</span>
+                            </h4>
+                        </Tooltip>
+                        <Tooltip content="Peso de la mascota">
+                            <h4 className="font-semibold text-base flex items-center space-x-2 mt-2">
+                                <FaWeight className="text-gray-500" />
+                                <span>{initialData.peso} kg</span>
+                            </h4>
+                        </Tooltip>
+                    </div>
+                </div>
+
+            </div>
+            <div className="capitalize mt-4 text-center text-sm font-medium">
+                <span className={`px-4 py-2 rounded-full text-white bg-${statusColorMap[initialData.estado]}`}>
+                    {initialData.estado}
+                </span>
+            </div>
+            <div className="overflow-visible py-4">
+                <div className="relative w-6/12 h-auto mb-4 overflow-hidden mx-auto">
+                    {imagenesArray.length > 0 ? (
+                        <div className={`grid ${imagenesArray.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-1`}>
+                            {imagenesArray.map((imagen, index) => (
                                 <div
-                                    key={vacuna.id_vacuna}
-                                    className="mb-4 w-1/2 px-2"
+                                    key={index}
+                                    className={`flex items-center justify-center ${imagenesArray.length === 1 && index === 0 ? 'col-span-2' : ''}`}
                                 >
-                                    <div className="border p-4 rounded">
-                                        <h5 className="font-bold">Enfermedad: {vacuna.enfermedad}</h5>
-                                        <p>Fecha: {formatDate(vacuna.fecha_vacuna)}</p>
-                                        <p>Estado: {vacuna.estado}</p>
-                                    </div>
+                                    <Image
+                                        alt={`Imagen ${index + 1}`}
+                                        className="object-cover w-full h-auto rounded-lg shadow-md mx-auto"
+                                        src={`${axiosClient.defaults.baseURL}/uploads/${imagen}`}
+                                        width="auto"
+                                        height="auto"
+                                    />
                                 </div>
-                            ))
-                        ) : (
-                            <p className="text-sm text-gray-700 font-medium mb-4">Esta mascota no tiene vacunas.</p>
-                        )}
-                    </div>
-                </CardBody>
-            </Card>
-            <ModalFooter>
+                            ))}
+                        </div>
+                    ) : (
+                        <Image
+                            alt="Imagen por defecto"
+                            className="object-cover w-full h-auto rounded-lg shadow-md mx-auto"
+                            src="https://nextui.org/images/hero-card-complete.jpeg"
+                            width="auto"
+                            height="auto"
+                        />
+                    )}
+                </div>
+
+                <p className="text-sm text-gray-700 font-medium">{initialData.descripcion}</p>
+                <div className="flex flex-wrap -mx-2">
+                    {vacunas.length > 0 ? (
+                        vacunas.map((vacuna) => (
+                            <div key={vacuna.id_vacuna} className="w-full md:w-1/2 px-2">
+                                <div className="border p-4 rounded-lg shadow-sm bg-white">
+                                    <h5 className="font-bold text-gray-800 mb-1 text-sm">Enfermedad: {vacuna.enfermedad}</h5>
+                                    <p className="text-gray-600 mb-1 text-xs">Fecha: {formatDate(vacuna.fecha_vacuna)}</p>
+                                    <p className="text-gray-600 text-xs">Estado: {vacuna.estado}</p>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-sm text-gray-700 font-medium mb-4">Esta mascota no tiene vacunas.</p>
+                    )}
+                </div>
+            </div>
+
+            <div className="flex justify-end mt-2">
                 <Button color="danger" onClick={onClose}>Cancelar</Button>
-                <Button color="warning" className="z-1 text-white" onClick={handleAdoptar}>
-                    ¡Adoptame!
-                </Button>
-            </ModalFooter>
+                {user && user.rol !== 'superusuario' && (
+                    <>
+                        {initialData.estado !== 'Reservado' && initialData.estado !== 'Adoptado' && (
+                            <Button color="warning" className="ml-4 z-1 text-white" onClick={handleAdoptar}>
+                                ¡Adoptame!
+                            </Button>
+                        )}
+                    </>
+                )}
+            </div>
         </>
     );
-}
 
+}
 export default ListMascota;
