@@ -10,6 +10,10 @@ const Reportes = () => {
     navigate('/Filtrosreporte'); // Redirige a la vista de filtrados
   }
 
+  const handleSubmit2 = (e) => {
+    e.preventDefault();
+    navigate('/Filtrosreporte2'); // Redirige a la vista de filtrados
+  }
   return (
     <div className="flex flex-col items-center justify-center">
       <Header title="Reportes de Mascotas" />
@@ -36,6 +40,7 @@ const Reportes = () => {
             Este módulo permite generar reportes detallados sobre las mascotas adoptadas. Puedes filtrar los reportes por código del animal, día, semana, rango de fechas, categoría y raza, y generar reportes en formatos Excel y PDF.
           </p>
           <button
+          onClick={handleSubmit2}
             className="w-full py-3 bg-warning-500 text-white font-bold rounded-lg shadow-md hover:bg-warning-300 focus:outline-none focus:ring-2 focus:ring-warning-500 transition duration-300"
           >
             Filtrar y Generar Reportes

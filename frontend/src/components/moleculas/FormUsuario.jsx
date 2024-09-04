@@ -13,10 +13,12 @@ const validationSchema = yup.object().shape({
     tipo_documento: yup
         .string()
         .required('El tipo de documento es obligatorio'),
-    documento_identidad: yup
+        documento_identidad: yup
         .string()
         .required('El documento de identidad es obligatorio')
-        .matches(/^\d+$/, 'El documento de identidad debe ser numérico'),
+        .matches(/^\d+$/, 'El documento de identidad debe ser numérico')
+        .length(10, 'El documento de identidad debe contener exactamente 10 dígitos'),
+    
     nombre: yup
         .string()
         .required('El nombre es obligatorio'),
@@ -33,7 +35,8 @@ const validationSchema = yup.object().shape({
     telefono: yup
         .string()
         .required('El telefono es obligatorio')
-        .matches(/^\d*$/, 'El teléfono debe ser numérico'),
+        .matches(/^\d*$/, 'El teléfono debe ser numérico')
+        .length(10, 'El telefono debe contener exactamente 10 dígitos'),
     password: yup
         .string()
         .required('La contraseña es obligatoria'),

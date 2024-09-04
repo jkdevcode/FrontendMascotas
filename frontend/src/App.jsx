@@ -8,6 +8,7 @@ import IniciarSesion from './components/pages/IniciarSesion';
 import GlobalProvider from "./context/GlobalContext";
 import { ListsMascotas } from "./components/pages/ListsMascotas";
 import FiltradosReporte from "./components/pages/FiltradosReporte";
+import FiltradosReporte2 from "./components/pages/FiltradosReporte2";
 import Graficas from "./components/pages/Grafica";
 import Usuarios from "./components/pages/Usuarios";
 import TabMascotas from "./components/pages/TabMascotas";
@@ -35,6 +36,7 @@ function App() {
               <Route path="/graficas" element={<Graficas />} />
               <Route path="/perfil" element={<PerfilUsuario />} />
               <Route path="/Filtrosreporte" element={<FiltradosReporte />} />
+              <Route path="/Filtrosreporte2" element={<FiltradosReporte2 />} />
               <Route path="/reportes" element={<Reportes />} />
             </>
           )}
@@ -43,6 +45,7 @@ function App() {
               <Route path="/mascotas" element={<TabMascotas />} />
               <Route path="/perfil" element={<PerfilUsuario />} />
               <Route path="/Filtrosreporte" element={<FiltradosReporte />} />
+              <Route path="/Filtrosreporte2" element={<FiltradosReporte2 />} />
               <Route path="/reportes" element={<Reportes />} />
             </>
           )}
@@ -52,6 +55,7 @@ function App() {
               <Route path="/notificaciones" element={<TabNotificaciones />} />
               <Route path="/perfil" element={<PerfilUsuario />} />
               <Route path="/Filtrosreporte" element={<FiltradosReporte />} />
+              <Route path="/Filtrosreporte2" element={<FiltradosReporte2 />} />
               <Route path="/reportes" element={<Reportes />} />
             </>
           )}
