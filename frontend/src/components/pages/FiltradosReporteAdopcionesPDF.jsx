@@ -6,12 +6,11 @@ import axiosClient from '../axiosClient.js';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
-import ReporteExcelButton2 from "../moleculas/ReporteExcelButton2.jsx"; 
 
 
-const FiltradosReporte2 = () => {
+
+const FiltradosReporteAdopcionesPDF = () => {
   const [tipoFecha, setTipoFecha] = useState("dia"); // 'dia', 'mes', 'rango'
-  const [idMascota, setIdMascota] = useState("");
   const [fechaDia, setFechaDia] = useState(new Date());
   const [fechaMes, setFechaMes] = useState(new Date());
   const [fechaInicio, setFechaInicio] = useState(new Date());
@@ -55,10 +54,10 @@ const FiltradosReporte2 = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Construir los parámetros de la consulta
-    let params = { tipo_fecha: tipoFecha, id_mascota: idMascota };
-  
+    let params = { tipo_fecha: tipoFecha };
+
     if (tipoFecha === "dia") {
       params.fecha_inicio = fechaDia.toISOString().split("T")[0];
     } else if (tipoFecha === "mes") {
@@ -67,21 +66,21 @@ const FiltradosReporte2 = () => {
       params.fecha_inicio = moment(fechaInicio).format("YYYY-MM-DD");
       params.fecha_fin = moment(fechaFin).format("YYYY-MM-DD");
     }
-  
+
     if (categoriaSeleccionada) {
       params.categoria = categoriaSeleccionada;
     }
-  
+
     if (razaSeleccionada) {
       params.raza = razaSeleccionada;
     }
-  
+
     try {
-      const res = await axiosClient.get("/reportesPDF2/reporte_pdf", {
+      const res = await axiosClient.get("/reportesPDF1/reporte_pdf", {
         params,
         responseType: "blob", // Importante para recibir el PDF
       });
-  
+
       // Crear un enlace para descargar el PDF
       const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
       const link = document.createElement("a");
@@ -92,90 +91,60 @@ const FiltradosReporte2 = () => {
       link.remove();
     } catch (error) {
       console.error("Error al generar el reporte:", error);
-      alert("Error al generar el reporte. Por favor, intente nuevamente.");
+      alert("No se pudo generar el reporte. Por favor, verifica los filtros.");
     }
   };
-  
+
   return (
     <div className="flex flex-col items-center justify-center">
-      <Header title="Reporte de Mascotas Adoptadas" />
+      <Header title="Reporte de Mascotas en Adopción" />
       <div className="w-full max-w-4xl bg-white shadow-custom rounded-lg p-8 mt-16">
 
-        <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Generar Reporte de Mascotas Adoptadas</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Generar Reporte de Mascotas en Adopción</h2>
         <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-    <div className="flex flex-col space-y-2">
-        <label className="text-lg font-medium text-gray-800">ID de Mascota:</label>
-        <input
-            type="text"
-            value={idMascota}
-            onChange={(e) => setIdMascota(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-warning-500 focus:border-warning-500 transition duration-300"
-        />
-    </div>
-
-
-                <div className="flex flex-col space-y-2">
-                <label className="text-lg font-medium text-gray-800">Tipo de Fecha:</label>
-                <select
-                    value={tipoFecha}
-                    onChange={(e) => setTipoFecha(e.target.value)}
-                    className="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-warning-500 focus:border-warning-500 transition duration-300"
-                >
-                    <option value="dia">Día</option>
-                    <option value="mes">Mes</option>
-                    <option value="rango">Rango de Fechas</option>
-                </select>
-                </div>
-
-                    
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col space-y-2">
-              <label className="text-lg font-medium text-gray-800">Categoría:</label>
+              <label className="text-lg font-medium text-gray-800">Tipo de Fecha:</label>
               <select
-                value={categoriaSeleccionada}
-                onChange={(e) => setCategoriaSeleccionada(e.target.value)}
+                value={tipoFecha}
+                onChange={(e) => setTipoFecha(e.target.value)}
                 className="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-warning-500 focus:border-warning-500 transition duration-300"
               >
-                <option value="">Todas</option>
-                {categorias.map((categoria) => (
-                  <option key={categoria.id_categoria} value={categoria.id_categoria}>
-                    {categoria.nombre_categoria}
-                  </option>
-                ))}
+                <option value="dia">Día</option>
+                <option value="mes">Mes</option>
+                <option value="rango">Rango de Fechas</option>
               </select>
             </div>
-    
-                {tipoFecha === "dia" && (
-                <div className="flex flex-col space-y-2">
-                    <label className="text-lg font-medium text-gray-800">Selecciona el Día:</label>
-                    <DatePicker
-    selected={fechaDia}
-    onChange={(date) => setFechaDia(date)}
-    dateFormat="yyyy-MM-dd"
-    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-warning-500 focus:border-warning-500 transition duration-300"
-    />
+  
+            {tipoFecha === "dia" && (
+              <div className="flex flex-col space-y-2">
+                <label className="text-lg font-medium text-gray-800">Selecciona el Día:</label>
+                <DatePicker
+  selected={fechaDia}
+  onChange={(date) => setFechaDia(date)}
+  dateFormat="yyyy-MM-dd"
+  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-warning-500 focus:border-warning-500 transition duration-300"
+/>
 
-                </div>
-                )}
-    
-                {tipoFecha === "mes" && (
-                <div className="flex flex-col space-y-2">
-                    <label className="text-lg font-medium text-gray-800">Selecciona el Mes:</label>
-                    <DatePicker
-    selected={fechaMes}
-    onChange={(date) => setFechaMes(date)}
-    dateFormat="MM-yyyy"
-    showMonthYearPicker
-    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-warning-500 focus:border-warning-500 transition duration-300"
-    />
+              </div>
+            )}
+  
+            {tipoFecha === "mes" && (
+              <div className="flex flex-col space-y-2">
+                <label className="text-lg font-medium text-gray-800">Selecciona el Mes:</label>
+                <DatePicker
+  selected={fechaMes}
+  onChange={(date) => setFechaMes(date)}
+  dateFormat="MM-yyyy"
+  showMonthYearPicker
+  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-warning-500 focus:border-warning-500 transition duration-300"
+/>
 
-                </div>
-                )}
-    
-    {tipoFecha === "rango" && (
+              </div>
+            )}
+  
+  {tipoFecha === "rango" && (
   <div className="flex flex-col space-y-2">
-
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> {/* Contenedor para alinear los inputs */}
       <div className="flex flex-col space-y-2">
         <label className="text-lg font-medium text-gray-800">Fecha de Inicio:</label>
@@ -199,7 +168,22 @@ const FiltradosReporte2 = () => {
   </div>
 )}
 
-
+  
+            <div className="flex flex-col space-y-2">
+              <label className="text-lg font-medium text-gray-800">Categoría:</label>
+              <select
+                value={categoriaSeleccionada}
+                onChange={(e) => setCategoriaSeleccionada(e.target.value)}
+                className="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-warning-500 focus:border-warning-500 transition duration-300"
+              >
+                <option value="">Selecciona la categoria</option>
+                {categorias.map((categoria) => (
+                  <option key={categoria.id_categoria} value={categoria.id_categoria}>
+                    {categoria.nombre_categoria}
+                  </option>
+                ))}
+              </select>
+            </div>
   
             <div className="flex flex-col space-y-2">
               <label className="text-lg font-medium text-gray-800">Raza:</label>
@@ -208,7 +192,7 @@ const FiltradosReporte2 = () => {
                 onChange={(e) => setRazaSeleccionada(e.target.value)}
                 className="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-warning-500 focus:border-warning-500 transition duration-300"
               >
-                <option value="">Todas</option>
+                <option value="">Selecciona la raza</option>
                 {razas.map((raza) => (
                   <option key={raza.id_raza} value={raza.id_raza}>
                     {raza.nombre_raza}
@@ -217,15 +201,13 @@ const FiltradosReporte2 = () => {
               </select>
             </div>
           </div>
-  
-  {/*         <button
+
+          <button
             type="submit"
-            className="w-full py-3 bg-warning-500 text-white font-bold rounded-lg shadow-md hover:bg-warning-300 focus:outline-none focus:ring-2 focus:ring-warning-500 transition duration-300"
+            className="w-full py-3 bg-red-600 text-white font-bold rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-300"
           >
             Generar Reporte PDF
-          </button> */}
-
-<ReporteExcelButton2 />
+          </button>
         </form>
       </div>
       
@@ -235,4 +217,4 @@ const FiltradosReporte2 = () => {
   
 };
 
-export default FiltradosReporte2;
+export default FiltradosReporteAdopcionesPDF;

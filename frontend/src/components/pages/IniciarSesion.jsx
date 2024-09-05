@@ -32,15 +32,15 @@ function IniciarSesion() {
             try {
                 const response = await axiosClient.post('/validacion', values);
                 console.log('Datos enviados en la validación: ', response);
-
+    
                 if (response.status === 200) {
                     const { token, user } = response.data;
                     const userInfo = user[0] || user;
                     localStorage.setItem('token', token);
                     localStorage.setItem('user', JSON.stringify(userInfo));
-
+    
                     const userRol = userInfo.rol;
-
+    
                     if (userRol === 'usuario') {
                         navigate('/listmascotas');
                     } else if (userRol === 'administrador') {
@@ -48,7 +48,7 @@ function IniciarSesion() {
                     } else if (userRol === 'superusuario') {
                         navigate('/usuarios');
                     }
-
+    
                     Swal.fire({
                         position: "top-center",
                         icon: "success",
@@ -56,28 +56,34 @@ function IniciarSesion() {
                         showConfirmButton: false,
                         timer: 1500
                     });
-                } else {
-                    console.log('Response', response);
-                    Swal.fire({
-                        position: "top-center",
-                        icon: "error",
-                        title: "Datos Incorrectos",
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
                 }
             } catch (error) {
-                console.error('Error en la solicitud:', error);
-                Swal.fire({
-                    position: "top-center",
-                    icon: "error",
-                    title: "Error en la solicitud",
-                    showConfirmButton: false,
-                    timer: 1500
-                });
+                if (error.response && error.response.status === 404) {
+                    // Mostrar mensaje si el correo o la contraseña están mal
+                    const mensajeError = error.response.data.message;
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Datos Incorrectos',
+                        text: mensajeError, // Mostrar el mensaje específico del backend
+                        showConfirmButton: true,
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#1193F1'
+                    });
+                } else {
+                    // Mensaje para otros errores
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error en la solicitud',
+                        text: 'Ocurrió un error al procesar su solicitud. Inténtelo más tarde.',
+                        showConfirmButton: true,
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#1193F1'
+                    });
+                }
             }
         }
     });
+    
 
     // Estado para visibilidad de la contraseña
     const [isVisible, setIsVisible] = useState(false);

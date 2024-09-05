@@ -145,22 +145,38 @@ export function Mascotas() {
                         </Skeleton>
                         <p className="text-sm text-gray-700 font-medium mb-4">{mascota.descripcion}</p>
                         <div className="flex flex-col gap-2 mt-4">
-                            <div className="flex justify-start gap-4">
-                                <Button color="warning" variant="ghost" onPress={() => handleToggle('update', setMascotaId(mascota))}>
-                                    Editar
-                                </Button>
-                                <Button color="primary" variant="ghost" onPress={() => handleDownloadPDF(mascota.id_mascota)}>
-                                    Ficha Técnica
-                                </Button>
-                            </div>
-                            <div className="flex justify-start">
-                                <Button color="default" variant="ghost" onPress={() => handleViewDetails('view', mascota)}>
-                                    <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                        <EyeIcon />
-                                    </span>
-                                </Button>
-                            </div>
-                        </div>
+    {/* Botones Editar y Ver Detalles */}
+    <div className="flex flex-col items-center gap-4">
+    <Link 
+        className="text-blue-600 underline cursor-pointer font-semibold" 
+        to="#" 
+        onClick={() => handleViewDetails('view', mascota)}
+    >
+        Ver más Información
+    </Link>
+    <div className="flex flex-row gap-4">
+        <Button 
+            color="warning" 
+            variant="ghost" 
+            onPress={() => handleToggle('update', setMascotaId(mascota))}
+        >
+            Editar
+        </Button>
+        <Button 
+            color="danger" 
+            variant="ghost" 
+            onPress={() => handleDownloadPDF(mascota.id_mascota)}
+        >
+            Ficha Técnica
+        </Button>
+    </div>
+</div>
+
+
+        
+
+</div>
+
                     </CardBody>
                 </Card>
 
@@ -182,9 +198,7 @@ export function Mascotas() {
                                 onChange={onSearchChange}
                             />
                             <div className="z-0 flex gap-3">
-                                <Button as={Link} to="/reportes" color="primary" variant="bordered" className="text-gray-700">
-                                    Reportes
-                                </Button>
+
                                 <Dropdown>
                                     <DropdownTrigger>
                                         <Button
@@ -212,6 +226,9 @@ export function Mascotas() {
                                 </Dropdown>
                                 <Button color="warning" variant="bordered" className="z-1 text-orange-500" style={{ position: 'relative' }} endContent={<PlusIcon />} onClick={() => handleToggle('create')}>
                                     Registrar
+                                </Button>
+                                <Button as={Link} to="/reportes" color="primary" variant="bordered" className="text-gray-700">
+                                    Reportes
                                 </Button>
                             </div>
 

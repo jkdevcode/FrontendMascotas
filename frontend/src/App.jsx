@@ -7,14 +7,17 @@ import RegistroUser from './components/pages/RegistroUser';
 import IniciarSesion from './components/pages/IniciarSesion';
 import GlobalProvider from "./context/GlobalContext";
 import { ListsMascotas } from "./components/pages/ListsMascotas";
-import FiltradosReporte from "./components/pages/FiltradosReporte";
-import FiltradosReporte2 from "./components/pages/FiltradosReporte2";
+
 import Graficas from "./components/pages/Grafica";
 import Usuarios from "./components/pages/Usuarios";
 import TabMascotas from "./components/pages/TabMascotas";
 import TabNotificaciones from "./components/pages/TabNotificaciones";
 import PerfilUsuario from "./components/pages/Perfil";
 import Reportes from "./components/pages/Reportes";
+import FiltradosReporteAdopcionesExcel from "./components/pages/FiltradosReporteAdopcionesExcel";
+import FiltradosReporteAdopcionesPDF from "./components/pages/FiltradosReporteAdopcionesPDF";
+import FiltradosReporteAdoptadosPDF from "./components/pages/FiltradosReporteAdoptadosPDF";
+import FiltradosReporteAdoptadosEXCEL from "./components/pages/FiltradosReporteAdoptadosExcel";
 
 function App() {
   const stored = localStorage.getItem('user');
@@ -35,8 +38,10 @@ function App() {
               <Route path="/notificaciones" element={<TabNotificaciones />} />
               <Route path="/graficas" element={<Graficas />} />
               <Route path="/perfil" element={<PerfilUsuario />} />
-              <Route path="/Filtrosreporte" element={<FiltradosReporte />} />
-              <Route path="/Filtrosreporte2" element={<FiltradosReporte2 />} />
+              <Route path="/FiltrosReporteAdopcionesPDF" element={<FiltradosReporteAdopcionesPDF />} />
+              <Route path="/FiltrosReporteAdopcionesEXCEL" element={<FiltradosReporteAdopcionesExcel />} />
+              <Route path="/FiltradosReporteAdoptadosPDF" element={<FiltradosReporteAdoptadosPDF />} />
+              <Route path="/FiltradosReporteAdoptadosEXCEL" element={<FiltradosReporteAdoptadosEXCEL />} />
               <Route path="/reportes" element={<Reportes />} />
             </>
           )}
@@ -44,8 +49,10 @@ function App() {
             <>
               <Route path="/mascotas" element={<TabMascotas />} />
               <Route path="/perfil" element={<PerfilUsuario />} />
-              <Route path="/Filtrosreporte" element={<FiltradosReporte />} />
-              <Route path="/Filtrosreporte2" element={<FiltradosReporte2 />} />
+              <Route path="/FiltrosReporteAdopcionesPDF" element={<FiltradosReporteAdopcionesPDF />} />
+              <Route path="/FiltrosReporteAdopcionesEXCEL" element={<FiltradosReporteAdopcionesExcel />} />
+              <Route path="/FiltradosReporteAdoptadosPDF" element={<FiltradosReporteAdoptadosPDF />} />
+              <Route path="/FiltradosReporteAdoptadosEXCEL" element={<FiltradosReporteAdoptadosEXCEL />} />
               <Route path="/reportes" element={<Reportes />} />
             </>
           )}
@@ -54,9 +61,6 @@ function App() {
               <Route path="/listmascotas" element={<ListsMascotas />} />
               <Route path="/notificaciones" element={<TabNotificaciones />} />
               <Route path="/perfil" element={<PerfilUsuario />} />
-              <Route path="/Filtrosreporte" element={<FiltradosReporte />} />
-              <Route path="/Filtrosreporte2" element={<FiltradosReporte2 />} />
-              <Route path="/reportes" element={<Reportes />} />
             </>
           )}
         </Routes>

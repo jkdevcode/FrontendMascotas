@@ -154,14 +154,23 @@ export function ListsMascotas() {
                             </div>
                         </Skeleton>
                         <p className="text-sm text-gray-700 font-medium mb-4">{mascota.descripcion}</p>
-                        <div className="flex justify-start gap-10">
-                            <Link className='text-blue-600 underline cursor-pointer font-semibold' to='#' onClick={() => handleToggle('view', mascota)}>
-                                Ver más
-                            </Link>
-                            <Button color="primary" variant="ghost" onPress={() => handleDownloadPDF(mascota.id_mascota)}>
-                                Ficha Técnica
-                            </Button>
-                        </div>
+                        <div className="flex flex-col items-center gap-4">
+    <Link 
+        className="text-blue-600 underline cursor-pointer font-semibold" 
+        to="#" 
+        onClick={() => handleToggle('view', mascota)}
+    >
+        Ver más Información
+    </Link>
+    <Button 
+        color="danger" 
+        variant="ghost" 
+        onPress={() => handleDownloadPDF(mascota.id_mascota)}
+    >
+        Ficha Técnica
+    </Button>
+</div>
+
                     </CardBody>
                 </Card>
             );
