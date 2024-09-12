@@ -21,10 +21,12 @@ const validationSchema = yup.object().shape({
     
     nombre: yup
         .string()
-        .required('El nombre es obligatorio'),
+        .required('El nombre es obligatorio')
+ 	 .matches(/^[a-zA-Z\s]{1,20}$/, 'El nombre debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
     apellido: yup
         .string()
-        .required('El apellido es obligatorio'),
+        .required('El apellido es obligatorio')
+ 	 .matches(/^[a-zA-Z\s]{1,20}$/, 'El apellido debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
     direccion: yup
         .string()
         .required('La dirección es obligatoria'),

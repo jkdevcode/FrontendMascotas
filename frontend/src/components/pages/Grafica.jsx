@@ -66,7 +66,7 @@ const Graficas = () => {
                 }
             } catch (error) {
                 console.error('Error fetching mascotas data:', error);
-                setError('Error fetching mascotas data');
+                // setError('Error fetching mascotas data');
             } finally {
                 setLoading(false);
             }
@@ -144,19 +144,34 @@ const Graficas = () => {
         maintainAspectRatio: false,
     };
 
-
     return (
         <>
-           <Header title="Graficas" />
+            <Header title="Graficas" />
             <div className="p-8 pl-24">
                 <ListGraficaModal>
                     <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-28">
                         <div>
-                            {loading ? <p>Cargando...</p> : <Bar data={mascotasData} options={optionsBar} style={{ height: '470px' }} />}
+                            {loading ? (
+                                <p>Cargando...</p>
+                            ) : (
+                                mascotasData.datasets[0].data.length === 0 ? (
+                                    <p>No hay datos de mascotas disponibles</p>
+                                ) : (
+                                    <Bar data={mascotasData} options={optionsBar} style={{ height: '470px' }} />
+                                )
+                            )}
                             {error && <p className="text-red-500">{error}</p>}
                         </div>
                         <div>
-                            {loading ? <p>Cargando...</p> : <Doughnut data={usuariosData} options={optionsDoughnut} style={{ height: '500px' }} />}
+                            {loading ? (
+                                <p>Cargando...</p>
+                            ) : (
+                                usuariosData.datasets[0].data.length === 0 ? (
+                                    <p>No hay datos de usuarios disponibles</p>
+                                ) : (
+                                    <Doughnut data={usuariosData} options={optionsDoughnut} style={{ height: '500px' }} />
+                                )
+                            )}
                             {error && <p className="text-red-500">{error}</p>}
                         </div>
                     </div>

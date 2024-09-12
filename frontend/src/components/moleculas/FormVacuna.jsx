@@ -4,6 +4,8 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import axiosClient from '../axiosClient';
 import VacunasContext from '../../context/VacunasContext';
+import { DatePicker } from "@nextui-org/react";
+import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 
 // Esquema de validación con Yup
 const validationSchema = yup.object().shape({
@@ -48,22 +50,31 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
     const formik = useFormik({
         initialValues: {
             fk_id_mascota: '',
-            fecha_vacuna: '',
+            fecha_vacuna: null, // Inicialmente, la fecha está vacía
             enfermedad: '',
             estado: ''
         },
         validationSchema: validationSchema,
-        onSubmit: (values, { resetForm }) => {
-            handleSubmit(values);
-            resetForm();
-        },
+      onSubmit: (values, { resetForm }) => {
+    const formattedDate = values.fecha_vacuna 
+        ? values.fecha_vacuna.toISOString().split('T')[0] 
+        : null;
+        
+    const payload = {
+        ...values,
+        fecha_vacuna: formattedDate
+    };
+
+    handleSubmit(payload);
+    resetForm();
+}
     });
 
     useEffect(() => {
         if (mode === 'update' && idVacuna) {
             formik.setValues({
                 fk_id_mascota: idVacuna.fk_id_mascota || '',
-                fecha_vacuna: idVacuna.fecha_vacuna ? new Date(idVacuna.fecha_vacuna).toISOString().split('T')[0] : '',
+                fecha_vacuna: idVacuna.fecha_vacuna ? new Date(idVacuna.fecha_vacuna) : null,
                 enfermedad: idVacuna.enfermedad || '',
                 estado: idVacuna.estado || '',
             });
@@ -96,22 +107,24 @@ const FormVacunas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                         <div className="text-red-500 text-xs">{formik.errors.fk_id_mascota}</div>
                     ) : null}
                 </div>
-                <div className='py-2'>
-                    <input
-                        type="date"
-                        className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
-                        id='fecha_vacuna'
-                        name="fecha_vacuna"
-                        value={formik.values.fecha_vacuna}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        isInvalid={formik.touched.fecha_vacuna && !!formik.errors.fecha_vacuna}
+
+                {/* Componente DatePicker */}
+                <div className="py-2">
+                    <DatePicker
+                        label="Fecha de la vacuna"
+                        className="w-80"
+                        color="warning"
+                        variant="bordered"
+                        maxValue={today(getLocalTimeZone())}
+                        value={formik.values.fecha_vacuna ? parseDate(formik.values.fecha_vacuna.toISOString().split('T')[0]) : null}
+                        onChange={(date) => formik.setFieldValue('fecha_vacuna', date ? new Date(date) : null)}
                         required
                     />
                     {formik.touched.fecha_vacuna && formik.errors.fecha_vacuna ? (
                         <div className="text-red-500 text-xs">{formik.errors.fecha_vacuna}</div>
                     ) : null}
                 </div>
+
                 <div className='py-2'>
                     <Input
                         className='w-80'

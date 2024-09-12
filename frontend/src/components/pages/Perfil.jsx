@@ -8,6 +8,7 @@ import PerfilModal from '../templates/PerfilModal';
 import Header from '../moleculas/Header';
 
 const PerfilUsuario = () => {
+  const [solicitudEnviada, setSolicitudEnviada] = useState(false); // Estado para controlar si la solicitud fue enviada
   const [perfil, setPerfil] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [initialData, setInitialData] = useState(null);
@@ -90,12 +91,28 @@ const PerfilUsuario = () => {
   };
 
   const handleRequestRoleChange = async () => {
+    if (solicitudEnviada) {
+      // Si ya se envió la solicitud, muestra el mensaje de advertencia
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        title: "Solicitud ya enviada",
+        text: "Ya has enviado una solicitud de cambio de rol. Por favor, espera la aprobación.",
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return; // No hace nada más si ya se envió la solicitud
+    }
+
     try {
       const token = localStorage.getItem("token");
       const id_usuario = JSON.parse(localStorage.getItem('user')).id_usuario;
-      const response = await axiosClient.post(`/usuarios/solicitarCambioRol/${id_usuario}`, { headers: { token: token } });
+      const response = await axiosClient.post(`/usuarios/solicitarCambioRol/${id_usuario}`, {
+        headers: { token: token },
+      });
 
       if (response.status === 200) {
+        setSolicitudEnviada(true); // Cambia el estado para indicar que la solicitud fue enviada
         Swal.fire({
           position: "center",
           icon: "success",

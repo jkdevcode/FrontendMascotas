@@ -70,9 +70,14 @@ function Vacunas() {
         const renderCell = React.useCallback((vacuna, columnKey) => {
             let cellValue = vacuna[columnKey];
         
-            if (columnKey === 'fecha_vacuna') {
-                cellValue = format(new Date(cellValue), 'dd/MM/yyyy'); // Formato corto de fecha
-            }
+if (columnKey === 'fecha_vacuna') {
+    const dateOnly = new Date(cellValue).toLocaleDateString('es-ES', {
+        timeZone: 'UTC'  // Esto asegura que no se use la zona horaria local
+    });
+    cellValue = dateOnly; // Formato corto de fecha
+}
+
+
         
             switch (columnKey) {
                 case "actions":
@@ -269,8 +274,8 @@ function Vacunas() {
             sortable: true
         },
         {
-            uid: 'fk_id_mascota',
-            name: 'Vacuna',
+            uid: 'nombre_mascota',
+            name: 'Mascota',
             sortable: true
         },
         {

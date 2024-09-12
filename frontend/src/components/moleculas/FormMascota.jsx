@@ -6,102 +6,198 @@ import { CameraIcon } from '../nextUI/CameraIcon.jsx';
 import MascotasContext from '../../context/MascotasContext.jsx';
 import axiosClient from '../axiosClient.js';
 import { DatePicker } from "@nextui-org/react";
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
+
+const validationSchema = yup.object().shape({
+    nombre_mascota: yup
+        .string()
+        .required('El nombre_mascota es obligatorio')
+        .matches(/^[a-zA-Z\s]{1,20}$/, 'El nombre de la mascota debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
+    fechaNacimiento: yup
+        .date()
+        .required('La fecha de nacimiento es obligatoria')
+        .max(today(getLocalTimeZone()), 'La fecha no puede ser futura'),
+    estado: yup
+        .string()
+        .required('El estado es obligatorio'),
+    descripcion: yup
+        .string()
+        .max(300, 'Máximo 300 caracteres')
+        .required('La descripción es obligatoria'),
+    esterilizacion: yup
+        .string()
+        .required('Especifica si la mascota está esterilizada'),
+    tamano: yup
+        .string()
+        .required('El tamaño es obligatorio'),
+    peso: yup
+        .string()
+        .matches(/^[0-9]+(,[0-9]{1,2})?$/, 'El peso debe ser un número con hasta dos decimales')
+        .test('max', 'El peso no puede ser mayor a 200', value => {
+            if (!value) return true; // Si el valor está vacío, no validamos
+            const pesoEnKg = parseFloat(value.replace(',', '.')); // Convertimos a número con punto decimal
+            return pesoEnKg <= 200;
+        })
+        .required('El peso es obligatorio'),
+    fk_id_categoria: yup
+        .string()
+        .required('La categoría es obligatoria'),
+    fk_id_raza: yup
+        .string()
+        .required('La raza es obligatoria'),
+    fk_id_departamento: yup
+        .string()
+        .required('El departamento es obligatorio'),
+    fk_id_municipio: yup
+        .string()
+        .required('El municipio es obligatorio'),
+    sexo: yup
+        .string()
+        .required('El sexo es obligatorio'),
+});
+
 const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
     const [categoria, setCategoria] = useState([]);
     const [raza, setRaza] = useState([]);
     const [departamento, setDepartamento] = useState([]);
     const [municipio, setMunicipio] = useState([]);
-    const [nombre, setNombre] = useState('');
-    const [fechaNacimiento, setFechaNacimiento] = useState(null);
-    const [estado, setEstado] = useState('En Adopcion');
-    const [descripcion, setDescripcion] = useState('');
-    const [esterilizacion, setEsterilizacion] = useState('');
-    const [tamano, setTamano] = useState('');
-    const [peso, setPeso] = useState('');
-    const [fk_id_categoria, setFkIdCategoria] = useState('');
-    const [fk_id_raza, setFkIdRaza] = useState('');
-    const [fk_id_departamento, setFkIdDepartamento] = useState('');
-    const [fk_id_municipio, setFkIdMunicipio] = useState('');
-    const [sexo, setSexo] = useState('');
     const [fotos, setFotos] = useState([null, null, null, null]);
+    const [fotoUrl, setFotoUrl] = useState([null, null, null, null]);
     const [imagenesExistentes, setImagenesExistentes] = useState([null, null, null, null]);
     const fileInputRef = useRef(null);
     const { idMascota } = useContext(MascotasContext);
+
     useEffect(() => {
         axiosClient.get('/categorias/listar').then((response) => setCategoria(response.data));
         axiosClient.get('/razas/listar').then((response) => setRaza(response.data));
         axiosClient.get('/departamentos/listar').then((response) => setDepartamento(response.data));
         axiosClient.get('/municipios/listar').then((response) => setMunicipio(response.data));
     }, []);
+
     useEffect(() => {
         if (mode === 'update' && idMascota) {
-            // console.log("Datos de la mascota: ", idMascota);
-            
             const fecha = idMascota.fecha_nacimiento ? new Date(idMascota.fecha_nacimiento) : null;
-            setNombre(idMascota.nombre_mascota || '');
-            setFechaNacimiento(fecha);
-            setEstado(idMascota.estado || 'En Adopcion');
-            setDescripcion(idMascota.descripcion || '');
-            setEsterilizacion(idMascota.esterilizado || '');
-            setTamano(idMascota.tamano || '');
-            setPeso(idMascota.peso || '');
-            setFkIdCategoria(idMascota.fk_id_categoria || '');
-            setFkIdRaza(idMascota.fk_id_raza || '');
-            setFkIdDepartamento(idMascota.fk_id_departamento || '');
-            setFkIdMunicipio(idMascota.fk_id_municipio || '');
-            setSexo(idMascota.sexo || '');
+
+            const peso = parseFloat(idMascota.peso)
+            formik.setValues({
+                nombre_mascota: idMascota.nombre_mascota || '',
+                fechaNacimiento: fecha,
+                estado: idMascota.estado || 'En Adopcion',
+                descripcion: idMascota.descripcion || '',
+                esterilizacion: idMascota.esterilizado || '',
+                tamano: idMascota.tamano || '',
+                peso: peso || '',
+                fk_id_categoria: idMascota.fk_id_categoria || '',
+                fk_id_raza: idMascota.fk_id_raza || '',
+                fk_id_departamento: idMascota.fk_id_departamento || '',
+                fk_id_municipio: idMascota.fk_id_municipio || '',
+                sexo: idMascota.sexo || ''
+            });
+
             const imagenesArray = idMascota.imagenes ? idMascota.imagenes.split(',') : [];
             const updatedFotos = [...imagenesArray, ...Array(4 - imagenesArray.length).fill(null)];
-            setFotos(updatedFotos);
             setImagenesExistentes(updatedFotos);
+
+            const fotoUrls = updatedFotos.map(imagen => imagen ? `${axiosClient.defaults.baseURL}/uploads/${imagen}` : null);
+            setFotoUrl(fotoUrls);
         }
     }, [mode, idMascota]);
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append('nombre_mascota', nombre);
-        formData.append('fecha_nacimiento', fechaNacimiento ? fechaNacimiento.toISOString() : '');
-        formData.append('estado', estado);
-        formData.append('descripcion', descripcion);
-        formData.append('esterilizado', esterilizacion);
-        formData.append('tamano', tamano);
-        formData.append('peso', peso);
-        formData.append('fk_id_categoria', fk_id_categoria);
-        formData.append('fk_id_raza', fk_id_raza);
-        formData.append('fk_id_departamento', fk_id_departamento);
-        formData.append('fk_id_municipio', fk_id_municipio);
-        formData.append('sexo', sexo);
-        fotos.forEach((foto, index) => {
-            if (foto instanceof File) {
-                formData.append('imagenes', foto);
-            } else if (imagenesExistentes[index]) {
-                formData.append('imagenesExistentes[]', imagenesExistentes[index]);
+
+
+
+    const formik = useFormik({
+        initialValues: {
+            nombre_mascota: '',
+            fechaNacimiento: null,
+            estado: 'En Adopcion',
+            descripcion: '',
+            esterilizacion: '',
+            tamano: '',
+            peso: '',
+            fk_id_categoria: '',
+            fk_id_raza: '',
+            fk_id_departamento: '',
+            fk_id_municipio: '',
+            sexo: '',
+        },
+        validationSchema: validationSchema,
+        onSubmit: async (values) => {
+            // Verificar si se ha seleccionado al menos una imagen (nueva o existente)
+            const hasValidFotos = fotos.some(foto => foto instanceof File) || (imagenesExistentes && imagenesExistentes.length > 0);
+
+            if (!hasValidFotos) {
+                Swal.fire({
+                    position: "top-center",
+                    icon: 'warning',
+                    title: 'Debe seleccionar una imagen',
+                    text: 'Por favor, seleccione al menos una imagen antes de continuar.',
+                    showConfirmButton: true
+                });
+                return; // Detener el envío del formulario
             }
-        });
-        handleSubmit(formData, e);
-    };
+
+            const formData = new FormData();
+            formData.append('nombre_mascota', values.nombre_mascota);
+
+            // Formatear fecha_nacimiento a 'YYYY-MM-DD'
+            const formattedDate = values.fechaNacimiento ? new Date(values.fechaNacimiento).toISOString().split('T')[0] : null;
+            formData.append('fecha_nacimiento', formattedDate);
+
+            formData.append('estado', values.estado);
+            formData.append('descripcion', values.descripcion);
+            formData.append('esterilizado', values.esterilizacion);
+            formData.append('tamano', values.tamano);
+            formData.append('peso', values.peso);
+            formData.append('fk_id_categoria', values.fk_id_categoria);
+            formData.append('fk_id_raza', values.fk_id_raza);
+            formData.append('fk_id_departamento', values.fk_id_departamento);
+            formData.append('fk_id_municipio', values.fk_id_municipio);
+            formData.append('sexo', values.sexo);
+
+            // Agregar las imágenes al formData
+            fotos.forEach((foto, index) => {
+                if (foto instanceof File) {
+                    formData.append('imagenes', foto); // Si es un archivo nuevo
+                } else if (imagenesExistentes[index]) {
+                    formData.append('imagenesExistentes[]', imagenesExistentes[index]); // Si es una imagen existente
+                }
+            });
+
+            // Enviar el formulario
+            handleSubmit(formData);
+        }
+
+    });
+
     const handleImageChange = (e, index) => {
         const file = e.target.files[0];
         if (file) {
             const updatedFotos = [...fotos];
             updatedFotos[index] = file;
             setFotos(updatedFotos);
+
+            const updatedFotoUrl = [...fotoUrl];
+            updatedFotoUrl[index] = URL.createObjectURL(file);
+            setFotoUrl(updatedFotoUrl);
         }
     };
+
     const handleClick = (index) => {
         fileInputRef.current.dataset.index = index;
         fileInputRef.current.click();
     };
+
     return (
-        <form method='post' onSubmit={handleFormSubmit} encType="multipart/form-data">
+        <form onSubmit={formik.handleSubmit} encType="multipart/form-data">
             <div className='flex flex-row items-center justify-center'>
                 <AvatarGroup isBordered max={4} size={20} className='gap-1'>
-                    {fotos.map((imagen, index) => (
+                    {fotoUrl.map((imagenUrl, index) => (
                         <div key={`foto-${index}`} className="w-24 h-24 mb-4 cursor-pointer">
                             <Avatar
                                 size={80}
-                                src={imagen ? (imagen instanceof File ? URL.createObjectURL(imagen) : `http://localhost:8366/uploads/${imagen}`) : null}
+                                src={imagenUrl || null}
                                 onClick={() => handleClick(index)}
                                 fallback={<CameraIcon className="animate-pulse w-12 h-8 text-default-500" fill="currentColor" />}
                             />
@@ -123,15 +219,17 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                     <div className='py-2'>
                         <Input
                             type="text"
-                            label="Nombre de la mascota"
+                            label="nombre_mascota de la mascota"
                             className="w-80"
                             color='warning'
                             variant="bordered"
-                            id='nombre'
-                            name="nombre"
-                            value={nombre}
-                            onChange={(e) => setNombre(e.target.value)}
-                            required
+                            id='nombre_mascota'
+                            name="nombre_mascota"
+                            value={formik.values.nombre_mascota}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            isInvalid={formik.touched.nombre_mascota && !!formik.errors.nombre_mascota}
+                            errorMessage={formik.errors.nombre_mascota}
                         />
                     </div>
                     <div className="py-2">
@@ -141,10 +239,12 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             color='warning'
                             variant="bordered"
                             maxValue={today(getLocalTimeZone())}
-                            value={fechaNacimiento ? parseDate(fechaNacimiento.toISOString().split('T')[0]) : null}
-                            onChange={(date) => setFechaNacimiento(date ? new Date(date) : null)}
-                            required
+                            value={formik.values.fechaNacimiento ? parseDate(formik.values.fechaNacimiento.toISOString().split('T')[0]) : null}
+                            onChange={(date) => formik.setFieldValue('fechaNacimiento', date ? new Date(date) : null)}
+                            isInvalid={formik.touched.fechaNacimiento && !!formik.errors.fechaNacimiento}
+                            errorMessage={formik.errors.fechaNacimiento}
                         />
+
                     </div>
                     {/* <input
                             type="date"
@@ -155,15 +255,17 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             onChange={(e) => setFechaNacimiento(e.target.value)}
                             required
                         /> */}
-                    <div className='py-2'>
+                    <div className="py-2">
                         <select
                             className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
+                            id='tamano'
                             name="tamano"
-                            value={tamano}
-                            onChange={(e) => setTamano(e.target.value)}
+                            value={formik.values.tamano}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             required
                         >
-                             <option value="" hidden className="text-gray-600">
+                            <option value="" hidden>
                                 Tamaño
                             </option>
                             <option value="Grande">Grande</option>
@@ -171,102 +273,138 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             <option value="Mediano">Mediano</option>
                             <option value="Pequeño">Pequeño</option>
                         </select>
+                        {formik.touched.tamano && formik.errors.tamano && (
+                            <div className="text-red-500 text-xs mt-1">{formik.errors.tamano}</div>
+                        )}
                     </div>
-                    <div className='py-2'>
+                    <div className="py-2">
                         <Input
-                            type="number"
-                            label="Peso (kg)"
+                            type="text"
+                            label="Peso (Kg)"
                             className="w-80"
                             color='warning'
                             variant="bordered"
                             id='peso'
                             name="peso"
-                            value={peso}
-                            onChange={(e) => setPeso(e.target.value)}
-                            required
-                            min="0"
+                            value={formik.values.peso}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            isInvalid={formik.touched.peso && !!formik.errors.peso}
+                            errorMessage={formik.errors.peso}
                         />
                     </div>
-                    <div className='py-2'>
+                    <div className="py-2">
                         <select
                             className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
+                            id='fk_id_categoria'
                             name="fk_id_categoria"
-                            value={fk_id_categoria}
-                            onChange={(e) => setFkIdCategoria(e.target.value)}
+                            value={formik.values.fk_id_categoria}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             required
                         >
-                            <option value="" hidden className="text-gray-600">
-                                Seleccionar Categoría
+                            <option value="" hidden>
+                                Seleccionar categoría
                             </option>
-                            {categoria.map(cate => (
-                                <option key={cate.id_categoria} value={cate.id_categoria}>
-                                    {cate.nombre_categoria}
+                            {categoria.map((cat) => (
+                                <option key={cat.id_categoria} value={cat.id_categoria}>
+                                    {cat.nombre_categoria}
                                 </option>
                             ))}
                         </select>
+                        {formik.touched.fk_id_categoria && formik.errors.fk_id_categoria && (
+                            <div className="text-red-500 text-xs mt-1">
+                                {formik.errors.fk_id_categoria}
+                            </div>
+                        )}
                     </div>
-                    <div className='py-2'>
+                    <div className="py-2">
                         <select
                             className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
+                            id='fk_id_raza'
                             name="fk_id_raza"
-                            value={fk_id_raza}
-                            onChange={(e) => setFkIdRaza(e.target.value)}
+                            value={formik.values.fk_id_raza}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             required
                         >
-                            <option value="" hidden className="text-gray-600">
+                            <option value="" hidden>
                                 Seleccionar Raza
                             </option>
-                            {raza.map(raz => (
-                                <option key={raz.id_raza} value={raz.id_raza}>
-                                    {raz.nombre_raza}
+                            {raza.map((r) => (
+                                <option key={r.id_raza} value={r.id_raza}>
+                                    {r.nombre_raza}
                                 </option>
                             ))}
                         </select>
+                        {formik.touched.fk_id_raza && formik.errors.fk_id_raza && (
+                            <div className="text-red-500 text-xs mt-1">
+                                {formik.errors.fk_id_raza}
+                            </div>
+                        )}
                     </div>
-                    <div className='py-2'>
+                    <div className="py-2">
                         <select
                             className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
+                            id='fk_id_departamento'
                             name="fk_id_departamento"
-                            value={fk_id_departamento}
-                            onChange={(e) => setFkIdDepartamento(e.target.value)}
+                            value={formik.values.fk_id_departamento}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             required
                         >
-                            <option value="" hidden className="text-gray-600">
-                                Seleccionar Departamento
+                            <option value="" hidden>
+                                Seleccionar departamento
                             </option>
-                            {departamento.map(depar => (
-                                <option key={depar.id_departamento} value={depar.id_departamento}>
-                                    {depar.nombre_departamento}
+                            {departamento.map((dep) => (
+                                <option key={dep.id_departamento} value={dep.id_departamento}>
+                                    {dep.nombre_departamento}
                                 </option>
                             ))}
                         </select>
+                        {formik.touched.fk_id_departamento && formik.errors.fk_id_departamento && (
+                            <div className="text-red-500 text-xs mt-1">
+                                {formik.errors.fk_id_departamento}
+                            </div>
+                        )}
                     </div>
+
+
                 </div>
-                <div className='flex flex-col ml-4'>
-                    <div className='py-2'>
+                <div className='flex flex-col'>
+                    <div className="py-2">
                         <select
                             className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
+                            id='fk_id_municipio'
                             name="fk_id_municipio"
-                            value={fk_id_municipio}
-                            onChange={(e) => setFkIdMunicipio(e.target.value)}
+                            value={formik.values.fk_id_municipio}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             required
                         >
-                            <option value="" hidden className="text-gray-600">
-                                Seleccionar Municipio
+                            <option value="" hidden>
+                                Seleccionar municipio
                             </option>
-                            {municipio.map(muni => (
-                                <option key={muni.id_municipio} value={muni.id_municipio}>
-                                    {muni.nombre_municipio}
+                            {municipio.map((mun) => (
+                                <option key={mun.id_municipio} value={mun.id_municipio}>
+                                    {mun.nombre_municipio}
                                 </option>
                             ))}
                         </select>
+                        {formik.touched.fk_id_municipio && formik.errors.fk_id_municipio && (
+                            <div className="text-red-500 text-xs mt-1">
+                                {formik.errors.fk_id_municipio}
+                            </div>
+                        )}
                     </div>
-                    <div className='py-2'>
+                    <div className="py-2">
                         <select
                             className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
+                            id='sexo'
                             name="sexo"
-                            value={sexo}
-                            onChange={(e) => setSexo(e.target.value)}
+                            value={formik.values.sexo}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             required
                         >
                             <option value="" hidden>
@@ -275,13 +413,20 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             <option value="Macho">Macho</option>
                             <option value="Hembra">Hembra</option>
                         </select>
+                        {formik.touched.sexo && formik.errors.sexo && (
+                            <div className="text-red-500 text-xs mt-1">
+                                {formik.errors.sexo}
+                            </div>
+                        )}
                     </div>
-                    <div className='py-2'>
+                    <div className="py-2">
                         <select
                             className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
-                            name="esterilizado"
-                            value={esterilizacion}
-                            onChange={(e) => setEsterilizacion(e.target.value)}
+                            id='esterilizacion'
+                            name="esterilizacion"
+                            value={formik.values.esterilizacion}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             required
                         >
                             <option value="" hidden>
@@ -290,26 +435,39 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             <option value="si">Sí</option>
                             <option value="no">No</option>
                         </select>
+                        {formik.touched.esterilizacion && formik.errors.esterilizacion && (
+                            <div className="text-red-500 text-xs mt-1">
+                                {formik.errors.esterilizacion}
+                            </div>
+                        )}
                     </div>
-                    <div className='py-2'>
+
+                    <div className="py-2">
                         <Textarea
-                            label="Descripción de la mascota"
+                            label="Descripción"
                             className="w-80"
                             color='warning'
                             variant="bordered"
                             id='descripcion'
                             name="descripcion"
-                            value={descripcion}
-                            onChange={(e) => setDescripcion(e.target.value)}
-                            required
+                            value={formik.values.descripcion}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            isInvalid={formik.touched.descripcion && !!formik.errors.descripcion}
+                            errorMessage={formik.errors.descripcion}
                         />
                     </div>
+
+
+
                     <div className='py-2'>
                         <select
                             className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
+                            id='estado'
                             name="estado"
-                            value={estado}
-                            onChange={(e) => setEstado(e.target.value)}
+                            value={formik.values.estado}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                             required
                         >
                             <option value="" hidden>
@@ -320,6 +478,11 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             <option value="Urgente">Urgente</option>
                             <option value="Adoptado">Adoptado</option>
                         </select>
+                        {formik.touched.estado && formik.errors.estado && (
+                            <div className="text-red-500 text-xs mt-1">
+                                {formik.errors.estado}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
