@@ -145,37 +145,34 @@ export function Mascotas() {
                         </Skeleton>
                         <p className="text-sm text-gray-700 font-medium mb-4">{mascota.descripcion}</p>
                         <div className="flex flex-col gap-2 mt-4">
-    {/* Botones Editar y Ver Detalles */}
-    <div className="flex flex-col items-center gap-4">
-    <Link 
-        className="text-blue-600 underline cursor-pointer font-semibold" 
-        to="#" 
-        onClick={() => handleViewDetails('view', mascota)}
-    >
-        Ver más Información
-    </Link>
-    <div className="flex flex-row gap-4">
-        <Button 
-            color="warning" 
-            variant="ghost" 
-            onPress={() => handleToggle('update', setMascotaId(mascota))}
-        >
-            Editar
-        </Button>
-        <Button 
-            color="danger" 
-            variant="ghost" 
-            onPress={() => handleDownloadPDF(mascota.id_mascota)}
-        >
-            Ficha Técnica
-        </Button>
-    </div>
-</div>
+                            {/* Botones Editar y Ver Detalles */}
+                            <div className="flex flex-col items-center gap-4">
+                                <Link
+                                    className="text-blue-600 underline cursor-pointer font-semibold"
+                                    to="#"
+                                    onClick={() => handleViewDetails('view', mascota)}
+                                >
+                                    Ver más Información
+                                </Link>
+                                <div className="flex flex-row gap-4">
+                                    <Button
+                                        color="warning"
+                                        variant="ghost"
+                                        onPress={() => handleToggle('update', setMascotaId(mascota))}
+                                    >
+                                        Editar
+                                    </Button>
+                                    <Button
+                                        color="danger"
+                                        variant="ghost"
+                                        onPress={() => handleDownloadPDF(mascota.id_mascota)}
+                                    >
+                                        Ficha Técnica
+                                    </Button>
+                                </div>
+                            </div>
 
-
-        
-
-</div>
+                        </div>
 
                     </CardBody>
                 </Card>
@@ -251,7 +248,7 @@ export function Mascotas() {
     const [mascotas, setMascotas] = useState([]);
     const { idMascota, setMascotaId } = useContext(MascotasContext);
 
-    
+
     useEffect(() => {
         peticionGet();
     }, []);
@@ -266,9 +263,9 @@ export function Mascotas() {
         }
     };
 
-    const handleSubmit = async (formData, e) => {
+    const handleSubmit = async (formData) => {
         console.log('Datos enviados...:', formData);
-        e.preventDefault();
+        // e.preventDefault();
 
         try {
             if (mode === 'create') {

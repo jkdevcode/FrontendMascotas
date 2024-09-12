@@ -30,10 +30,10 @@ const TabMascotas = () => {
                                     </CardBody>
                                 </Card>
                             </Tab>
-                            <Tab key="mascotas" title="Mascotas">
+                            <Tab key="categorias" title="Categorias">
                                 <Card className="h-full">
                                     <CardBody className="flex justify-center items-center">
-                                        <Mascotas />
+                                        <Categorias />
                                     </CardBody>
                                 </Card>
                             </Tab>
@@ -44,17 +44,17 @@ const TabMascotas = () => {
                                     </CardBody>
                                 </Card>
                             </Tab>
+                            <Tab key="mascotas" title="Mascotas">
+                                <Card className="h-full">
+                                    <CardBody className="flex justify-center items-center">
+                                        <Mascotas />
+                                    </CardBody>
+                                </Card>
+                            </Tab>
                             <Tab key="vacunas" title="Vacunas">
                                 <Card className="h-full">
                                     <CardBody className="flex justify-center items-center">
                                         <Vacunas />
-                                    </CardBody>
-                                </Card>
-                            </Tab>
-                            <Tab key="categorias" title="Categorias">
-                                <Card className="h-full">
-                                    <CardBody className="flex justify-center items-center">
-                                        <Categorias />
                                     </CardBody>
                                 </Card>
                             </Tab>

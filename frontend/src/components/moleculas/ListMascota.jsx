@@ -20,23 +20,28 @@ function ListMascota({ initialData, onClose }) {
         ? initialData.imagenes.split(',').filter(imagen => imagen.trim() !== '')
         : [];
 
-    useEffect(() => {
-        const fetchVacunas = async () => {
-            try {
-                const response = await axiosClient.get(`/vacunas/listar/${initialData.id_mascota}`);
-                setVacunas(response.data);
-            } catch (error) {
-                console.error('Error al listar vacunas:', error);
-            }
-        };
+useEffect(() => {
+    const fetchVacunas = async () => {
+        try {
+            console.log(`Solicitando vacunas para la mascota con ID: ${initialData.id_mascota}`);
+            const response = await axiosClient.get(`/vacunas/listarVacunasAsociadaAMascota/${initialData.id_mascota}`);
+            console.log("Respuesta del servidor para vacunas: ", response.data);
+            setVacunas(response.data);
+        } catch (error) {
+            console.error('Error al listar vacunas:', error);
+        }
+    };
 
+    if (initialData.id_mascota) {
         fetchVacunas();
-    }, [initialData.id_mascota]);
+    }
+}, [initialData.id_mascota]);
 
 
     useEffect(() => {
         peticionGet();
     }, []);
+
 
     const peticionGet = async () => {
         try {
@@ -263,7 +268,7 @@ function ListMascota({ initialData, onClose }) {
                                 <div className="border p-4 rounded-lg shadow-sm bg-white">
                                     <h5 className="font-bold text-gray-800 mb-1 text-sm">Enfermedad: {vacuna.enfermedad}</h5>
                                     <p className="text-gray-600 mb-1 text-xs">Fecha: {formatDate(vacuna.fecha_vacuna)}</p>
-                                    <p className="text-gray-600 text-xs">Estado: {vacuna.estado}</p>
+                                    <p className="text-gray-600 text-xs">Estado: {vacuna.estado_vacuna}</p>
                                 </div>
                             </div>
                         ))
