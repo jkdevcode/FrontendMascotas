@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { AiOutlineUser, AiOutlineHome, AiOutlineBell, AiOutlineDashboard, AiOutlinePieChart, AiOutlineFileText } from "react-icons/ai";
+import { AiOutlineUser, AiOutlineBell, AiOutlinePieChart } from "react-icons/ai";
 import { FaUsers } from "react-icons/fa6";
 import { MdOutlinePets } from "react-icons/md";
 import Control from './../../assets/control.png';
@@ -46,7 +46,6 @@ export const Sidebar = () => {
 
   const MenusAdmin = [
     { title: "Mascotas", link: "/mascotas", icon: MdOutlinePets },
-
     { title: "Perfil", link: "/perfil", icon: AiOutlineUser },
   ];
 
@@ -54,6 +53,10 @@ export const Sidebar = () => {
     { title: "Mis Mascotas", link: "/listmascotas", icon: MdOutlinePets },
     { title: "Notificaciones", link: "/notificaciones", icon: AiOutlineBell },
     { title: "Perfil", link: "/perfil", icon: AiOutlineUser },
+  ];
+
+  const InvitedPets = [
+    { title: "Mascotas", link: "/invitado", icon: MdOutlinePets },
   ];
 
   return (
@@ -124,9 +127,20 @@ export const Sidebar = () => {
                   </span>
                 </Link>
               ))}
+              {!user?.rol && InvitedPets.map((Menu, index) => (
+                <Link
+                  to={Menu?.link}
+                  key={index}
+                  onClick={() => setActiveLink(Menu.link)}
+                  className={`flex rounded-md p-2 cursor-pointer hover:bg-[#EAEDF6] text-white hover:text-black text-lg font-bold items-center gap-x-4 ${Menu.gap ? "mt-9" : "mt-2"} ${activeLink === Menu.link ? "border-2 border-[#EAEDF6]" : ""}`}
+                >
+                  <div>{React.createElement(Menu?.icon, { size: "20" })}</div>
+                  <span className={`${!open && "hidden"} origin-left duration-200`}>
+                    {Menu.title}
+                  </span>
+                </Link>
+              ))}
             </ul>
-            <div className="flex justify-center items-center my-5 sm:hidden">
-            </div>
           </div>
         ) : null}
       </div>

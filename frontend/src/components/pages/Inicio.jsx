@@ -32,6 +32,7 @@ function Inicio() {
                 <div className="text-center max-w-4xl">
                     <h1 className="text-7xl text-white font-semibold mb-4">Bienvenidos a Purrfect Match</h1>
                     <p className="text-2xl text-white leading-tight">¡Bienvenido a Purrfect Match tu amigo ideal en el mundo. Explora y adopta! una cola espera por ti</p>
+                    <a href="/invitado"  className="text-1xl text-sky-500 leading-tight cursor-pointer">¡Ingresa como invitado!</a>
                 </div>
             </div>
         </div>

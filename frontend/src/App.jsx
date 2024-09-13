@@ -18,6 +18,7 @@ import FiltradosReporteAdopcionesExcel from "./components/pages/FiltradosReporte
 import FiltradosReporteAdopcionesPDF from "./components/pages/FiltradosReporteAdopcionesPDF";
 import FiltradosReporteAdoptadosPDF from "./components/pages/FiltradosReporteAdoptadosPDF";
 import FiltradosReporteAdoptadosEXCEL from "./components/pages/FiltradosReporteAdoptadosExcel";
+import InvitadoPets from "./components/pages/InvitadoPets";
 
 function App() {
   const stored = localStorage.getItem('user');
@@ -63,6 +64,7 @@ function App() {
               <Route path="/perfil" element={<PerfilUsuario />} />
             </>
           )}
+          <Route path="/invitado" element={<InvitadoPets />} />
         </Routes>
       </GlobalProvider>
     </BrowserRouter>
