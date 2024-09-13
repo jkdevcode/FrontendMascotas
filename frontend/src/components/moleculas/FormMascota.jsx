@@ -18,7 +18,7 @@ const validationSchema = yup.object().shape({
     fechaNacimiento: yup
         .date()
         .required('La fecha de nacimiento es obligatoria')
-        .max(today(getLocalTimeZone()), 'La fecha no puede ser futura'),
+        .max(new Date(), 'La fecha no puede ser futura'),
     estado: yup
         .string()
         .required('El estado es obligatorio'),
@@ -36,8 +36,8 @@ const validationSchema = yup.object().shape({
         .string()
         .matches(/^[0-9]+(,[0-9]{1,2})?$/, 'El peso debe ser un número con hasta dos decimales')
         .test('max', 'El peso no puede ser mayor a 200', value => {
-            if (!value) return true; // Si el valor está vacío, no validamos
-            const pesoEnKg = parseFloat(value.replace(',', '.')); // Convertimos a número con punto decimal
+            if (!value) return true;
+            const pesoEnKg = parseFloat(value.replace(',', '.'));
             return pesoEnKg <= 200;
         })
         .required('El peso es obligatorio'),
@@ -56,6 +56,18 @@ const validationSchema = yup.object().shape({
     sexo: yup
         .string()
         .required('El sexo es obligatorio'),
+    imagenes: yup
+        .array()
+        .of(
+            yup.mixed().test('fileSize', 'El tamaño del archivo es muy grande', value => {
+                return value ? value.size <= 2000000 : true;  // Límite de tamaño de 2MB por ejemplo
+            })
+                .test('fileType', 'El archivo debe ser una imagen', value => {
+                    return value ? ['image/jpeg', 'image/png', 'image/gif'].includes(value.type) : true;
+                })
+        )
+        .min(1, 'Debe seleccionar al menos una imagen')
+        .required('Debe seleccionar al menos una imagen'),
 });
 
 const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
@@ -105,8 +117,6 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
         }
     }, [mode, idMascota]);
 
-
-
     const formik = useFormik({
         initialValues: {
             nombre_mascota: '',
@@ -121,27 +131,13 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
             fk_id_departamento: '',
             fk_id_municipio: '',
             sexo: '',
+            imagenes: [],
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {
-            // Verificar si se ha seleccionado al menos una imagen (nueva o existente)
-            const hasValidFotos = fotos.some(foto => foto instanceof File) || (imagenesExistentes && imagenesExistentes.length > 0);
-
-            if (!hasValidFotos) {
-                Swal.fire({
-                    position: "top-center",
-                    icon: 'warning',
-                    title: 'Debe seleccionar una imagen',
-                    text: 'Por favor, seleccione al menos una imagen antes de continuar.',
-                    showConfirmButton: true
-                });
-                return; // Detener el envío del formulario
-            }
-
             const formData = new FormData();
             formData.append('nombre_mascota', values.nombre_mascota);
 
-            // Formatear fecha_nacimiento a 'YYYY-MM-DD'
             const formattedDate = values.fechaNacimiento ? new Date(values.fechaNacimiento).toISOString().split('T')[0] : null;
             formData.append('fecha_nacimiento', formattedDate);
 
@@ -156,19 +152,16 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
             formData.append('fk_id_municipio', values.fk_id_municipio);
             formData.append('sexo', values.sexo);
 
-            // Agregar las imágenes al formData
             fotos.forEach((foto, index) => {
                 if (foto instanceof File) {
-                    formData.append('imagenes', foto); // Si es un archivo nuevo
+                    formData.append('imagenes', foto);
                 } else if (imagenesExistentes[index]) {
-                    formData.append('imagenesExistentes[]', imagenesExistentes[index]); // Si es una imagen existente
+                    formData.append('imagenesExistentes[]', imagenesExistentes[index]);
                 }
             });
 
-            // Enviar el formulario
             handleSubmit(formData);
         }
-
     });
 
     const handleImageChange = (e, index) => {
@@ -181,6 +174,10 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
             const updatedFotoUrl = [...fotoUrl];
             updatedFotoUrl[index] = URL.createObjectURL(file);
             setFotoUrl(updatedFotoUrl);
+
+            
+            // Aquí también actualizamos el campo de Formik
+            formik.setFieldValue('imagenes', updatedFotos.filter(f => f !== null));
         }
     };
 
@@ -213,6 +210,13 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                     onChange={(e) => handleImageChange(e, fileInputRef.current.dataset.index)}
                 />
             </div>
+
+            {/* Mostrar mensaje de error si no se ha seleccionado una imagen */}
+            {formik.errors.imagenes && formik.touched.imagenes ? (
+                <div className="text-red-500 text-sm mt-1 flex justify-center">
+                    {formik.errors.imagenes}
+                </div>
+            ) : null}
             {/*  */}
             <div className='flex justify-center'>
                 <div className='flex flex-col mr-4'>
