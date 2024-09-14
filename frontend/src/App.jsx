@@ -19,6 +19,7 @@ import FiltradosReporteAdopcionesPDF from "./components/pages/FiltradosReporteAd
 import FiltradosReporteAdoptadosPDF from "./components/pages/FiltradosReporteAdoptadosPDF";
 import FiltradosReporteAdoptadosEXCEL from "./components/pages/FiltradosReporteAdoptadosExcel";
 import InvitadoPets from "./components/pages/InvitadoPets";
+import TabAdopciones from "./components/pages/TabAdopciones";
 
 function App() {
   const stored = localStorage.getItem('user');
@@ -49,6 +50,7 @@ function App() {
           {user && user.rol === 'administrador' && (
             <>
               <Route path="/mascotas" element={<TabMascotas />} />
+              <Route path="/adopciones" element={<TabAdopciones />} />
               <Route path="/perfil" element={<PerfilUsuario />} />
               <Route path="/FiltrosReporteAdopcionesPDF" element={<FiltradosReporteAdopcionesPDF />} />
               <Route path="/FiltrosReporteAdopcionesEXCEL" element={<FiltradosReporteAdopcionesExcel />} />
@@ -61,6 +63,7 @@ function App() {
             <>
               <Route path="/listmascotas" element={<ListsMascotas />} />
               <Route path="/notificaciones" element={<TabNotificaciones />} />
+              <Route path="/adopciones" element={<TabAdopciones />} />
               <Route path="/perfil" element={<PerfilUsuario />} />
             </>
           )}

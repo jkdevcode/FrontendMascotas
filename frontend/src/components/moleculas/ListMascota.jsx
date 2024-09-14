@@ -20,22 +20,22 @@ function ListMascota({ initialData, onClose }) {
         ? initialData.imagenes.split(',').filter(imagen => imagen.trim() !== '')
         : [];
 
-useEffect(() => {
-    const fetchVacunas = async () => {
-        try {
-            console.log(`Solicitando vacunas para la mascota con ID: ${initialData.id_mascota}`);
-            const response = await axiosClient.get(`/vacunas/listarVacunasAsociadaAMascota/${initialData.id_mascota}`);
-            console.log("Respuesta del servidor para vacunas: ", response.data);
-            setVacunas(response.data);
-        } catch (error) {
-            console.error('Error al listar vacunas:', error);
-        }
-    };
+    useEffect(() => {
+        const fetchVacunas = async () => {
+            try {
+                console.log(`Solicitando vacunas para la mascota con ID: ${initialData.id_mascota}`);
+                const response = await axiosClient.get(`/vacunas/listarVacunasAsociadaAMascota/${initialData.id_mascota}`);
+                console.log("Respuesta del servidor para vacunas: ", response.data);
+                setVacunas(response.data);
+            } catch (error) {
+                console.error('Error al listar vacunas:', error);
+            }
+        };
 
-    if (initialData.id_mascota) {
-        fetchVacunas();
-    }
-}, [initialData.id_mascota]);
+        if (initialData.id_mascota) {
+            fetchVacunas();
+        }
+    }, [initialData.id_mascota]);
 
 
     useEffect(() => {
@@ -282,7 +282,7 @@ useEffect(() => {
                 <Button color="danger" onClick={onClose}>Cancelar</Button>
                 {user && user.rol !== 'superusuario' && (
                     <>
-                        {initialData.estado !== 'Reservado' && initialData.estado !== 'Adoptado' && (
+                        {initialData.estado !== 'Reservado' && initialData.estado !== 'Adoptado'  && initialData.estado_adopcion !== 'proceso de adopcion' && (
                             <Button color="warning" className="ml-4 z-1 text-white" onClick={handleAdoptar}>
                                 ¡Adoptame!
                             </Button>

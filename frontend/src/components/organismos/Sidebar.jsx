@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { AiOutlineUser, AiOutlineBell, AiOutlinePieChart } from "react-icons/ai";
+import { AiOutlineUser, AiOutlineBell, AiOutlinePieChart, AiFillAlert } from "react-icons/ai";
 import { FaUsers } from "react-icons/fa6";
 import { MdOutlinePets } from "react-icons/md";
 import Control from './../../assets/control.png';
@@ -43,14 +43,16 @@ export const Sidebar = () => {
     { title: "Gráficas", link: "/graficas", icon: AiOutlinePieChart },
     { title: "Perfil", link: "/perfil", icon: AiOutlineUser },
   ];
-
+  
   const MenusAdmin = [
     { title: "Mascotas", link: "/mascotas", icon: MdOutlinePets },
+    { title: "Adopciones", link: "/adopciones", icon: AiFillAlert },
     { title: "Perfil", link: "/perfil", icon: AiOutlineUser },
   ];
-
+  
   const MenusUser = [
     { title: "Mis Mascotas", link: "/listmascotas", icon: MdOutlinePets },
+    { title: "Adopciones", link: "/adopciones", icon: AiFillAlert },
     { title: "Notificaciones", link: "/notificaciones", icon: AiOutlineBell },
     { title: "Perfil", link: "/perfil", icon: AiOutlineUser },
   ];
