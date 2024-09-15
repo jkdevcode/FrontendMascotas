@@ -32,6 +32,7 @@ function App() {
           <Route path="/" element={<Inicio />} />
           <Route path="/iniciosesion" element={<IniciarSesion />} />
           <Route path="/registro" element={<RegistroUser />} />
+          <Route path="/invitado" element={<InvitadoPets />} />
 
           {user && user.rol === 'superusuario' && (
             <>
@@ -67,7 +68,6 @@ function App() {
               <Route path="/perfil" element={<PerfilUsuario />} />
             </>
           )}
-          <Route path="/invitado" element={<InvitadoPets />} />
         </Routes>
       </GlobalProvider>
     </BrowserRouter>
