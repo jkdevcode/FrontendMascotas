@@ -61,7 +61,7 @@ export function ListsMascotas() {
                     String(mascota.id_mascota).toLowerCase().includes(filterValue.toLowerCase()) ||
                     mascota.nombre_mascota.toLowerCase().includes(filterValue.toLowerCase()) ||
                     mascota.raza.toLowerCase().includes(filterValue.toLowerCase()) ||
-                    mascota.genero.toLowerCase().includes(filterValue.toLowerCase())
+                    mascota.sexo.toLowerCase().includes(filterValue.toLowerCase())
                 );
             }
 

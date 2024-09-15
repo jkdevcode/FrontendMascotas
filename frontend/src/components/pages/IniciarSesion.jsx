@@ -101,7 +101,7 @@ function IniciarSesion() {
 
                     <span className="m-4 text-4xl font-bold">Inicio De Sesión</span>
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
-                        <img src={imagenes.imgPrincipalPets} className='h-32 w-32 rounded-xl' alt="" />
+                        <img src={imagenes.imgLogo} className='h-32 w-32 rounded-xl' alt="" />
                     </div>
                     <div className="py-2">
                         <Input
