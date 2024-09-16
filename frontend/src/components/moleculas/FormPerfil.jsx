@@ -6,6 +6,38 @@ import { Button } from '@nextui-org/button';
 import { EyeFilledIcon } from '../nextUI/EyeFilledIcon';
 import { EyeSlashFilledIcon } from '../nextUI/EyeSlashFilledIcon';
 import { Avatar } from '@nextui-org/react';
+import * as yup from 'yup';
+import { Formik, Field, Form, ErrorMessage } from 'formik';
+
+const validationSchema = yup.object().shape({
+  tipo_documento: yup
+    .string()
+    .required('El tipo de documento es obligatorio'),
+  nombre: yup
+    .string()
+    .required('El nombre es obligatorio')
+    .matches(/^[a-zA-Z\s]{1,20}$/, 'El nombre debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
+  apellido: yup
+    .string()
+    .required('El apellido es obligatorio')
+    .matches(/^[a-zA-Z\s]{1,20}$/, 'El apellido debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
+  direccion: yup
+    .string()
+    .required('La dirección es obligatoria'),
+  correo: yup
+    .string()
+    .email('El correo electrónico debe ser válido')
+    .required('El correo electrónico es obligatorio'),
+  telefono: yup
+    .string()
+    .required('El teléfono es obligatorio')
+    .matches(/^\d*$/, 'El teléfono debe ser numérico')
+    .length(10, 'El teléfono debe contener exactamente 10 dígitos'),
+  password: yup
+    .string()
+    .required('La contraseña es obligatoria'),
+});
+
 
 const FormPerfil = () => {
   const [perfil, setPerfil] = useState(null);
@@ -132,151 +164,219 @@ const FormPerfil = () => {
 
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px'}}>
-<h6 className="text-3xl font-extrabold text-warning-500 mb-6 text-center">Editar Perfil</h6>
-
-      <form onSubmit={actualizarPerfil}>
-        <div className='flex flex-col items-center mb-4'>
-        <Avatar
-  showFallback
-  className="w-24 h-24 cursor-pointer mb-4"
-  onClick={handleClick}
-  src={fotoUrl || ''} // Usa fotoUrl solo si existe, de lo contrario usa una cadena vacía
-/>
-
-
-          <input
-            type="file"
-            accept="image/*"
-            name="img"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            onChange={handleImageChange}
-          />
-        </div>
-        <div className="flex flex-wrap justify-between">
-          <div className="flex flex-col w-full md:w-1/2 p-2">
-            <div className="py-2">
-              <Input
-                type="text"
-                color='warning'
-                variant="bordered"
-                label="Nombre"
-                className="w-full"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                required
+      <h6 className="text-3xl font-extrabold text-warning-500 mb-6 text-center">Editar Perfil</h6>
+  
+      <Formik
+        initialValues={{
+          nombre,
+          apellido,
+          direccion,
+          correo,
+          telefono,
+          tipo_documento: tipoDocumentoOp,
+          password: passwordDisplay,
+        }}
+        validationSchema={validationSchema}
+        onSubmit={async (values) => {
+          try {
+            const token = localStorage.getItem('token');
+            const formData = new FormData();
+            formData.append('nombre', values.nombre);
+            formData.append('apellido', values.apellido);
+            formData.append('correo', values.correo);
+            formData.append('direccion', values.direccion);
+            formData.append('telefono', values.telefono);
+            formData.append('tipo_documento', values.tipo_documento);
+            if (values.password) formData.append('password', values.password);
+            if (foto) formData.append('img', foto);
+  
+            const response = await axiosClient.put(
+              `/usuarios/actualizarPerfil/${id_usuario}`,
+              formData,
+              { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } }
+            );
+  
+            if (response.status === 200) {
+              Swal.fire('¡Información actualizada!', 'Tu información ha sido actualizada correctamente.', 'success');
+              onClose(); // Cierra el modal
+            }
+          } catch (error) {
+            console.error('Error al actualizar la información:', error.response ? error.response.data : error.message);
+            Swal.fire('¡Error!', 'Hubo un problema al actualizar tu perfil. Inténtalo de nuevo más tarde.', 'error');
+          }
+        }}
+      >
+        {({ setFieldValue, values }) => (
+          <Form>
+            <div className='flex flex-col items-center mb-4'>
+              <Avatar
+                showFallback
+                className="w-24 h-24 cursor-pointer mb-4"
+                onClick={handleClick}
+                src={fotoUrl || ''}
+              />
+              <input
+                type="file"
+                accept="image/*"
+                name="img"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleImageChange}
               />
             </div>
-            <div className="py-2">
-              <Input
-                type="text"
-                color='warning'
-                variant="bordered"
-                label="Apellido"
-                className="w-full"
-                value={apellido}
-                onChange={(e) => setApellido(e.target.value)}
-                required
-              />
-            </div>
-            <div className="py-2">
-              <Input
-                type="text"
-                color='warning'
-                variant="bordered"
-                label="Dirección"
-                className="w-full"
-                value={direccion}
-                onChange={(e) => setDireccion(e.target.value)}
-                required
-              />
-            </div>
-            <div className="py-2">
-              <select
-                className="h-14 pl-2 pr-4 py-2 w-full text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
-                name="tipo_documento"
-                value={tipoDocumentoOp}
-                onChange={(e) => setTipoDocumentoOp(e.target.value)}
-                required
-              >
-                <option value="" hidden>
-                  Seleccionar Tipo de documento
-                </option>
-                {tipo_documento.map((tipo) => (
-                  <option key={tipo.key} value={tipo.key}>
-                    {tipo.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="flex flex-col w-full md:w-1/2 p-2">
-            <div className="py-2">
-              <Input
-                type="email"
-                color='warning'
-                variant="bordered"
-                label="Correo Electrónico"
-                className="w-full"
-                value={correo}
-                onChange={(e) => setCorreo(e.target.value)}
-                required
-              />
-            </div>
-            <div className="py-2">
-              <Input
-                label="Contraseña"
-                color='warning'
-                variant="bordered"
-                type={isVisible ? "text" : "password"}
-                endContent={
-                  <button type="button" onClick={toggleVisibility}>
-                    {isVisible ? (
-                      <EyeFilledIcon className="text-2xl" />
-                    ) : (
-                      <EyeSlashFilledIcon className="text-2xl" />
+            <div className="flex flex-wrap justify-between">
+              <div className="flex flex-col w-full md:w-1/2 p-2">
+                <div className="py-2">
+                  <Field name="nombre">
+                    {({ field }) => (
+                      <Input
+                        type="text"
+                        color='warning'
+                        variant="bordered"
+                        label="Nombre"
+                        className="w-full"
+                        {...field}
+                        required
+                      />
                     )}
-                  </button>
-                }
-                className="w-full"
-                value={passwordDisplay}
-                onChange={handlePasswordChange}
-                required
-              />
+                  </Field>
+                  <ErrorMessage name="nombre" component="div" className="text-red-500" />
+                </div>
+                <div className="py-2">
+                  <Field name="apellido">
+                    {({ field }) => (
+                      <Input
+                        type="text"
+                        color='warning'
+                        variant="bordered"
+                        label="Apellido"
+                        className="w-full"
+                        {...field}
+                        required
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage name="apellido" component="div" className="text-red-500" />
+                </div>
+                <div className="py-2">
+                  <Field name="direccion">
+                    {({ field }) => (
+                      <Input
+                        type="text"
+                        color='warning'
+                        variant="bordered"
+                        label="Dirección"
+                        className="w-full"
+                        {...field}
+                        required
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage name="direccion" component="div" className="text-red-500" />
+                </div>
+                <div className="py-2">
+                  <Field name="tipo_documento">
+                    {({ field }) => (
+                      <select
+                        className="h-14 pl-2 pr-4 py-2 w-full text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
+                        {...field}
+                        required
+                      >
+                        <option value="" hidden>
+                          Seleccionar Tipo de documento
+                        </option>
+                        {tipo_documento.map((tipo) => (
+                          <option key={tipo.key} value={tipo.key}>
+                            {tipo.label}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </Field>
+                  <ErrorMessage name="tipo_documento" component="div" className="text-red-500" />
+                </div>
+              </div>
+              <div className="flex flex-col w-full md:w-1/2 p-2">
+                <div className="py-2">
+                  <Field name="correo">
+                    {({ field }) => (
+                      <Input
+                        type="email"
+                        color='warning'
+                        variant="bordered"
+                        label="Correo Electrónico"
+                        className="w-full"
+                        {...field}
+                        required
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage name="correo" component="div" className="text-red-500" />
+                </div>
+                <div className="py-2">
+                  <Field name="password">
+                    {({ field }) => (
+                      <Input
+                        label="Contraseña"
+                        color='warning'
+                        variant="bordered"
+                        type={isVisible ? "text" : "password"}
+                        endContent={
+                          <button type="button" onClick={toggleVisibility}>
+                            {isVisible ? (
+                              <EyeFilledIcon className="text-2xl" />
+                            ) : (
+                              <EyeSlashFilledIcon className="text-2xl" />
+                            )}
+                          </button>
+                        }
+                        className="w-full"
+                        {...field}
+                        required
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage name="password" component="div" className="text-red-500" />
+                </div>
+                <div className="py-2">
+                  <Field name="telefono">
+                    {({ field }) => (
+                      <Input
+                        type="text"
+                        color='warning'
+                        variant="bordered"
+                        label="Teléfono"
+                        className="w-full"
+                        {...field}
+                        required
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage name="telefono" component="div" className="text-red-500" />
+                </div>
+              </div>
             </div>
-            <div className="py-2">
-              <Input
-                type="text"
-                color='warning'
-                variant="bordered"
-                label="Teléfono"
-                className="w-full"
-                value={telefono}
-                onChange={(e) => setTelefono(e.target.value)}
-                required
-              />
+            <div className="flex justify-center mt-8">
+              <Button
+                type="submit"
+                color="warning"
+                className="mt-4 text-white p-2 w-40"
+                css={{ 
+                  borderRadius: "$full", 
+                  fontWeight: "bold", 
+                  fontSize: "1.125rem", 
+                  padding: "0.5rem 2rem"
+                }}
+              >
+                Editar
+              </Button>
             </div>
-          </div>
-        </div>
-        <div className="flex justify-center mt-8">
-  <Button
-    type="submit"
-    color="warning"
-    className="mt-4 text-white p-2 w-40"
-    css={{ 
-      borderRadius: "$full", 
-      fontWeight: "bold", 
-      fontSize: "1.125rem", 
-      padding: "0.5rem 2rem"
-    }}
-  >
-    Editar
-  </Button>
-</div>
-
-      </form>
+          </Form>
+        )}
+      </Formik>
     </div>
   );
+  
 };
 
 export default FormPerfil;

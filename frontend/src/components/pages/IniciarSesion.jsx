@@ -145,7 +145,7 @@ function IniciarSesion() {
                             className="max-w-xs"
                         />
                     </div>
-                    <a href="/ruta" className="text-gray-700 hover:text-gray-900 hover:underline flex justify-center mt-3">
+                    <a href="/solicitra_recuperacion" className="text-gray-700 hover:text-gray-900 hover:underline flex justify-center mt-3">
                         ¿Olvidó su contraseña?
                     </a>
                     <Button color="warning" className='mt-4 w-full text-white p-2' onClick={formik.handleSubmit}>

@@ -20,6 +20,8 @@ import FiltradosReporteAdoptadosPDF from "./components/pages/FiltradosReporteAdo
 import FiltradosReporteAdoptadosEXCEL from "./components/pages/FiltradosReporteAdoptadosExcel";
 import InvitadoPets from "./components/pages/InvitadoPets";
 import TabAdopciones from "./components/pages/TabAdopciones";
+import SolicitarRecuperacion from "./components/pages/SolicitarRecuperacion";
+import RestablecerContrasena from "./components/pages/RestablecerContrasena";
 
 function App() {
   const stored = localStorage.getItem('user');
@@ -33,6 +35,8 @@ function App() {
           <Route path="/iniciosesion" element={<IniciarSesion />} />
           <Route path="/registro" element={<RegistroUser />} />
           <Route path="/invitado" element={<InvitadoPets />} />
+          <Route path="/solicitra_recuperacion" element={<SolicitarRecuperacion />} />
+          <Route path="/restablecer_contrasena" element={<RestablecerContrasena />} />
 
           {user && user.rol === 'superusuario' && (
             <>
