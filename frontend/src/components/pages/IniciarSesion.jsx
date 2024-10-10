@@ -15,10 +15,10 @@ import * as yup from 'yup';
 function IniciarSesion() {
     const navigate = useNavigate();
 
-    // Esquema de validación con Yup
+    // Esquema de validación con Yupnp
     const validationSchema = yup.object({
         correo: yup.string().email('Debe ser un correo válido').required('El correo es obligatorio'),
-        password: yup.string().required('La contraseña es obligatoria')
+        password: yup.string().min(8, 'La contraseña debe tener al menos 8 caracteres').max(16, 'La contraseña no puede tener más de 16 caracteres').required('La contraseña es obligatoria')
     });
 
     // Configuración de Formik
@@ -32,15 +32,16 @@ function IniciarSesion() {
             try {
                 const response = await axiosClient.post('/validacion', values);
                 console.log('Datos enviados en la validación: ', response);
-    
+
                 if (response.status === 200) {
                     const { token, user } = response.data;
                     const userInfo = user[0] || user;
                     localStorage.setItem('token', token);
                     localStorage.setItem('user', JSON.stringify(userInfo));
-    
+
                     const userRol = userInfo.rol;
-    
+
+                    // Redirigir según el rol
                     if (userRol === 'usuario') {
                         navigate('/listmascotas');
                     } else if (userRol === 'administrador') {
@@ -48,29 +49,30 @@ function IniciarSesion() {
                     } else if (userRol === 'superusuario') {
                         navigate('/usuarios');
                     }
-    
+
+                    // Mostrar mensaje de bienvenida y recargar la página
                     Swal.fire({
                         position: "top-center",
                         icon: "success",
                         title: `Bienvenido ${userRol}`,
                         showConfirmButton: false,
                         timer: 1500
+                    }).then(() => {
+                        window.location.reload(); // Recargar la página
                     });
                 }
             } catch (error) {
                 if (error.response && error.response.status === 404) {
-                    // Mostrar mensaje si el correo o la contraseña están mal
                     const mensajeError = error.response.data.message;
                     Swal.fire({
                         icon: 'error',
                         title: 'Datos Incorrectos',
-                        text: mensajeError, // Mostrar el mensaje específico del backend
+                        text: mensajeError,
                         showConfirmButton: true,
                         confirmButtonText: 'Entendido',
                         confirmButtonColor: '#1193F1'
                     });
                 } else {
-                    // Mensaje para otros errores
                     Swal.fire({
                         icon: 'error',
                         title: 'Error en la solicitud',
@@ -83,7 +85,6 @@ function IniciarSesion() {
             }
         }
     });
-    
 
     // Estado para visibilidad de la contraseña
     const [isVisible, setIsVisible] = useState(false);
@@ -135,9 +136,10 @@ function IniciarSesion() {
                             endContent={
                                 <button type="button" onClick={toggleVisibility}>
                                     {isVisible ? (
-                                        <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                     	<EyeFilledIcon className="text-2xl text-default-400 pointer-events-none mb-2" />
                                     ) : (
-                                        <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none mb-2" />
+                                       
+    					<EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
                                     )}
                                 </button>
                             }
@@ -145,7 +147,7 @@ function IniciarSesion() {
                             className="max-w-xs"
                         />
                     </div>
-                    <a href="/solicitra_recuperacion" className="text-gray-700 hover:text-gray-900 hover:underline flex justify-center mt-3">
+                    <a href="/solicitar_recuperacion" className="text-gray-700 hover:text-gray-900 hover:underline flex justify-center mt-3">
                         ¿Olvidó su contraseña?
                     </a>
                     <Button color="warning" className='mt-4 w-full text-white p-2' onClick={formik.handleSubmit}>

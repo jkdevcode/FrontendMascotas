@@ -16,6 +16,7 @@ import {
     Pagination,
 } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
+import { Avatar, AvatarIcon } from "@nextui-org/react";
 import { PlusIcon } from "./../nextUI/PlusIcon.jsx";
 import { SearchIcon } from "./../nextUI/SearchIcon.jsx";
 import { EditIcon } from "../nextUI/EditIcon";
@@ -53,9 +54,13 @@ function Usuarios() {
                 // Si no hay filtro de búsqueda, igual excluimos los "superusuario"
                 filteredusuarios = filteredusuarios.filter(usuario => usuario.rol !== "superusuario");
             }
-
+        
             return filteredusuarios;
         }, [usuarios, filterValue]);
+        
+        // Filtramos los usuarios para obtener solo los que no sean superusuarios
+        const totalUsuariosSinSuperusuario = usuarios.filter(usuario => usuario.rol !== "superusuario").length;
+        
 
         const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -82,16 +87,26 @@ function Usuarios() {
                 case "nombre":
                     const imageUrl = usuario.img
                         ? `${axiosClient.defaults.baseURL}/uploads/${usuario.img}`
-                        : 'path/to/default-image.jpg'; // Fallback in case there's no image
+                        : null; // No image URL if none exists
 
                     return (
                         <div className="flex items-center gap-4">
-                            <img
-                                src={imageUrl}
-                                alt={`${usuario.nombre} ${usuario.apellido}`}
-                                className="w-10 h-10 object-cover rounded-lg"
-                            />
-                            <div className="">
+                            {imageUrl ? (
+                                <img
+                                    src={imageUrl}
+                                    alt={`${usuario.nombre} ${usuario.apellido}`}
+                                    className="w-10 h-10 object-cover rounded-full"
+                                />
+                            ) : (
+                                <Avatar
+                                    icon={<AvatarIcon />}
+                                    classNames={{
+                                        base: "w-10 h-10 bg-gradient-to-br from-[#FFB457] to-[#FF705B] rounded-full",
+                                        icon: "text-black/80",
+                                    }}
+                                />
+                            )}
+                            <div>
                                 <span>{usuario.nombre} </span>
                                 <span>{usuario.apellido}</span><br />
                                 <span>{usuario.correo}</span>
@@ -173,7 +188,7 @@ function Usuarios() {
                             </div>
                         </div>
                         <div className="flex justify-between items-center z-10 mr-30 mt-2">
-                            <span className="text-default-400 text-small">Total {usuarios.length} Resultados</span>
+                            <span className="text-default-400 text-small">Total {totalUsuariosSinSuperusuario} Resultados</span>
                             <label className="flex items-center text-default-400 mr-30 text-small">
                                 Columnas por página:
                                 <select
@@ -359,7 +374,7 @@ function Usuarios() {
     };
 
 
-    const handleSubmit = async (formData) => {
+    const handleSubmit = async (formData, passwordChanged) => {
         try {
 
             if (mode === 'create') {
@@ -379,6 +394,12 @@ function Usuarios() {
                     }
                 })
             } else if (mode === 'update') {
+
+                // Si la contraseña no ha cambiado, eliminamos el campo `password` de `formData`
+                if (!passwordChanged) {
+                    delete formData.password;
+                }
+
                 await axiosClient.put(`/usuarios/actualizar/${idUsuario.id_usuario}`, formData).then((response) => {
                     if (response.status === 200) {
                         Swal.fire({

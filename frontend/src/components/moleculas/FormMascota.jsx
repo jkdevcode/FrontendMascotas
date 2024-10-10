@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { ModalFooter, Input, Textarea, Avatar, AvatarGroup } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
@@ -11,10 +10,10 @@ import * as yup from 'yup';
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 
 const validationSchema = yup.object().shape({
-    nombre_mascota: yup
+     nombre_mascota: yup
         .string()
         .required('El nombre_mascota es obligatorio')
-        .matches(/^[a-zA-Z\s]{1,20}$/, 'El nombre de la mascota debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
+        .matches(/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{1,20}$/, 'El nombre de la mascota debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
     fechaNacimiento: yup
         .date()
         .required('La fecha de nacimiento es obligatoria')
@@ -58,16 +57,9 @@ const validationSchema = yup.object().shape({
         .required('El sexo es obligatorio'),
     imagenes: yup
         .array()
-        .of(
-            yup.mixed().test('fileSize', 'El tamaño del archivo es muy grande', value => {
-                return value ? value.size <= 2000000 : true;  // Límite de tamaño de 2MB por ejemplo
-            })
-                .test('fileType', 'El archivo debe ser una imagen', value => {
-                    return value ? ['image/jpeg', 'image/png', 'image/gif'].includes(value.type) : true;
-                })
-        )
         .min(1, 'Debe seleccionar al menos una imagen')
         .required('Debe seleccionar al menos una imagen'),
+
 });
 
 const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
@@ -82,17 +74,69 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
     const { idMascota } = useContext(MascotasContext);
 
     useEffect(() => {
-        axiosClient.get('/categorias/listar').then((response) => setCategoria(response.data));
         axiosClient.get('/razas/listar').then((response) => setRaza(response.data));
-        axiosClient.get('/departamentos/listar').then((response) => setDepartamento(response.data));
         axiosClient.get('/municipios/listar').then((response) => setMunicipio(response.data));
     }, []);
+
+    const [municipiosPorDepartamento, setMunicipiosPorDepartamento] = useState([]);
+    const [razasPorCategoria, setRazasPorCategoria] = useState([]);
+
+    useEffect(() => {
+        axiosClient.get('/departamentos/listar').then((response) => setDepartamento(response.data));
+    }, []);
+
+    useEffect(() => {
+        axiosClient.get('/categorias/listar').then((response) => {
+          const categoriasFilter = response.data.filter(cate => cate.estado === 'activa');
+          setCategoria(categoriasFilter);
+        });
+      }, []);
+
+      /* const handleDepartamentoChange = async (event) => {
+        const departamentoId = event.target.value;
+        formik.setFieldValue('fk_id_departamento', departamentoId); // Actualizar el valor en formik
+
+        if (departamentoId) {
+            try {
+                const response = await axiosClient.get(`/municipios/listarMunicipiosPorDepartamento/${departamentoId}`);
+                setMunicipiosPorDepartamento(response.data); // Actualizar los municipios según el departamento
+            } catch (error) {
+                console.error('Error al obtener los municipios:', error);
+            }
+        } else {
+            setMunicipiosPorDepartamento([]); // Limpiar los municipios si no hay departamento seleccionado
+        }
+    }; */
+
+     /*  const handleCategoriaChange = async (event) => {
+        const categoriaId = event.target.value;
+        formik.setFieldValue('fk_id_categoria', categoriaId); // Actualizar el valor en formik
+
+        if (categoriaId) {
+            try {
+                const response = await axiosClient.get(`/razas/listarRazasPorCategoria/${categoriaId}`);
+                setRazasPorCategoria(response.data);
+            } catch (error) {
+                console.error('Error al obtener las razas:', error);
+            }
+        } else {
+            setRazasPorCategoria([]); // Limpiar los municipios si no hay departamento seleccionado
+        }
+    }; */
 
     useEffect(() => {
         if (mode === 'update' && idMascota) {
             const fecha = idMascota.fecha_nacimiento ? new Date(idMascota.fecha_nacimiento) : null;
+            const peso = parseFloat(idMascota.peso);
 
-            const peso = parseFloat(idMascota.peso)
+            const imagenesArray = idMascota.imagenes ? idMascota.imagenes.split(',') : [];
+            const updatedFotos = [...imagenesArray, ...Array(4 - imagenesArray.length).fill(null)];
+            setImagenesExistentes(updatedFotos);
+
+            const fotoUrls = updatedFotos.map(imagen => imagen ? `${axiosClient.defaults.baseURL}/uploads/${imagen}` : null);
+            setFotoUrl(fotoUrls);
+
+            // Aquí actualizamos formik con las imágenes existentes
             formik.setValues({
                 nombre_mascota: idMascota.nombre_mascota || '',
                 fechaNacimiento: fecha,
@@ -105,17 +149,56 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                 fk_id_raza: idMascota.fk_id_raza || '',
                 fk_id_departamento: idMascota.fk_id_departamento || '',
                 fk_id_municipio: idMascota.fk_id_municipio || '',
-                sexo: idMascota.sexo || ''
+                sexo: idMascota.sexo || '',
+                imagenes: updatedFotos.filter(imagen => imagen !== null),  // Añadimos las imágenes existentes
             });
 
-            const imagenesArray = idMascota.imagenes ? idMascota.imagenes.split(',') : [];
-            const updatedFotos = [...imagenesArray, ...Array(4 - imagenesArray.length).fill(null)];
-            setImagenesExistentes(updatedFotos);
-
-            const fotoUrls = updatedFotos.map(imagen => imagen ? `${axiosClient.defaults.baseURL}/uploads/${imagen}` : null);
-            setFotoUrl(fotoUrls);
+        // Cargar razas por categoría
+        loadRazasPorCategoria(idMascota.fk_id_categoria);
+        // Cargar municipios por departamento
+        loadMunicipiosPorDepartamento(idMascota.fk_id_departamento);
         }
     }, [mode, idMascota]);
+
+    const loadRazasPorCategoria = async (categoriaId) => {
+        try {
+            const response = await axiosClient.get(`/razas/listarRazasPorCategoria/${categoriaId}`);
+            setRazasPorCategoria(response.data);
+        } catch (error) {
+            console.error('Error al obtener las razas:', error);
+        }
+    };
+    
+    const loadMunicipiosPorDepartamento = async (departamentoId) => {
+        try {
+            const response = await axiosClient.get(`/municipios/listarMunicipiosPorDepartamento/${departamentoId}`);
+            setMunicipiosPorDepartamento(response.data);
+        } catch (error) {
+            console.error('Error al obtener los municipios:', error);
+        }
+    };
+    
+    const handleDepartamentoChange = async (event) => {
+        const departamentoId = event.target.value;
+        formik.setFieldValue('fk_id_departamento', departamentoId);
+    
+        if (departamentoId) {
+            await loadMunicipiosPorDepartamento(departamentoId);
+        } else {
+            setMunicipiosPorDepartamento([]);
+        }
+    };
+    
+    const handleCategoriaChange = async (event) => {
+        const categoriaId = event.target.value;
+        formik.setFieldValue('fk_id_categoria', categoriaId);
+    
+        if (categoriaId) {
+            await loadRazasPorCategoria(categoriaId);
+        } else {
+            setRazasPorCategoria([]);
+        }
+    };
 
     const formik = useFormik({
         initialValues: {
@@ -131,7 +214,7 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
             fk_id_departamento: '',
             fk_id_municipio: '',
             sexo: '',
-            imagenes: [],
+            imagenes: [], // Inicialmente vacío, pero se actualizará en el useEffect si es actualización
         },
         validationSchema: validationSchema,
         onSubmit: async (values) => {
@@ -152,11 +235,12 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
             formData.append('fk_id_municipio', values.fk_id_municipio);
             formData.append('sexo', values.sexo);
 
+            // Verificamos las imágenes nuevas y las existentes
             fotos.forEach((foto, index) => {
                 if (foto instanceof File) {
                     formData.append('imagenes', foto);
                 } else if (imagenesExistentes[index]) {
-                    formData.append('imagenesExistentes[]', imagenesExistentes[index]);
+                    formData.append('imagenesExistentes[]', imagenesExistentes[index]);  // Mantenemos las imágenes existentes
                 }
             });
 
@@ -175,11 +259,11 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
             updatedFotoUrl[index] = URL.createObjectURL(file);
             setFotoUrl(updatedFotoUrl);
 
-            
-            // Aquí también actualizamos el campo de Formik
+            // Actualizamos el campo de Formik con las nuevas imágenes
             formik.setFieldValue('imagenes', updatedFotos.filter(f => f !== null));
         }
     };
+
 
     const handleClick = (index) => {
         fileInputRef.current.dataset.index = index;
@@ -250,15 +334,6 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                         />
 
                     </div>
-                    {/* <input
-                            type="date"
-                            className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
-                            id='fecha_nacimiento'
-                            name="fecha_nacimiento"
-                            value={fechaNacimiento}
-                            onChange={(e) => setFechaNacimiento(e.target.value)}
-                            required
-                        /> */}
                     <div className="py-2">
                         <select
                             className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
@@ -303,7 +378,7 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             id='fk_id_categoria'
                             name="fk_id_categoria"
                             value={formik.values.fk_id_categoria}
-                            onChange={formik.handleChange}
+                            onChange={handleCategoriaChange}
                             onBlur={formik.handleBlur}
                             required
                         >
@@ -335,7 +410,7 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             <option value="" hidden>
                                 Seleccionar Raza
                             </option>
-                            {raza.map((r) => (
+                            {razasPorCategoria.map((r) => (
                                 <option key={r.id_raza} value={r.id_raza}>
                                     {r.nombre_raza}
                                 </option>
@@ -353,7 +428,7 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             id='fk_id_departamento'
                             name="fk_id_departamento"
                             value={formik.values.fk_id_departamento}
-                            onChange={formik.handleChange}
+                            onChange={handleDepartamentoChange}
                             onBlur={formik.handleBlur}
                             required
                         >
@@ -372,8 +447,6 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             </div>
                         )}
                     </div>
-
-
                 </div>
                 <div className='flex flex-col'>
                     <div className="py-2">
@@ -389,7 +462,7 @@ const FormMascotas = ({ mode, handleSubmit, onClose, actionLabel }) => {
                             <option value="" hidden>
                                 Seleccionar municipio
                             </option>
-                            {municipio.map((mun) => (
+                            {municipiosPorDepartamento.map((mun) => (
                                 <option key={mun.id_municipio} value={mun.id_municipio}>
                                     {mun.nombre_municipio}
                                 </option>

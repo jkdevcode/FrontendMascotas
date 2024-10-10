@@ -322,7 +322,8 @@ if (columnKey === 'fecha_vacuna') {
                         text: "vacuna eliminada correctamente.",
                         icon: "success"
                     });
-
+		    // Actualiza el estado de vacunas manualmente para reflejar la eliminación
+                setVacunas(prevVacunas => prevVacunas.filter(vacuna => vacuna.id_vacuna !== id_vacuna));
                     // Actualizar la lista de vacunas
                     peticionGet();
                 } else {

@@ -89,7 +89,7 @@ function MisSolicitudesMascotas() {
                         </div>
                         <div className="flex flex-col items-center gap-4 mt-5">
                             <Button
-                                className="wargnig"
+                                color="danger"
                                 onClick={() => handleDenegarSolicitud(mascota.id_adopcion)}
                             >
                                 Denegar Solicitud

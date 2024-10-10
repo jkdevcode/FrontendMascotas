@@ -17,31 +17,35 @@ const validationSchema = yup.object().shape({
         .string()
         .required('El documento de identidad es obligatorio')
         .matches(/^\d+$/, 'El documento de identidad debe ser numérico')
-        .length(10, 'El documento de identidad debe contener exactamente 10 dígitos'),
+        .min(6, 'El documento de identidad debe contener como minimo 6 dígitos')
+        .max(10, 'El documento de identidad debe contener como maximo 10 dígitos'),
     
     nombre: yup
         .string()
         .required('El nombre es obligatorio')
- 	 .matches(/^[a-zA-Z\s]{1,20}$/, 'El nombre debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
+ 	 .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{1,20}$/, 'El nombre debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
     apellido: yup
         .string()
         .required('El apellido es obligatorio')
- 	 .matches(/^[a-zA-Z\s]{1,20}$/, 'El apellido debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
+ 	 .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{1,20}$/, 'El apellido debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
     direccion: yup
         .string()
         .required('La dirección es obligatoria'),
+      password: yup
+	.string()
+	.min(8, 'La contraseña debe tener al menos 8 caracteres')
+	.max(16, 'La contraseña no puede tener más de 16 caracteres')
+	.required('La contraseña es obligatoria'),
     correo: yup
-        .string()
-        .email('El correo electrónico debe ser válido')
-        .required('El correo electrónico es obligatorio'),
+	.string()
+	.email('Debe ser un correo válido')
+	.required('El correo es obligatorio'),
     telefono: yup
         .string()
         .required('El telefono es obligatorio')
         .matches(/^\d*$/, 'El teléfono debe ser numérico')
-        .length(10, 'El telefono debe contener exactamente 10 dígitos'),
-    password: yup
-        .string()
-        .required('La contraseña es obligatoria'),
+        .min(10, 'El telefono debe contener exactamente 10 dígitos')
+        .max(10, 'El telefono debe contener exactamente 10 dígitos'),
     rol: yup
         .string()
         .required('El rol es obligatorio'),
@@ -50,6 +54,7 @@ const validationSchema = yup.object().shape({
 const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
     const [rol, setRol] = useState([]);
     const [tipo_documento, setTipoDocumento] = useState([]);
+    const [passwordChanged, setPasswordChanged] = useState(false);
 
     const [foto, setFoto] = useState(null);
     const [fotoUrl, setFotoUrl] = useState('');
@@ -98,13 +103,17 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
                 formData.append('direccion', values.direccion);
                 formData.append('correo', values.correo);
                 formData.append('telefono', values.telefono);
-                formData.append('password', values.password);
+                // formData.append('password', values.password);
                 formData.append('rol', values.rol);
 
                 if (foto) {
                     formData.append('img', foto);
                 }
 
+                if (passwordChanged) {
+                    formData.append('password', values.password);
+                }
+                
                 handleSubmit(formData);
             } catch (error) {
                 alert('Hay un error en el sistema ' + error);
@@ -122,10 +131,11 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
                 direccion: idUsuario.direccion || '',
                 correo: idUsuario.correo || '',
                 telefono: idUsuario.telefono || '',
-                password: '*******', // La contraseña en sí no se muestra
+                password: '********', // Mostrar los asteriscos
                 rol: idUsuario.rol || '',
             });
-            setFotoUrl(idUsuario.img ? `${axiosClient.defaults.baseURL}/uploads/${idUsuario.img}` : '');
+setFotoUrl(idUsuario.img ? `${axiosClient.defaults.baseURL}/uploads/${idUsuario.img}` : '');
+            setPasswordChanged(false);  // Restablecemos cuando cargamos los valores
         }
     }, [mode, idUsuario]);
 
@@ -288,31 +298,36 @@ const FormUsuarios = ({ mode, handleSubmit, onClose, actionLabel }) => {
                         />
                     </div>
                     <div className='py-2'>
-                        <Input
-                            color='warning'
-                            variant="bordered"
-                            label="Contraseña"
-                            type={isVisible ? "text" : "password"}
-                            className="w-full"
-                            required
-                            id='password'
-                            name="password"
-                            value={formik.values.password}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            isInvalid={formik.touched.password && !!formik.errors.password}
-                            errorMessage={formik.errors.password}
-                            endContent={
-                                <button type="button" onClick={toggleVisibility}>
-                                    {isVisible ? (
-                                        <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none mb-2" />
-                                    ) : (
-                                        <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                                    )}
-                                </button>
-                            }
-                        />
-                    </div>
+                <Input
+                    color='warning'
+                    variant="bordered"
+                    label="Contraseña"
+                    type={isVisible ? "text" : "password"}
+                    className="w-full"
+                    required
+                    id='password'
+                    name="password"
+                    value={formik.values.password}
+                    onChange={(e) => {
+                        formik.handleChange(e);
+                        if (e.target.value !== '********') {
+                            setPasswordChanged(true);  // Si el valor cambia, marcamos que la contraseña ha sido modificada
+                        }
+                    }}
+                    onBlur={formik.handleBlur}
+                    isInvalid={formik.touched.password && !!formik.errors.password}
+                    errorMessage={formik.errors.password}
+                    endContent={
+                        <button type="button" onClick={toggleVisibility}>
+                            {isVisible ? (
+                                <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none mb-2" />
+                            ) : (
+                                <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                            )}
+                        </button>
+                    }
+                />
+            </div>
                     <div className='py-2'>
                         <select
                             className="pl-2 pr-4 py-2 w-80 h-14 text-sm border-2 rounded-xl border-gray-200 hover:border-gray-400 shadow-sm text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"

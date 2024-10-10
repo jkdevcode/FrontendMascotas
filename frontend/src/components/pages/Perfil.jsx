@@ -42,7 +42,7 @@ const PerfilUsuario = () => {
     obtenerDatos();
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e, passwordChanged) => {
     e.preventDefault();
     console.log('Datos enviados:', initialData);
 
@@ -50,6 +50,9 @@ const PerfilUsuario = () => {
       const id_usuario = JSON.parse(localStorage.getItem('user')).id_usuario;
 
       if (mode === 'update') {
+        if (!passwordChanged) {
+          delete formData.password;
+        }
         const response = await axiosClient.put(`/usuarios/actualizar/${id_usuario}`, initialData);
         if (response.status === 200) {
           Swal.fire({

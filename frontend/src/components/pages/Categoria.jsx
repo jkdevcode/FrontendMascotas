@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import CategoriaModal from '../templates/CategoriaModal.jsx';
 import AccionesModal from '../organismos/ModalAcciones.jsx';
 import Swal from 'sweetalert2';
@@ -12,37 +12,79 @@ import {
     TableRow,
     TableCell,
     Input,
+    // Button,
+    DropdownTrigger,
     Dropdown,
+    DropdownMenu,
+    DropdownItem,
+    Chip,
     Pagination,
 } from "@nextui-org/react";
+import { ChevronDownIcon } from "./../nextUI/ChevronDownIcon.jsx";
 import { Button } from "@nextui-org/button";
 import { PlusIcon } from "./../nextUI/PlusIcon.jsx";
 import { SearchIcon } from "./../nextUI/SearchIcon.jsx";
 import { EditIcon } from "../nextUI/EditIcon";
 import { DeleteIcon } from "../nextUI/DeleteIcon";
+import { PiDeviceMobileSlashDuotone } from "react-icons/pi";
 
 function Categorias() {
 
+    const statusColorMap = {
+        activa: "success",
+        inactiva: "danger",
+    };
+
     function EjemploCategoria() {
         const [filterValue, setFilterValue] = useState("");
-        const [selectedKeys, setSelectedKeys] = useState(new Set([]));
+        const [selectedKeys, setSelectedKeys] = useState(new Set(["activa"]));
         const [rowsPerPage, setRowsPerPage] = useState(5);
         const [sortDescriptor, setSortDescriptor] = useState({
             column: "fecha",
             direction: "ascending",
         });
         const [page, setPage] = useState(1);
+
+        const statusOptions = [
+            { name: "Activa", uid: "activa" },
+            { name: "Inactiva", uid: "inactiva" },
+        ];
+
+
+        const statusFilter = useMemo(() => {
+            return Array.from(selectedKeys).join(", ");
+        }, [selectedKeys]);
+
         const hasSearchFilter = Boolean(filterValue);
 
-        const filteredItems = React.useMemo(() => {
+        const filteredItems = useMemo(() => {
             let filteredCategorias = categorias;
             if (hasSearchFilter) {
                 filteredCategorias = filteredCategorias.filter(categoria =>
-                    String(categoria.nombre_categoria).toLowerCase().includes(filterValue.toLowerCase())
+                    categoria.nombre_categoria.toLowerCase().includes(filterValue.toLowerCase())
+                    );
+            }
+
+            // Filtrar por estado (activa o inactiva)
+            if (statusFilter === "activa") {
+                filteredCategorias = filteredCategorias.filter(
+                    (categoria) => categoria.estado === "activa"
+                );
+            } else if (statusFilter === "inactiva") {
+                filteredCategorias = filteredCategorias.filter(
+                    (categoria) => categoria.estado === "inactiva"
                 );
             }
             return filteredCategorias;
-        }, [categorias, filterValue]);
+        }, [categorias, filterValue, statusFilter]);
+
+        // Filtrar las categorías según el estado para calcular el total
+        const totalCategorias = useMemo(() => {
+            return categorias.filter(categoria =>
+                (statusFilter === "activa" && categoria.estado === "activa") ||
+                (statusFilter === "inactiva" && categoria.estado === "inactiva")
+            ).length;
+        }, [categorias, statusFilter]);
 
         const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -65,6 +107,12 @@ function Categorias() {
             const cellValue = categoria[columnKey];
 
             switch (columnKey) {
+                case "estado":
+                    return (
+                        <Chip className="capitalize" color={statusColorMap[categoria.estado]} size="sm" variant="flat">
+                            {cellValue}
+                        </Chip>
+                    );
                 case "actions":
                     return (
                         <div className="relative flex justify-start items-center gap-2">
@@ -75,9 +123,18 @@ function Categorias() {
                                     </span>
                                     <span className="text-lg text-danger cursor-pointer active:opacity-50">
                                         <DeleteIcon
+                                            onClick={() => peticionEliminar(categoria.id_categoria)}
+                                        />
+                                    </span>
+                                    <span
+                                        className={`text-lg cursor-pointer active:opacity-50 ${categoria.estado === "activa" ? "text-success" : "text-danger"
+                                            }`}
+                                    >
+                                        <PiDeviceMobileSlashDuotone
                                             onClick={() => peticionDesactivar(categoria.id_categoria)}
                                         />
                                     </span>
+
                                 </div>
                             </Dropdown>
                         </div>
@@ -105,19 +162,14 @@ function Categorias() {
             setPage(1);
         }, []);
 
-        const onSearchChange = React.useCallback((value) => {
-            if (value) {
-                setFilterValue(value);
-                setPage(1);
-            } else {
-                setFilterValue("");
-            }
-        }, []);
+        const onSearchChange = (e) => {
+            setFilterValue(e.target.value);
+        };
 
-        const onClear = React.useCallback(() => {
-            setFilterValue("");
-            setPage(1);
-        }, []);
+        const onClear = () => {
+            setFilterValue('');
+        };
+
 
         const topContent = React.useMemo(() => {
             return (
@@ -131,16 +183,41 @@ function Categorias() {
                                 startContent={<SearchIcon />}
                                 value={filterValue}
                                 onClear={() => onClear()}
-                                onValueChange={onSearchChange}
+                                onChange={onSearchChange}
                             />
                             <div className="flex gap-3">
+                                <Dropdown>
+                                    <DropdownTrigger>
+                                        <Button
+                                            variant="bordered"
+                                            className="capitalize"
+                                            endContent={<ChevronDownIcon className="text-small text-slate-700" />}
+                                        >
+                                            {statusFilter}
+                                        </Button>
+                                    </DropdownTrigger>
+                                    <DropdownMenu
+                                        aria-label="Single selection example"
+                                        variant="flat"
+                                        disallowEmptySelection
+                                        selectionMode="single"
+                                        selectedKeys={selectedKeys}
+                                        onSelectionChange={setSelectedKeys}
+                                    >
+                                        {statusOptions.map((status) => (
+                                            <DropdownItem key={status.uid} className="capitalize w-55">
+                                                {status.name}
+                                            </DropdownItem>
+                                        ))}
+                                    </DropdownMenu>
+                                </Dropdown>
                                 <Button color="warning" className="mr-30 text-white" style={{ position: 'relative' }} endContent={<PlusIcon />} onClick={() => handleToggle('create')}>
                                     Registrar
                                 </Button>
                             </div>
                         </div>
                         <div className="flex justify-between items-center z-10 mr-30 mt-2">
-                            <span className="text-default-400 text-small">Total {categorias.length} Resultados</span>
+                            <span className="text-default-400 text-small">Total {totalCategorias} Resultados</span>
                             <label className="flex items-center text-default-400 mr-30 text-small">
                                 Columnas por página:
                                 <select
@@ -244,6 +321,7 @@ function Categorias() {
     const peticionGet = async () => {
         try {
             const response = await axiosClient.get('/categorias/listar');
+            // const categoriasFilter = response.data.filter(cate => cate.estado === 'activa');
             setCategorias(response.data);
         } catch (error) {
             console.log('Error en el servidor ' + error);
@@ -273,15 +351,16 @@ function Categorias() {
         }
     ];
 
-    const peticionDesactivar = async (id_categoria) => {
+    const peticionEliminar = async (id_categoria) => {
         try {
             const result = await Swal.fire({
                 title: "¿Estás seguro?",
                 icon: "question",
+                text: "¡Esto podría afectar a tus categorias!",
                 showCancelButton: true,
                 confirmButtonColor: "orange",
                 cancelButtonColor: "#d33",
-                confirmButtonText: "¡Sí, estoy seguro!"
+                confirmButtonText: "¡Sí, eliminar!"
             });
 
             if (result.isConfirmed) {
@@ -290,19 +369,75 @@ function Categorias() {
                 if (response.status === 200) {
                     Swal.fire({
                         title: "¡Eliminado!",
-                        text: "Categoria eliminada correctamente.",
+                        text: "Categoría eliminada correctamente.",
                         icon: "success"
                     });
                     peticionGet();
-                } else {
-                    alert('Error al eliminar la categoria');
                 }
             }
         } catch (error) {
-            alert('Error del servidor: ' + error);
+            // Aquí manejas el error y muestras el mensaje que viene del backend
+            if (error.response && error.response.status === 400) {
+                // El backend devuelve un mensaje cuando la categoría está en uso
+                Swal.fire({
+                    title: "Error",
+                    text: error.response.data.message,
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else {
+                Swal.fire({
+                    title: "Error",
+                    text: "Error en el servidor. Intente nuevamente más tarde.",
+                    icon: "error"
+                });
+            }
         }
     };
 
+    const peticionDesactivar = (id_categoria) => {
+        // Mostrar la alerta de confirmación primero
+        Swal.fire({
+            title: "¿Estás seguro de cambiar el estado de la categoría?",
+            text: "¡Esto podría afectar a tus categorías!",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "orange",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "¡Sí, estoy seguro!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await axiosClient.put(`/categorias/desactivar/${id_categoria}`);
+
+                    if (response.status === 200) {
+                        const nuevoEstado = response.data.message;
+                        Swal.fire({
+                            title: "¡Actualizado!",
+                            text: nuevoEstado,
+                            icon: "success"
+                        });
+                        peticionGet(); // Actualizar la lista después de la desactivación/activación
+                    } else {
+                        // Si el servidor responde con un estado diferente a 200
+                        Swal.fire({
+                            title: "Error",
+                            text: response.data.message || "Error al actualizar la categoría.",
+                            icon: "error"
+                        });
+                    }
+                } catch (error) {
+                    // Manejar errores del servidor
+                    Swal.fire({
+                        title: "Error del servidor",
+                        text: error.response?.data?.message || "Ocurrió un error inesperado.",
+                        icon: "error"
+                    });
+                }
+            }
+        });
+    };
 
     const handleSubmit = async (formData) => {
         // Aquí eliminas 'e.preventDefault();'
@@ -334,15 +469,31 @@ function Categorias() {
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        peticionGet();
-                    } else {
-                        alert('Error al actualizar');
+                        peticionGet(); // Refrescar los datos
+                    }
+                }).catch((error) => {
+                    // Capturar el error durante la actualización
+                    if (error.response && error.response.status === 400) {
+                        Swal.fire({
+                            position: "center",
+                            icon: "error",
+                            title: "No se puede actualizar",
+                            text: error.response.data.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                     }
                 });
             }
-            setModalOpen(false);
+            setModalOpen(false); // Cerrar el modal después de enviar el formulario
         } catch (error) {
-            alert('Error en el servidor');
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "Error en el servidor",
+                text: "Ocurrió un error inesperado",
+                showConfirmButton: true
+            });
         }
     };
 

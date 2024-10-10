@@ -9,7 +9,7 @@ const validationSchema = yup.object().shape({
     nombre_categoria: yup
         .string()
         .required('El nombre de la categoría es obligatorio')
-        .matches(/^[a-zA-Z\s]{1,50}$/, 'El nombre de la categoría debe tener máximo 50 caracteres, y solo puede contener letras y espacios'),
+        .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{1,50}$/, 'El nombre de la categoría debe tener máximo 50 caracteres, y solo puede contener letras y espacios'),
     estado: yup
         .string()
         .required('El estado de la categoría es obligatorio')

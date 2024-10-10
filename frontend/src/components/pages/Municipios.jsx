@@ -42,7 +42,7 @@ function Municipios() {
             if (hasSearchFilter) {
                 filteredmunicipios = filteredmunicipios.filter(municipio =>
                     String(municipio.nombre_municipio).toLowerCase().includes(filterValue.toLowerCase()) ||
-                        municipio.codigo_dane.toLowerCase().includes(filterValue.toLowerCase())
+                    municipio.codigo_dane.toLowerCase().includes(filterValue.toLowerCase())
                 );
             }
 
@@ -307,60 +307,107 @@ function Municipios() {
                         text: "municipio eliminada correctamente.",
                         icon: "success"
                     });
-
+		     setMunicipios(prevMunicipios => prevMunicipios.filter(municipios => municipios.id_municipio !== id_municipio));
                     // Actualizar la lista de municipios
                     peticionGet();
-                } else {
-                    alert('Error al eliminar la municipio');
                 }
             }
         } catch (error) {
-            alert('Error del servidor: ' + error);
+            // Verificar si el error viene del backend y es un 400 (por ejemplo, departamento en uso)
+            if (error.response && error.response.status === 400) {
+                Swal.fire({
+                    title: "Error",
+                    text: error.response.data.message, // Mostrar el mensaje del backend
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else {
+                Swal.fire({
+                    title: "Error del servidor",
+                    text: "No se pudo eliminar el municipio. Inténtalo más tarde.",
+                    icon: "error"
+                });
+            }
         }
     };
 
 
     const handleSubmit = async (formData) => {
         try {
-
             if (mode === 'create') {
-
-                await axiosClient.post('/municipios/registrar', formData).then((response) => {
-                    if (response.status == 200) {
+                await axiosClient.post('/municipios/registrar', formData)
+                    .then((response) => {
+                        if (response.status === 200) {
+                            Swal.fire({
+                                position: "center",
+                                icon: "success",
+                                title: "Municipio registrado con éxito",
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            peticionGet();
+                            setModalOpen(false);
+                        }
+                    })
+                    .catch((error) => {
                         Swal.fire({
                             position: "center",
-                            icon: "success",
-                            title: "municipio registrada con éxito",
+                            icon: "error",
+                            title: "Error en el registro",
+                            text: error.response?.data?.message,
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        peticionGet()
-                    } else {
-                        alert('Error en el registro')
-                    }
-                })
+                    });
             } else if (mode === 'update') {
-                await axiosClient.put(`/municipios/actualizar/${idMunicipio.id_municipio}`, formData).then((response) => {
-                    if (response.status === 200) {
+                await axiosClient.put(`/municipios/actualizar/${idMunicipio.id_municipio}`, formData)
+                    .then((response) => {
+                        if (response.status === 200) {
+                            Swal.fire({
+                                position: "center",
+                                icon: "success",
+                                title: "Se actualizó con éxito el municipio",
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            peticionGet();
+                            setModalOpen(false);
+                        } else {
+                            Swal.fire({
+                                position: "center",
+                                icon: "error",
+                                title: "Error al actualizar",
+                                text: response.data.message || 'Error en el servidor',
+                                showConfirmButton: false,
+				timer: 1500
+                            });
+                        }
+                    })
+                    .catch((error) => {
                         Swal.fire({
                             position: "center",
-                            icon: "success",
-                            title: "Se actualizó con éxito la municipio",
-                            showConfirmButton: false,
-                            timer: 1500
+                            icon: "error",
+                            title: "Error al actualizar",
+                            text: error.response?.data?.message || 'Error en el servidor',
+                            showConfirmButton: true,
                         });
-                        peticionGet()
-                    } else {
-                        alert('Error al actualizar')
-                    }
-                })
+                    });
             }
-            setModalOpen(false)
 
+            // setModalOpen(false);
         } catch (error) {
-            alert('Error en el servidor')
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "Error en el servidor",
+                text: error.message,
+                showConfirmButton: true,
+            });
         }
-    }
+    };
+
+
 
     const handleToggle = (mode, initialData) => {
         setInitialData(initialData)

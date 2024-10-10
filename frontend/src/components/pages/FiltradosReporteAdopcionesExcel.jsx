@@ -1,4 +1,3 @@
-// src/components/ReporteMascotas.js
 
 import React, { useState, useEffect } from "react";
 import Header from '../moleculas/Header.jsx';
@@ -6,6 +5,7 @@ import axiosClient from '../axiosClient.js';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
+import Swal from 'sweetalert2';
 
 
 
@@ -54,12 +54,23 @@ const FiltradosReporteAdopcionesExcel = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+      // Validar que si se selecciona una categoría, también se seleccione una raza
+  if (categoriaSeleccionada && !razaSeleccionada) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Advertencia',
+      text: 'Debe seleccionar una raza si ha seleccionado una categoría.',
+      confirmButtonColor: '#1193F1',
+    });
+    return; // No continuar con la solicitud si no cumple la validación
+  }
 
     // Construir los parámetros de la consulta
     let params = { tipo_fecha: tipoFecha };
 
     if (tipoFecha === "dia") {
-      params.fecha_inicio = fechaDia.toISOString().split("T")[0];
+      // Asegúrate de que estás enviando el formato completo 'YYYY-MM-DD'
+      params.fecha_inicio = moment(fechaDia).format("YYYY-MM-DD");
     } else if (tipoFecha === "mes") {
       params.fecha_inicio = moment(fechaMes).format("MM-YYYY"); // Formato 'MM-YYYY'
     } else if (tipoFecha === "rango") {
@@ -91,7 +102,12 @@ const FiltradosReporteAdopcionesExcel = () => {
     link.remove();
   } catch (error) {
     console.error("Error al generar el reporte:", error);
-    alert("No se pudo generar el reporte. Por favor, verifica los filtros.");
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo generar el reporte. Por favor, verifica los filtros de la fecha seleccionada.',
+      confirmButtonColor: '#1193F1',
+    });
   }
 };
 
@@ -117,18 +133,20 @@ const FiltradosReporteAdopcionesExcel = () => {
             </div>
   
             {tipoFecha === "dia" && (
-              <div className="flex flex-col space-y-2">
-                <label className="text-lg font-medium text-gray-800">Selecciona el Día:</label>
-                <DatePicker
-  selected={fechaDia}
-  onChange={(date) => setFechaDia(date)}
-  dateFormat="yyyy-MM-dd"
-  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-warning-500 focus:border-warning-500 transition duration-300"
-/>
+  <div className="flex flex-col space-y-2">
+    <label className="text-lg font-medium text-gray-800">Selecciona el Día:</label>
+    <DatePicker
+      selected={fechaDia}
+      onChange={(date) => setFechaDia(date)}
+      dateFormat="yyyy-MM-dd"  // Mostrar formato "Día-Año"
+      showMonthDropdown
+      showYearDropdown
+      dropdownMode="select"  // Desplegables para mes y año
+      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-warning-500 focus:border-warning-500 transition duration-300"
+    />
+  </div>
+)}
 
-              </div>
-            )}
-  
             {tipoFecha === "mes" && (
               <div className="flex flex-col space-y-2">
                 <label className="text-lg font-medium text-gray-800">Selecciona el Mes:</label>

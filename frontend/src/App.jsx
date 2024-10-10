@@ -35,8 +35,8 @@ function App() {
           <Route path="/iniciosesion" element={<IniciarSesion />} />
           <Route path="/registro" element={<RegistroUser />} />
           <Route path="/invitado" element={<InvitadoPets />} />
-          <Route path="/solicitra_recuperacion" element={<SolicitarRecuperacion />} />
-          <Route path="/restablecer_contrasena" element={<RestablecerContrasena />} />
+          <Route path="/solicitar_recuperacion" element={<SolicitarRecuperacion />} />
+          <Route path="${process.env.FRONTEND_URL}/restablecer_contrasena/${token}" element={<RestablecerContrasena />} />
 
           {user && user.rol === 'superusuario' && (
             <>

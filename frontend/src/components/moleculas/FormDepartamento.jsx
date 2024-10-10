@@ -12,11 +12,11 @@ const FormDepartamentos = ({ mode, handleSubmit, onClose, actionLabel }) => {
         nombre_departamento: yup
             .string()
             .required('El nombre del departamento es obligatorio')
-            .matches(/^[a-zA-Z\s]{1,50}$/, 'El nombre del departamento debe tener máximo 50 caracteres, y solo puede contener letras y espacios'),
+             .matches(/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{1,50}$/, 'El nombre del departamento debe tener máximo 50 caracteres, y solo puede contener letras y espacios'),
         codigo_dane: yup
             .string()
             .required('El código DANE es obligatorio')
-            .matches(/^\d{1,10}$/, 'El código DANE debe tener máximo 10 caracteres numéricos')
+            .matches(/^\d{2}$/, 'El código DANE debe tener exactamente 2 caracteres numéricos')
     });
 
     const formik = useFormik({

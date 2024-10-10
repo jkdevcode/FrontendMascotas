@@ -16,11 +16,11 @@ const FormMunicipios = ({ mode, handleSubmit, onClose, actionLabel }) => {
         nombre_municipio: yup
             .string()
             .required('El nombre del municipio es obligatorio')
-            .matches(/^[a-zA-Z\s]{1,50}$/, 'El nombre del municipio debe tener máximo 50 caracteres, y solo puede contener letras y espacios'),
+             .matches(/^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]{1,50}$/, 'El nombre del municipio debe tener máximo 50 caracteres, y solo puede contener letras y espacios'),
         codigo_dane: yup
             .string()
             .required('El código DANE es obligatorio')
-            .matches(/^\d{1,10}$/, 'El código DANE debe tener máximo 10 caracteres numéricos'),
+            .matches(/^\d{5}$/, 'El código DANE debe tener exactamente 5 caracteres numéricos'),
         fk_id_departamento: yup
             .string()
             .required('Seleccionar un departamento es obligatorio')
@@ -44,9 +44,9 @@ const FormMunicipios = ({ mode, handleSubmit, onClose, actionLabel }) => {
             fk_id_departamento: '',
         },
         validationSchema: validationSchema,
-        onSubmit: (values, { resetForm }) => {
+        onSubmit: (values/* , { resetForm } */) => {
             handleSubmit(values);
-            resetForm();
+           /*  resetForm(); */
         },
     });
 

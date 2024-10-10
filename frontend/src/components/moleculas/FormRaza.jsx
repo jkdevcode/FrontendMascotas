@@ -9,7 +9,7 @@ const validationSchema = yup.object().shape({
     nombre_raza: yup
         .string()
         .required('El nombre de la raza es obligatorio')
-        .matches(/^[a-zA-Z\s]{1,50}$/, 'El nombre de la raza debe tener máximo 50 caracteres, y solo puede contener letras y espacios'),
+        .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{1,50}$/, 'El nombre de la raza debe tener máximo 50 caracteres, y solo puede contener letras y espacios'),
     fk_id_categoria: yup
         .string()
         .required('La categoría es obligatoria')
@@ -20,13 +20,11 @@ const FormRazas = ({ mode, handleSubmit, onClose, actionLabel }) => {
     const { idRaza } = useContext(RazasContext);
 
     useEffect(() => {
-        // Obtener categorías disponibles para asociar con la raza
         axiosClient.get('/categorias/listar').then((response) => {
-            setCategorias(response.data);
-        }).catch((error) => {
-            console.log('Error fetching categories: ', error);
+          const categoriasFilter = response.data.filter(cate => cate.estado === 'activa');
+          setCategorias(categoriasFilter);
         });
-    }, []);
+      }, []);
 
     const formik = useFormik({
         initialValues: {
