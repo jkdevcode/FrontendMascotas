@@ -279,7 +279,7 @@ function Razas() {
             sortable: true
         }
     ];
-    const peticionDesactivar = async (id_raza) => {
+       const peticionDesactivar = async (id_raza) => {
         try {
             // Mostrar la alerta de confirmación primero
             const result = await Swal.fire({
@@ -291,11 +291,11 @@ function Razas() {
                 cancelButtonColor: "#d33",
                 confirmButtonText: "¡Sí, estoy seguro!"
             });
-
+    
             // Si el usuario confirma, se procede con la eliminación
             if (result.isConfirmed) {
                 const response = await axiosClient.delete(`/razas/eliminar/${id_raza}`);
-
+    
                 if (response.status === 200) {
                     Swal.fire({
                         title: "¡Eliminado!",
@@ -303,14 +303,29 @@ function Razas() {
                         icon: "success"
                     });
 
+		    setRazas(prevRazas => prevRazas.filter(razas => razas.id_raza !== id_raza));
+    
                     // Actualizar la lista de razas
                     peticionGet();
-                } else {
-                    alert('Error al eliminar la raza');
                 }
             }
         } catch (error) {
-            alert('Error del servidor: ' + error);
+            if (error.response && error.response.status === 400) {
+                // Mostrar alerta si la raza no puede ser eliminada
+                Swal.fire({
+                    title: "Error",
+                    text: error.response.data.message,
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else {
+                Swal.fire({
+                    title: "Error",
+                    text: "Error del servidor. Por favor, inténtalo de nuevo más tarde.",
+                    icon: "error"
+                });
+            }
         }
     };
 

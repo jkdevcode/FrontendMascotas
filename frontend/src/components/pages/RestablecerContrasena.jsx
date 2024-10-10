@@ -12,7 +12,7 @@ function RestablecerContrasena() {
         e.preventDefault();
 
         try {
-            const response = await axiosClient.post('/reset-password', { token, password });
+            const response = await axiosClient.post('/usuarios/reset-password', { token, password });
             Swal.fire('Éxito', response.data.message, 'success');
         } catch (error) {
             Swal.fire('Error', error.response.data.message, 'error');

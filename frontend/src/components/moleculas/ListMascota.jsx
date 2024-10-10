@@ -268,7 +268,7 @@ function ListMascota({ initialData, onClose }) {
                                 <div className="border p-4 rounded-lg shadow-sm bg-white">
                                     <h5 className="font-bold text-gray-800 mb-1 text-sm">Enfermedad: {vacuna.enfermedad}</h5>
                                     <p className="text-gray-600 mb-1 text-xs">Fecha: {formatDate(vacuna.fecha_vacuna)}</p>
-                                    <p className="text-gray-600 text-xs">Estado: {vacuna.estado_vacuna}</p>
+                                    <p className="text-gray-600 text-xs">Estado: {vacuna.estado}</p>
                                 </div>
                             </div>
                         ))

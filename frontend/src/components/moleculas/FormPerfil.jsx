@@ -16,11 +16,11 @@ const validationSchema = yup.object().shape({
   nombre: yup
     .string()
     .required('El nombre es obligatorio')
-    .matches(/^[a-zA-Z\s]{1,20}$/, 'El nombre debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
+    .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{1,20}$/, 'El nombre debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
   apellido: yup
     .string()
     .required('El apellido es obligatorio')
-    .matches(/^[a-zA-Z\s]{1,20}$/, 'El apellido debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
+    .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{1,20}$/, 'El apellido debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
   direccion: yup
     .string()
     .required('La dirección es obligatoria'),
@@ -34,8 +34,10 @@ const validationSchema = yup.object().shape({
     .matches(/^\d*$/, 'El teléfono debe ser numérico')
     .length(10, 'El teléfono debe contener exactamente 10 dígitos'),
   password: yup
-    .string()
-    .required('La contraseña es obligatoria'),
+     .string()
+     .min(8, 'La contraseña debe tener al menos 8 caracteres')
+     .max(16, 'La contraseña no puede tener más de 16 caracteres')
+     .required('La contraseña es obligatoria'),
 });
 
 
@@ -56,6 +58,7 @@ const FormPerfil = () => {
   const fileInputRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
 
+  const [passwordChanged, setPasswordChanged] = useState(false);
   const onClose = () => {
     // Aquí defines lo que hace la función onClose, por ejemplo, cerrar el modal
     console.log('Modal cerrado');
@@ -67,11 +70,11 @@ const FormPerfil = () => {
         const id_usuario = JSON.parse(localStorage.getItem('user')).id_usuario;
         const response = await axiosClient.get(`/usuarios/perfil/${id_usuario}`, { headers: { token: token } });
         const data = response.data[0];
-  
+
         if (data) {
           // Solo añadir el prefijo base si la URL no lo contiene ya
-          const imageUrl = data.img && !data.img.startsWith('http') 
-            ? `${axiosClient.defaults.baseURL}/uploads/${data.img}` 
+          const imageUrl = data.img && !data.img.startsWith('http')
+            ? `${axiosClient.defaults.baseURL}/uploads/${data.img}`
             : data.img || '';
           console.log('URL de la imagen:', imageUrl);
           setFotoUrl(imageUrl);
@@ -82,9 +85,11 @@ const FormPerfil = () => {
           setDireccion(data.direccion || '');
           setTelefono(data.telefono || '');
           setPassword('');
-          setPasswordDisplay('********');
+          setPassword('********');
           setIdUsuario(id_usuario);
           setTipoDocumentoOp(data.tipo_documento || '');
+
+          setPasswordChanged(false);  // Restablecemos cuando cargamos los valores
         } else {
           setFotoUrl('');
           setFoto(null);
@@ -93,9 +98,9 @@ const FormPerfil = () => {
         console.error("Error al obtener la información", error.response ? error.response.data : error.message);
       }
     };
-  
+
     obtenerDatos();
-  
+
     const enumDataTipoDocumento = [
       { key: "tarjeta", label: "Tarjeta" },
       { key: "cedula", label: "Cédula" },
@@ -103,48 +108,6 @@ const FormPerfil = () => {
     ];
     setTipoDocumento(enumDataTipoDocumento);
   }, []);
-  
-  
-
-  const actualizarPerfil = async (e) => {
-    e.preventDefault();
-    if (!perfil) return;
-  
-    try {
-      const token = localStorage.getItem('token');
-      const formData = new FormData();
-      formData.append('nombre', nombre);
-      formData.append('apellido', apellido);
-      formData.append('correo', correo);
-      formData.append('direccion', direccion);
-      formData.append('telefono', telefono);
-      formData.append('tipo_documento', tipoDocumentoOp);
-      if (password) formData.append('password', password);
-      if (foto) formData.append('img', foto);
-  
-      const response = await axiosClient.put(
-        `/usuarios/actualizarPerfil/${id_usuario}`,
-        formData,
-        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } }
-      );
-  
-      if (response.status === 200) {
-        Swal.fire('¡Información actualizada!', 'Tu información ha sido actualizada correctamente.', 'success');
-        // Aquí no es necesario actualizar el estado del perfil ya que lo haces en el componente principal
-        onClose(); // Cierra el modal
-      }
-    } catch (error) {
-      console.error('Error al actualizar la información:', error.response ? error.response.data : error.message);
-      Swal.fire('¡Error!', 'Hubo un problema al actualizar tu perfil. Inténtalo de nuevo más tarde.', 'error');
-    }
-  };
-  
-  
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-    setPasswordDisplay(e.target.value);
-  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -163,9 +126,9 @@ const FormPerfil = () => {
   if (!perfil) return null;
 
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px'}}>
+    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
       <h6 className="text-3xl font-extrabold text-warning-500 mb-6 text-center">Editar Perfil</h6>
-  
+
       <Formik
         initialValues={{
           nombre,
@@ -174,7 +137,7 @@ const FormPerfil = () => {
           correo,
           telefono,
           tipo_documento: tipoDocumentoOp,
-          password: passwordDisplay,
+          password: password,
         }}
         validationSchema={validationSchema}
         onSubmit={async (values) => {
@@ -187,15 +150,17 @@ const FormPerfil = () => {
             formData.append('direccion', values.direccion);
             formData.append('telefono', values.telefono);
             formData.append('tipo_documento', values.tipo_documento);
-            if (values.password) formData.append('password', values.password);
+            // if (values.password) formData.append('password', values.password);
             if (foto) formData.append('img', foto);
-  
+            if (passwordChanged) {
+              formData.append('password', values.password);
+            }
             const response = await axiosClient.put(
               `/usuarios/actualizarPerfil/${id_usuario}`,
               formData,
               { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } }
             );
-  
+
             if (response.status === 200) {
               Swal.fire('¡Información actualizada!', 'Tu información ha sido actualizada correctamente.', 'success');
               onClose(); // Cierra el modal
@@ -315,7 +280,7 @@ const FormPerfil = () => {
                 </div>
                 <div className="py-2">
                   <Field name="password">
-                    {({ field }) => (
+                    {({ field, form }) => (
                       <Input
                         label="Contraseña"
                         color='warning'
@@ -324,18 +289,25 @@ const FormPerfil = () => {
                         endContent={
                           <button type="button" onClick={toggleVisibility}>
                             {isVisible ? (
-                              <EyeFilledIcon className="text-2xl" />
+                              <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none mb-2" />
                             ) : (
-                              <EyeSlashFilledIcon className="text-2xl" />
+                              <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
                             )}
                           </button>
                         }
                         className="w-full"
                         {...field}
+                        onChange={(e) => {
+                          form.handleChange(e);  // Usamos form.handleChange para actualizar el valor en Formik
+                          if (e.target.value !== '*******') {
+                            setPasswordChanged(true);  // Cambiamos el estado si la contraseña ha sido modificada
+                          }
+                        }}
                         required
                       />
                     )}
                   </Field>
+
                   <ErrorMessage name="password" component="div" className="text-red-500" />
                 </div>
                 <div className="py-2">
@@ -361,10 +333,10 @@ const FormPerfil = () => {
                 type="submit"
                 color="warning"
                 className="mt-4 text-white p-2 w-40"
-                css={{ 
-                  borderRadius: "$full", 
-                  fontWeight: "bold", 
-                  fontSize: "1.125rem", 
+                css={{
+                  borderRadius: "$full",
+                  fontWeight: "bold",
+                  fontSize: "1.125rem",
                   padding: "0.5rem 2rem"
                 }}
               >
@@ -376,7 +348,7 @@ const FormPerfil = () => {
       </Formik>
     </div>
   );
-  
+
 };
 
 export default FormPerfil;

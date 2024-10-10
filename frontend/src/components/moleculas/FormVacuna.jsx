@@ -18,7 +18,7 @@ const validationSchema = yup.object().shape({
     enfermedad: yup
         .string()
         .required('La enfermedad es obligatoria')
-        .matches(/^[a-zA-Z\s]{1,20}$/, 'El nombre de la enfermedad debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
+        .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{1,20}$/, 'El nombre de la enfermedad debe tener máximo 20 caracteres, y solo puede contener letras y espacios'),
     estado: yup
         .string()
         .required('El estado de la vacuna es obligatorio')

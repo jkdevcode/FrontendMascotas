@@ -42,7 +42,7 @@ function Departamentos() {
             if (hasSearchFilter) {
                 filtereddepartamentos = filtereddepartamentos.filter(departamento =>
                     String(departamento.nombre_departamento).toLowerCase().includes(filterValue.toLowerCase()) ||
-                        departamento.codigo_dane.toLowerCase().includes(filterValue.toLowerCase())
+                    departamento.codigo_dane.toLowerCase().includes(filterValue.toLowerCase())
                 );
             }
 
@@ -284,7 +284,7 @@ function Departamentos() {
             // Mostrar la alerta de confirmación primero
             const result = await Swal.fire({
                 title: "¿Estás seguro?",
-                text: "¡Esto podría afectar a tus departamentos!",
+                text: "¡Esto podría afectar a tus municipios!",
                 icon: "question",
                 showCancelButton: true,
                 confirmButtonColor: "orange",
@@ -299,62 +299,100 @@ function Departamentos() {
                 if (response.status === 200) {
                     Swal.fire({
                         title: "¡Eliminado!",
-                        text: "departamento eliminada correctamente.",
+                        text: "Departamento eliminado correctamente.",
                         icon: "success"
                     });
-
+		    setDepartamentos(prevDepartamentos => prevDepartamentos.filter(departamentos => departamentos.id_departamento !== id_departamento));
                     // Actualizar la lista de departamentos
                     peticionGet();
-                } else {
-                    alert('Error al eliminar la departamento');
                 }
             }
         } catch (error) {
-            alert('Error del servidor: ' + error);
+            // Verificar si el error viene del backend y es un 400 (por ejemplo, departamento en uso)
+            if (error.response && error.response.status === 400) {
+                Swal.fire({
+                    title: "Error",
+                    text: error.response.data.message, // Mostrar el mensaje del backend
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else {
+                Swal.fire({
+                    title: "Error del servidor",
+                    text: "No se pudo eliminar el departamento. Inténtalo más tarde.",
+                    icon: "error"
+                });
+            }
         }
     };
-
 
     const handleSubmit = async (formData) => {
         try {
             if (mode === 'create') {
-
-                await axiosClient.post('/departamentos/registrar', formData).then((response) => {
-                    if (response.status == 200) {
+                await axiosClient.post('/departamentos/registrar', formData)
+                    .then((response) => {
+                        if (response.status === 200) {
+                            Swal.fire({
+                                position: "center",
+                                icon: "success",
+                                title: "Departamento registrado con éxito",
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            peticionGet();
+                            setModalOpen(false);
+                        }
+                    })
+                    .catch((error) => {
                         Swal.fire({
                             position: "center",
-                            icon: "success",
-                            title: "departamento registrada con éxito",
+                            icon: "error",
+                            title: "Error en el registro",
+                            text: error.response?.data?.message,
                             showConfirmButton: false,
                             timer: 1500
                         });
-                        peticionGet()
-                    } else {
-                        alert('Error en el registro')
-                    }
-                })
+                    });
             } else if (mode === 'update') {
-                await axiosClient.put(`/departamentos/actualizar/${idDepartamento.id_departamento}`, formData).then((response) => {
-                    if (response.status === 200) {
+                await axiosClient.put(`/departamentos/actualizar/${idDepartamento.id_departamento}`, formData)
+                    .then((response) => {
+                        if (response.status === 200) {
+                            Swal.fire({
+                                position: "center",
+                                icon: "success",
+                                title: "Departamento actualizado con éxito",
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            peticionGet();
+                            setModalOpen(false);
+                        }
+                    })
+                    .catch((error) => {
                         Swal.fire({
                             position: "center",
-                            icon: "success",
-                            title: "Se actualizó con éxito la departamento",
+                            icon: "error",
+                            title: "Error al actualizar",
+                            text: error.response?.data?.message || 'Error en el servidor',
                             showConfirmButton: false,
-                            timer: 1500
+  			    timer: 1500
                         });
-                        peticionGet()
-                    } else {
-                        alert('Error al actualizar')
-                    }
-                })
+                    });
             }
-            setModalOpen(false)
 
+            // setModalOpen(false);
         } catch (error) {
-            alert('Error en el servidor')
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "Error en el servidor",
+                text: error.message,
+                showConfirmButton: true,
+            });
         }
-    }
+    };
+
 
     const handleToggle = (mode, initialData) => {
         setInitialData(initialData)
@@ -364,7 +402,7 @@ function Departamentos() {
     return (
 
         <>
-        {/* <Header /> */}
+            {/* <Header /> */}
             <div className='w-full max-w-[90%] items-center p-10'>
                 <AccionesModal
                     isOpen={modalAcciones}

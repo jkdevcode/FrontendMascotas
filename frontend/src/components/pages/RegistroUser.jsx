@@ -34,10 +34,10 @@ function RegistroUser() {
     // Esquema de validación con Yup
     const validationSchema = yup.object({
         nombre: yup.string()
-            .matches(/^[a-zA-Z\s]+$/, 'El nombre solo puede contener letras y espacios')
+            .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, 'El nombre solo puede contener letras y espacios')
             .required('El nombre es obligatorio'),
         apellido: yup.string()
-            .matches(/^[a-zA-Z\s]+$/, 'El apellido solo puede contener letras y espacios')
+            .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, 'El apellido solo puede contener letras y espacios')
             .required('El apellido es obligatorio'),
         direccion: yup.string().required('La dirección es obligatoria'),
         correo: yup.string().email('Debe ser un correo válido').required('El correo es obligatorio'),
@@ -45,9 +45,12 @@ function RegistroUser() {
         .matches(/^[0-9]{10}$/, 'El teléfono debe contener exactamente 10 dígitos')
         .required('El teléfono es obligatorio'),
     
-        documento_identidad: yup.string()
-        .matches(/^[0-9]{10}$/, 'La identificación debe contener exactamente 10 dígitos')
-        .required('La identificación es obligatoria'),
+        documento_identidad: yup
+        .string()
+        .required('El documento de identidad es obligatorio')
+        .matches(/^\d+$/, 'El documento de identidad debe ser numérico')
+        .min(6, 'El documento de identidad debe contener como minimo 6 dígitos')
+        .max(10, 'El documento de identidad debe contener como maximo 10 dígitos'),
     
         password: yup.string().min(8, 'La contraseña debe tener al menos 8 caracteres').max(16, 'La contraseña no puede tener más de 16 caracteres').required('La contraseña es obligatoria'),
         tipo_documento: yup.string().required('Debe seleccionar un tipo de documento')
@@ -94,19 +97,6 @@ function RegistroUser() {
                 });
                 return;
             }
-
-            // Verificar si se ha seleccionado una imagen
-            if (!foto) {
-                Swal.fire({
-                    position: "top-center",
-                    icon: 'warning',
-                    title: 'Debe seleccionar una imagen',
-                    text: 'Por favor, seleccione una imagen antes de continuar.',
-                    showConfirmButton: true
-                });
-                return; // Detener el envío del formulario
-            }
-
             const formDataUser = new FormData();
             formDataUser.append('nombre', values.nombre);
             formDataUser.append('apellido', values.apellido);
@@ -268,7 +258,7 @@ function RegistroUser() {
                         {/* Campo Teléfono */}
                         <div className="py-2">
                             <Input
-                                type='text'
+                                type='number'
                                 label='Ingrese su teléfono'
                                 color="warning"
                                 variant="bordered"
@@ -307,7 +297,7 @@ function RegistroUser() {
                         {/* Campo Documento de Identidad */}
                         <div className="py-2">
                             <Input
-                                type='text'
+                                type='number'
                                 label='Ingrese su documento de identidad'
                                 color="warning"
                                 variant="bordered"
@@ -346,10 +336,16 @@ function RegistroUser() {
                                 isInvalid={formik.touched.password && !!formik.errors.password}
                                 errorMessage={formik.errors.password}
                                 endContent={
-                                    <button type="button" className="focus:outline-none" onClick={toggleVisibility}>
-                                        {isVisible ? <EyeSlashFilledIcon /> : <EyeFilledIcon />}
-                                    </button>
-                                }
+                                <button type="button" onClick={toggleVisibility}>
+                                    {isVisible ? (
+                                     	<EyeFilledIcon className="text-2xl text-default-400 pointer-events-none mb-2" />
+                                    ) : (
+                                       
+    					<EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                    )}
+                                </button>
+                            }
+
                             />
                         </div>
 
